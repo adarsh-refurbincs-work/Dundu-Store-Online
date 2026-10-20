@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Dundu",
+    "slug": "workadarsh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Delivery staff use the camera to scan hub pickup QR codes."
+      },
+      "bundleIdentifier": "com.dundu.store",
+      "buildNumber": "1"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/dundu-adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.dundu.store",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Delivery staff use the camera to scan hub pickup QR codes."
+        }
+      ]
+    ],
+    "scheme": "dundu",
+    "extra": {
+      "eas": {
+        "projectId": "d74fde9d-45e1-4e95-bdbc-92b970b73158"
+      }
+    },
+    "owner": "workadarshs-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/d74fde9d-45e1-4e95-bdbc-92b970b73158"
+    }
+  }
+}
