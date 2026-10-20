@@ -20,7 +20,7 @@ Dundu (formerly "Velora") is a clothing e-commerce platform for women, kids, new
 
 The web and admin dev servers proxy `/api` and `/uploads` to `http://localhost:5000`. Mobile calls the API directly (`mobile/src/config.js` → `EXPO_PUBLIC_API_URL`).
 
-There is **no git repository** in this folder. Back up before large edits (copy the folder or `git init`).
+**Git remote:** `origin` → https://github.com/adarsh-refurbincs-work/Dundu-Store-Online (branch `main`, GitHub account `adarsh-refurbincs-work`, HTTPS via `gh` auth). History was re-initialised on 2026-10-20; the previous remote `adarsh-techy/Dundu_Store` is no longer linked but still holds the old history. Large pushes have hit HTTP 408 timeouts on this connection — if that recurs, push in smaller commits (`git push origin <sha>:refs/heads/main`) with `-c http.version=HTTP/1.1`.
 
 ---
 
@@ -214,6 +214,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 ---
 
 ## 9. Changelog (newest first)
+
+### 2026-10-20 — Repo moved to new GitHub remote
+- Removed the old `.git` (remote `adarsh-techy/Dundu_Store`, 41 commits) and re-initialised. Full project pushed to https://github.com/adarsh-refurbincs-work/Dundu-Store-Online as 5 commits (root config/docs, backend, web, admin, mobile) because a single ~9 MB push kept failing with HTTP 408.
+- Only `.env.example` and `deploy/*.env` templates are tracked; real `.env` files stay ignored.
+- Section 1 note "no git repository" replaced with the remote details.
 
 ### 2026-09-29 — Splash text visible over bright photos
 - Cause: splash photos are bright (avg brightness ~200/255) with the subject centred; app name/tagline were centred white text over them (and local config was white text on `#FFFFFF` bg, invisible until the photo faded in). The 35% full-screen dim from `3ca968d` wasn't enough.
