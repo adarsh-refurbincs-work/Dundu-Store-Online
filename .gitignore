@@ -1,0 +1,28 @@
+# dependencies & builds
+node_modules/
+dist/
+dist-ssr/
+build/
+.expo/
+.expo-shared/
+*.tsbuildinfo
+
+# secrets — never commit real env files (keep the .env.example files)
+.env
+.env.*
+!.env.example
+
+# runtime data
+backend/uploads/*
+!backend/uploads/.gitkeep
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# deployment templates (placeholders only)
+!deploy/*.env
