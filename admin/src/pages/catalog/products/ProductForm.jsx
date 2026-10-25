@@ -5,7 +5,7 @@ import {
   Sparkles, TrendingUp, Tag, Printer, Download, CheckCircle2,
   HelpCircle, Layers, Boxes, Coins, Package,
 } from 'lucide-react';
-import { productApi, categoryApi, brandApi, reviewApi } from '../../../api';
+import { productApi, categoryApi, brandApi, reviewApi, materialApi } from '../../../api';
 import Button from '../../../components/ui/Button';
 import ImageCropperModal from '../../../components/ui/ImageCropperModal';
 import Input, { Select, Textarea } from '../../../components/ui/Input';
@@ -447,6 +447,7 @@ type: product?.type || '',
     product_code: product?.product_code || '',
     sub_category: product?.sub_category || '',
     pattern: product?.pattern || '',
+    material: product?.material || '',
     default_rating: product?.default_rating ?? 4.5,
   });
 
@@ -469,8 +470,11 @@ type: product?.type || '',
 
   const { data: catData } = useQuery({ queryKey: ['categories-admin'], queryFn: categoryApi.list });
   const { data: brandData } = useQuery({ queryKey: ['brands-admin'], queryFn: brandApi.list });
+  const { data: materialData } = useQuery({ queryKey: ['materials-admin'], queryFn: materialApi.list });
   const categories = catData?.data?.categories || [];
   const brands = brandData?.data?.brands || [];
+  // Global material list — fallback when the selected category defines none
+  const globalMaterials = (materialData?.data?.materials || []).filter((m) => m.is_active !== false);
 
   // Derive selected category metadata
   const parseJson = (v) => {
@@ -482,6 +486,11 @@ type: product?.type || '',
   const catSubCats     = parseJson(selectedCat?.sub_categories).filter(s => s.is_active);
   const catTypes       = parseJson(selectedCat?.types).filter(t => t.is_active);
 const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active);
+  const catMaterials   = parseJson(selectedCat?.materials).filter(m => m.is_active !== false);
+  // Category materials may be stored as plain strings or {name,is_active} objects
+  const materialOptions = (catMaterials.length ? catMaterials : globalMaterials)
+    .map((m) => (typeof m === 'string' ? m : m.name))
+    .filter(Boolean);
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
@@ -1153,7 +1162,7 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <Select label="Target Gender" value={form.gender} onChange={set('gender')}>
               <option value="">Any / Unisex</option>
               {['Female', 'Male', 'Unisex'].map(g => <option key={g}>{g}</option>)}
@@ -1172,6 +1181,15 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
                 ? catPatterns.map(p => <option key={p.name} value={p.name}>{p.name}</option>)
                 : PATTERNS.map(p => <option key={p} value={p}>{p}</option>)
               }
+            </Select>
+
+            <Select label="Material" value={form.material} onChange={set('material')}>
+              <option value="">Select material</option>
+              {/* Keep a saved value selectable even if it's no longer in the list */}
+              {form.material && !materialOptions.includes(form.material) && (
+                <option value={form.material}>{form.material}</option>
+              )}
+              {materialOptions.map(m => <option key={m} value={m}>{m}</option>)}
             </Select>
           </div>
         </div>

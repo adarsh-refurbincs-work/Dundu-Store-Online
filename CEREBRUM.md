@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Admin product form: Material select added
+- `ProductForm.jsx` had no Material field even though `products.material` exists and the backend create/update already persist it. Added a "Material" select beside Fabric Pattern: options come from the selected category's `materials` (strings or `{name,is_active}`), falling back to the global `product_materials` list (`materialApi.list`). Previously-saved values stay selectable.
+
 ### 2026-10-25 — Admin product form: one colour variant at a time
 - `ProductForm.jsx`: "Add Color" refuses (toast + greyed button) while any existing colour variant is incomplete — no colour picked, or no size filled. Prevents stacks of blank colour cards.
 
