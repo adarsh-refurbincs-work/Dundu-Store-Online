@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile Shop: "🔥 Hot Offer" chip in the sort row
+- `ProductsScreen`: orange Hot Offer chip after Newest / Price chips toggles `offerOnly` (products) or `comboFilters.offer` (combo mode).
+
 ### 2026-10-25 — Reviews: show 3, "See all N reviews" toggle
 - Mobile `ProductDetailScreen` (was 5), mobile `ComboDetailScreen` (was 6) and web `ProductDetail` (was all) now list 3 reviews with a pill button that expands to all / "Show less" (`showAllReviews`).
 

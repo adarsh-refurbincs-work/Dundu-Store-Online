@@ -645,6 +645,12 @@ export default function ProductsScreen() {
                 <Text style={[styles.chipText, comboSort === opt.value && styles.chipTextActive]}>{opt.label}</Text>
               </TouchableOpacity>
             ))}
+            <TouchableOpacity
+              style={[styles.chip, styles.hotChip, comboFilters.offer && styles.hotChipActive]}
+              onPress={() => setComboFilters((f) => ({ ...f, offer: !f.offer }))}
+            >
+              <Text style={[styles.chipText, styles.hotChipText, comboFilters.offer && styles.chipTextActive]}>🔥 Hot Offer</Text>
+            </TouchableOpacity>
             <Text style={styles.resultCount}>{visibleCombos.length} combo{visibleCombos.length !== 1 ? 's' : ''}</Text>
             <TouchableOpacity
               style={[styles.sortFilterBtn, { borderColor: T.primary, backgroundColor: T.surface }, comboFilterCount > 0 && { backgroundColor: T.tagBg }]}
@@ -733,6 +739,13 @@ export default function ProductsScreen() {
             <Text style={[styles.chipText, sort === opt.value && styles.chipTextActive]}>{opt.label}</Text>
           </TouchableOpacity>
         ))}
+        {/* Hot Offer — quick toggle for offer products only */}
+        <TouchableOpacity
+          style={[styles.chip, styles.hotChip, offerOnly && styles.hotChipActive]}
+          onPress={() => { setOfferOnly((p) => !p); setNewArrivalOnly(false); }}
+        >
+          <Text style={[styles.chipText, styles.hotChipText, offerOnly && styles.chipTextActive]}>🔥 Hot Offer</Text>
+        </TouchableOpacity>
 
         <Text style={styles.resultCount}>{products.length}{hasMore ? '+' : ''} items</Text>
 
@@ -902,6 +915,9 @@ const styles = StyleSheet.create({
   },
   chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   chipText: { fontSize: 12, fontWeight: '600', color: '#555' },
+  hotChip: { borderColor: '#f97316', backgroundColor: '#fff7ed' },
+  hotChipActive: { backgroundColor: '#f97316', borderColor: '#f97316' },
+  hotChipText: { color: '#c2410c' },
   chipTextActive: { color: '#fff' },
   resultCount: { fontSize: 11, color: '#999', fontWeight: '500', flexShrink: 1 },
 
