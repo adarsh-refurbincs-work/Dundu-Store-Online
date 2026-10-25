@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile combo detail: duplicate size chips
+- `ComboDetailScreen.jsx`: size list was every in-stock variant (so Black S + Red S showed "S" twice before a colour was chosen). Now one chip per size (`sizeOptions`), backed by the first in-stock variant; picking a size before a colour adopts that variant's colour; out-of-stock sizes stay visible but disabled; colour-only products resolve `variant_id` on colour tap.
+
 ### 2026-10-25 — Combo icon & theme editable in Admin (like a category)
 - **Backend**: `GET/PUT /api/admin/combos/appearance` (super admin; registered before the `/:id` trash guard). Stored in `settings`: `combo_icon_url` (multipart `icon`, 1:1; `remove_icon=true` clears), `combo_theme_enabled`, `combo_theme_color`, `combo_theme_bg_color` (hex-validated). Exposed publicly via `GET /api/settings/payment` as `combo_icon_url / combo_theme_enabled / combo_theme_color / combo_theme_bg_color`.
 - **Admin** (`catalog/combos/Combos.jsx`): new "Combo icon & theme" card above the stats — round icon upload with 1:1 cropper, theme toggle, preset palettes, colour pickers, live preview; `comboApi.getAppearance/updateAppearance`.

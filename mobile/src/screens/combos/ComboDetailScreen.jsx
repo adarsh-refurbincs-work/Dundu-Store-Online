@@ -30,9 +30,13 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
   const variants = chosenProduct?.variants || [];
   const colors = [...new Set(variants.filter((v) => v.color && v.stock > 0).map((v) => v.color))];
   const chosenColor = selection?.color || null;
-  const sizesForColor = variants.filter(
-    (v) => v.stock > 0 && (!chosenColor || v.color === chosenColor)
-  );
+  // One chip per size. Before a colour is picked a product with Black S + Red S would
+  // otherwise list "S" twice; dedupe by size and remember which variant backs each chip.
+  const sizePool = variants.filter((v) => v.size && (!chosenColor || v.color === chosenColor));
+  const sizeOptions = [...new Set(sizePool.map((v) => v.size))].map((size) => {
+    const inStock = sizePool.find((v) => v.size === size && v.stock > 0);
+    return { size, variant: inStock || sizePool.find((v) => v.size === size), inStock: !!inStock };
+  });
   const chosenSize = selection?.size || null;
 
   const selectProduct = (prod) => {
@@ -40,14 +44,18 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
   };
 
   const selectColor = (color) => {
-    onSelectionChange({ ...selection, product_id: chosenProductId, color, size: null, variant_id: null });
+    // Colour-only products (no sizes) resolve to a variant straight away
+    const colourOnly = variants.find((v) => v.color === color && !v.size && v.stock > 0);
+    onSelectionChange({ ...selection, product_id: chosenProductId, color, size: null, variant_id: colourOnly?.id || null });
   };
 
   const selectSize = (v) => {
+    if (!v) return;
     onSelectionChange({
       ...selection,
       product_id: chosenProductId,
-      color: chosenColor,
+      // Picking a size before a colour adopts that variant's colour
+      color: chosenColor || v.color || null,
       size: v.size,
       variant_id: v.id,
     });
@@ -147,25 +155,25 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
           )}
 
           {/* Size picker */}
-          {sizesForColor.length > 0 && (
+          {sizeOptions.length > 0 && (
             <View style={styles.variantBlock}>
               <Text style={styles.variantLabel}>
                 Size: <Text style={styles.variantValue}>{chosenSize || 'Select'}</Text>
               </Text>
               <View style={styles.optionRow}>
-                {sizesForColor.map((v) => (
+                {sizeOptions.map(({ size, variant, inStock }) => (
                   <TouchableOpacity
-                    key={v.id}
-                    onPress={() => selectSize(v)}
+                    key={size}
+                    onPress={() => selectSize(variant)}
                     style={[
                       styles.sizeChip,
-                      chosenSize === v.size && styles.sizeChipActive,
-                      v.stock === 0 && styles.sizeChipOOS,
+                      chosenSize === size && styles.sizeChipActive,
+                      !inStock && styles.sizeChipOOS,
                     ]}
-                    disabled={v.stock === 0}
+                    disabled={!inStock}
                   >
-                    <Text style={[styles.sizeChipText, chosenSize === v.size && styles.sizeChipTextActive]}>
-                      {v.size}
+                    <Text style={[styles.sizeChipText, chosenSize === size && styles.sizeChipTextActive]}>
+                      {size}
                     </Text>
                   </TouchableOpacity>
                 ))}
