@@ -6,6 +6,12 @@ const useSettingsStore = create((set) => ({
   offerBadgeColor: '#e91e8c',
   offerBadgeTextColor: '#ffffff',
 
+  // Combos entry appearance (admin → Combos → "Combo icon & theme")
+  comboIconUrl: null,
+  comboThemeEnabled: false,
+  comboThemeColor: '#e91e8c',
+  comboThemeBgColor: '#1a0a12',
+
   // Festival theme (defaults = normal dark theme)
   festivalEnabled: false,
   festivalName: '',
@@ -56,6 +62,10 @@ const useSettingsStore = create((set) => ({
       set({
         offerBadgeColor: pay?.offer_badge_color || '#e91e8c',
         offerBadgeTextColor: pay?.offer_badge_text_color || '#ffffff',
+        comboIconUrl: pay?.combo_icon_url || null,
+        comboThemeEnabled: String(pay?.combo_theme_enabled) === 'true',
+        comboThemeColor: pay?.combo_theme_color || '#e91e8c',
+        comboThemeBgColor: pay?.combo_theme_bg_color || '#1a0a12',
 
         festivalEnabled: festEnabled,
         festivalName: festRaw.festival_name || '',

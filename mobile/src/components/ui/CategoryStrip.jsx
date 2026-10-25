@@ -29,6 +29,9 @@ export default function CategoryStrip({
   const festEnabled = useSettingsStore((s) => s.festivalEnabled);
   const festNavBg   = useSettingsStore((s) => s.festivalNavbarColor);
   const festNavText = useSettingsStore((s) => s.festivalNavbarTextColor);
+  const comboIconUrl = useSettingsStore((s) => s.comboIconUrl);
+  const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
+  const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
 
   const activeColor = themeColor || (festEnabled ? festNavText : COLORS.primary);
   const bgColor     = festEnabled ? festNavBg : '#0d0d0d';
@@ -49,10 +52,16 @@ export default function CategoryStrip({
             onPress={onPressCombo}
             activeOpacity={0.75}
           >
-            <View style={[styles.comboCircle, { borderColor: activeColor }, isComboActive && { borderWidth: 2.5, backgroundColor: activeColor + '33' }]}>
-              <Text style={styles.comboCircleIcon}>🎀</Text>
-            </View>
-            <Text style={[styles.label, { color: '#fff' }, isComboActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
+            {(() => { const comboAccent = comboThemeEnabled ? comboThemeColor : activeColor; const iconUri = getImageUri(comboIconUrl); return (
+              <>
+                <View style={[styles.comboCircle, { borderColor: comboAccent }, isComboActive && { borderWidth: 2.5, backgroundColor: comboAccent + '33' }, iconUri && { overflow: 'hidden' }]}>
+                  {iconUri
+                    ? <Image source={{ uri: iconUri }} style={styles.circleImage} resizeMode="cover" />
+                    : <Text style={styles.comboCircleIcon}>🎀</Text>}
+                </View>
+                <Text style={[styles.label, { color: '#fff' }, isComboActive && { color: comboAccent, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
+              </>
+            ); })()}
           </TouchableOpacity>
         )}
 

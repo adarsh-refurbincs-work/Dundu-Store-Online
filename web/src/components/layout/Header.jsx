@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import useAuthStore from '../../store/auth.store';
 import useCartStore from '../../store/cart.store';
 import { categoryApi } from '../../api';
+import useSettingsStore from '../../store/settings.store';
+import { imageUrl } from '../../utils/image';
 import logo from '../../assets/logo.png';
 import { isGenzyMatch } from '../../store/theme.store';
 
@@ -28,6 +30,10 @@ export default function Header() {
   const activeCategory = params.get('category') || '';
   const isOfferPage = params.get('offer') === 'true';
   const isComboPage = location.pathname.startsWith('/combos');
+  const comboIconUrl = useSettingsStore((s) => s.comboIconUrl);
+  const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
+  const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
+  const comboAccent = comboThemeEnabled ? comboThemeColor : null;
   const count = totalItems();
 
   const { data: catData } = useQuery({
@@ -181,10 +187,13 @@ export default function Header() {
             <div className="flex gap-4 md:gap-6 overflow-x-auto py-2.5 md:py-3 scrollbar-none">
               {/* Combos — first circle, same as the mobile app strip */}
               <Link to="/combos" className="flex flex-col items-center gap-1.5 shrink-0 group">
-                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center bg-primary/15 border-2 transition-transform group-hover:scale-105 ${isComboPage ? 'border-primary ring-2 ring-primary/30' : 'border-primary/50'}`}>
-                  <Gift className="h-5 w-5 text-primary-soft" />
+                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center overflow-hidden bg-primary/15 border-2 transition-transform group-hover:scale-105 ${isComboPage ? 'border-primary ring-2 ring-primary/30' : 'border-primary/50'}`}
+                  style={comboAccent ? { borderColor: comboAccent, backgroundColor: comboAccent + '26', boxShadow: isComboPage ? `0 0 0 2px ${comboAccent}4d` : undefined } : undefined}>
+                  {comboIconUrl
+                    ? <img src={imageUrl(comboIconUrl)} alt="" className="w-full h-full object-cover" />
+                    : <Gift className="h-5 w-5 text-primary-soft" style={comboAccent ? { color: comboAccent } : undefined} />}
                 </div>
-                <span className={`text-[11px] font-semibold ${isComboPage ? 'text-primary-soft font-bold' : 'text-ink-2'}`}>Combos</span>
+                <span className={`text-[11px] font-semibold ${isComboPage ? 'text-primary-soft font-bold' : 'text-ink-2'}`} style={isComboPage && comboAccent ? { color: comboAccent } : undefined}>Combos</span>
               </Link>
               <Link to="/products?offer=true" className="flex flex-col items-center gap-1.5 shrink-0 group">
                 <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-transform group-hover:scale-105 ${isOfferPage ? 'ring-2 ring-offset-2 ring-offset-bg ring-primary' : ''}`}

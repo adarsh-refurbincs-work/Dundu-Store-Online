@@ -396,7 +396,23 @@ export default function ProductsScreen() {
   const isGenzy = Boolean(activeSlug?.toLowerCase().includes('genz') || categoryName?.toLowerCase().includes('genz'));
   const hasCustomTheme = Boolean(activeCat?.theme_enabled && activeCat?.theme_color);
 
-  const T = hasCustomTheme ? {
+  const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
+  const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
+  const comboThemeBgColor = useSettingsStore((s) => s.comboThemeBgColor);
+  const useComboTheme = comboMode && comboThemeEnabled && !!comboThemeColor;
+
+  const T = useComboTheme ? {
+    // Combos themed like a custom category (admin → Combos → icon & theme)
+    primary:     comboThemeColor,
+    bg:          comboThemeBgColor || '#1a0a12',
+    topBg:       comboThemeBgColor || '#1a0a12',
+    surface:     '#111720',
+    border:      comboThemeColor + '40',
+    tagBg:       comboThemeColor + '26',
+    inputBg:     '#151d28',
+    inputBorder: comboThemeColor + '40',
+    stripBorder: comboThemeColor,
+  } : hasCustomTheme ? {
     primary:     activeCat.theme_color,
     bg:          activeCat.theme_bg_color || '#090d12',
     topBg:       activeCat.theme_bg_color || '#090d12',
@@ -562,7 +578,7 @@ export default function ProductsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: festEnabled ? festNavBg : T.bg }]} edges={['left', 'right', 'bottom']}>
 
-      <AppHeader logo showCart showWishlist logoColor={(hasCustomTheme || isGenzy) ? T.primary : undefined} />
+      <AppHeader logo showCart showWishlist logoColor={(hasCustomTheme || isGenzy || useComboTheme) ? T.primary : undefined} />
 
       {/* Search bar */}
       <View style={[styles.searchBar, { backgroundColor: festEnabled ? festNavBg : T.topBg, borderBottomColor: festEnabled ? festNavBg : T.border }]}>

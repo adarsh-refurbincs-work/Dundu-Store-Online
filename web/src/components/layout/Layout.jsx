@@ -9,10 +9,14 @@ import AnnouncementBar from './AnnouncementBar';
 import BirthdayPopup from '../ui/BirthdayPopup';
 import { categoryApi } from '../../api';
 import useThemeStore, { isGenzyMatch, applyCategoryTheme, clearCategoryTheme } from '../../store/theme.store';
+import useSettingsStore from '../../store/settings.store';
 
 export default function Layout({ children }) {
   const location = useLocation();
   const overrideCategory = useThemeStore((s) => s.overrideCategory);
+  const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
+  const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
+  const comboThemeBgColor = useSettingsStore((s) => s.comboThemeBgColor);
 
   const { data: catData } = useQuery({
     queryKey: ['categories-nav'],
@@ -39,12 +43,15 @@ export default function Layout({ children }) {
 
     if (activeCat && activeCat.theme_enabled && activeCat.theme_color) {
       applyCategoryTheme(activeCat.theme_color, activeCat.theme_bg_color);
+    } else if (location.pathname.startsWith('/combos') && comboThemeEnabled && comboThemeColor) {
+      // Combos behave like a themed category
+      applyCategoryTheme(comboThemeColor, comboThemeBgColor);
     } else if (isGenzyMatch(categoryParam) || isGenzyMatch(typeof overrideCategory === 'string' ? overrideCategory : overrideCategory?.slug)) {
       applyCategoryTheme('#22c55e', '#040d04');
     } else {
       clearCategoryTheme();
     }
-  }, [location.pathname, location.search, overrideCategory, categories]);
+  }, [location.pathname, location.search, overrideCategory, categories, comboThemeEnabled, comboThemeColor, comboThemeBgColor]);
 
   return (
     <div className="min-h-screen flex flex-col transition-colors duration-300">

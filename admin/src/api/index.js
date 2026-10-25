@@ -58,6 +58,8 @@ export const comboApi = {
   update: (id, data) => client.put(`/admin/combos/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } }),
   toggle: (id)       => client.patch(`/admin/combos/${id}/toggle`),
   remove: (id)       => client.delete(`/admin/combos/${id}`),
+  getAppearance:    ()     => client.get('/admin/combos/appearance'),
+  updateAppearance: (data) => client.put('/admin/combos/appearance', data, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 

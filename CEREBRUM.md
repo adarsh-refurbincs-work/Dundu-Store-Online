@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo icon & theme editable in Admin (like a category)
+- **Backend**: `GET/PUT /api/admin/combos/appearance` (super admin; registered before the `/:id` trash guard). Stored in `settings`: `combo_icon_url` (multipart `icon`, 1:1; `remove_icon=true` clears), `combo_theme_enabled`, `combo_theme_color`, `combo_theme_bg_color` (hex-validated). Exposed publicly via `GET /api/settings/payment` as `combo_icon_url / combo_theme_enabled / combo_theme_color / combo_theme_bg_color`.
+- **Admin** (`catalog/combos/Combos.jsx`): new "Combo icon & theme" card above the stats — round icon upload with 1:1 cropper, theme toggle, preset palettes, colour pickers, live preview; `comboApi.getAppearance/updateAppearance`.
+- **Web**: `settings.store` carries the four values; `Header.jsx` strip circle shows the icon image / accent; `Layout.jsx` applies `applyCategoryTheme(comboThemeColor, comboThemeBgColor)` on `/combos*` when enabled (category theme still wins when a category param is present).
+- **Mobile**: `settings.store` carries the values; `CategoryStrip` combo circle shows the icon image / accent; `ProductsScreen` combo mode uses a theme built from the combo colours (`useComboTheme`) exactly like a custom category theme.
+
 ### 2026-10-25 — Web: Combos circle in header category strip
 - `components/layout/Header.jsx`: the strip now starts with a Combos circle (Gift icon, highlighted on `/combos`) like the mobile strip. Before, the only header entry was in the desktop-only nav (`hidden lg:flex`), so on phones/narrow windows Combos was unreachable from the header. Note: both local DBs (`demodundustore`, `dundustore`) currently have **0 combos** — the Home "Combo offers" section and `/combos` are empty until combos are created in Admin → Combos.
 

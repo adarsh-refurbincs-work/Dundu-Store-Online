@@ -51,12 +51,16 @@ router.get('/settings/splash', async (_req, res) => {
 router.get('/settings/payment', async (_req, res) => {
   try {
     const { rows } = await db.query(
-      "SELECT key, value FROM settings WHERE key IN ('cod_enabled','delivery_charge','free_delivery_threshold','coupon_field_enabled','birthday_discount','birthday_popup_enabled','update_available','update_message','latest_version','offer_badge_color','offer_badge_text_color','delivery_estimate_min_days','delivery_estimate_max_days','loyalty_redeem_points','loyalty_redeem_discount','wallet_enabled','wallet_min_order_amount','wallet_max_usage_percent','wallet_max_discount_cap')"
+      "SELECT key, value FROM settings WHERE key IN ('cod_enabled','delivery_charge','free_delivery_threshold','coupon_field_enabled','birthday_discount','birthday_popup_enabled','update_available','update_message','latest_version','offer_badge_color','offer_badge_text_color','delivery_estimate_min_days','delivery_estimate_max_days','loyalty_redeem_points','loyalty_redeem_discount','wallet_enabled','wallet_min_order_amount','wallet_max_usage_percent','wallet_max_discount_cap','combo_icon_url','combo_theme_enabled','combo_theme_color','combo_theme_bg_color')"
     );
     const map = Object.fromEntries(rows.map((r) => [r.key, r.value]));
     const deliveryEstimateMinDays = parseInt(map.delivery_estimate_min_days ?? '3', 10);
     const deliveryEstimateMaxDays = parseInt(map.delivery_estimate_max_days ?? '7', 10);
     ok(res, {
+      combo_icon_url: map.combo_icon_url || null,
+      combo_theme_enabled: map.combo_theme_enabled === 'true',
+      combo_theme_color: map.combo_theme_color || '#e91e8c',
+      combo_theme_bg_color: map.combo_theme_bg_color || '#1a0a12',
       cod_enabled: map.cod_enabled !== 'false',
       delivery_charge: parseInt(map.delivery_charge ?? '50', 10),
       free_delivery_threshold: parseInt(map.free_delivery_threshold ?? '500', 10),
