@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Live site not updating: DigitalOcean droplet deploys from the old repo; footer build marker
+- Production is a **DigitalOcean droplet** (`ssh droplet` → 139.59.65.141), not Render/Vercel. The live storefront bundle has none of the recent fixes (no `orders/quote`, no checkout quote UI) — the server is almost certainly still pulling the **old** GitHub repo `adarsh-techy/Dundu_Store` (dead since the 2026-10-20 move). Redeploy steps: `deploy/DIGITALOCEAN.md`.
+- `web/vite.config.js` defines `__BUILD_ID__` = `<short commit> · <build time UTC>`; `Footer.jsx` prints "Build …" under the copyright so the deployed build can be verified at a glance.
+- Local Dundu dev servers: web **:3002** (3000 belongs to another project), admin :3001, Expo :8083.
+
 ### 2026-10-25 — Combo savings line text green
 - `ComboDetailScreen.savingsText` base colour grey → green `#15803d` (amount green bold, separate total still red).
 

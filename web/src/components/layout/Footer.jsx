@@ -98,6 +98,10 @@ export default function Footer() {
       <div className="border-t border-line">
         <div className="container-x py-5 flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-faint">
           <p>© {new Date().getFullYear()} Dundu. All rights reserved.</p>
+          {/* Build marker — confirms which build is live (commit · build time) */}
+          <p className="text-[10px] text-faint" title="Build" data-build-id={typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : ''}>
+            Build {typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev'}
+          </p>
           <p>Made with love in India · Prices in INR, taxes included</p>
         </div>
       </div>
