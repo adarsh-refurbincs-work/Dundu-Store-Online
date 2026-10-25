@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo savings line colours
+- `ComboDetailScreen` "You save X vs. buying separately (Y)": base text grey `#777`, saved amount green `#15803d`, separate total red `#dc2626`.
+
 ### 2026-10-25 — Combo detail: tap-to-zoom images; shared LightboxViewer
 - New `components/ui/LightboxViewer.jsx` (pinch-to-zoom Modal, renders nothing when `uri` is falsy) extracted from `ProductDetailScreen` (local copy + styles removed). `ComboDetailScreen`: hero gallery images and review photos open it.
 
