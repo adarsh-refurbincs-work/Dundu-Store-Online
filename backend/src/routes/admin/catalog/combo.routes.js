@@ -6,7 +6,7 @@ const combo = require('../../../controllers/admin/catalog/combo.controller');
 
 // Strip icon + theme for the Combos entry (must be registered before the `/:id` guard below)
 router.get('/appearance', ah(combo.getAppearance));
-router.put('/appearance', upload.single('icon'), ah(combo.updateAppearance));
+router.put('/appearance', upload.any(), ah(combo.updateAppearance)); // fields: icon, bg_image
 
 // Records sitting in Trash cannot be read, edited or toggled here (restore them first).
 router.use('/:id', (req, res, next) => (req.method === 'DELETE' ? next() : notTrashed('combos')(req, res, next)));

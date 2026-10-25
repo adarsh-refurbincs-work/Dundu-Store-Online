@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo page background image (admin-set)
+- Appearance settings gain `combo_page_bg_url` (multipart `bg_image`, `remove_bg_image=true` clears). `PUT /api/admin/combos/appearance` now uses `upload.any()` and picks `icon` / `bg_image` by fieldname. Public `/api/settings/payment` exposes `combo_page_bg_url`.
+- Admin card: "Combo page background" 16:9 upload (cropper, ratio switch allowed) + remove; live preview shows it dimmed.
+- Web `pages/combos/Combos.jsx`: fixed full-viewport background layer with dark gradient behind the list. Mobile `ProductsScreen` combo mode: `ImageBackground` + 45% black overlay behind the combo FlatList.
+
 ### 2026-10-25 — Mobile combo detail: duplicate size chips
 - `ComboDetailScreen.jsx`: size list was every in-stock variant (so Black S + Red S showed "S" twice before a colour was chosen). Now one chip per size (`sizeOptions`), backed by the first in-stock variant; picking a size before a colour adopts that variant's colour; out-of-stock sizes stay visible but disabled; colour-only products resolve `variant_id` on colour tap.
 

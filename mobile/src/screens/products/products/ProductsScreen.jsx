@@ -16,7 +16,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { productApi, categoryApi, comboApi } from '../../../api/index';
 import { ComboCard } from '../../combos/ComboListScreen';
-import { COLORS } from '../../../config';
+import { COLORS, UPLOADS_URL } from '../../../config';
+import { ImageBackground } from 'react-native';
 import ProductCard from '../../../components/product/ProductCard';
 import AppHeader from '../../../components/ui/AppHeader';
 import CategoryStrip from '../../../components/ui/CategoryStrip';
@@ -399,6 +400,10 @@ export default function ProductsScreen() {
   const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
   const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
   const comboThemeBgColor = useSettingsStore((s) => s.comboThemeBgColor);
+  const comboPageBgUrl = useSettingsStore((s) => s.comboPageBgUrl);
+  const comboPageBgUri = comboPageBgUrl
+    ? (comboPageBgUrl.startsWith('http') ? comboPageBgUrl : UPLOADS_URL + (comboPageBgUrl.startsWith('/') ? comboPageBgUrl : '/' + comboPageBgUrl))
+    : null;
   const useComboTheme = comboMode && comboThemeEnabled && !!comboThemeColor;
 
   const T = useComboTheme ? {
@@ -668,15 +673,24 @@ export default function ProductsScreen() {
               )}
             </View>
           ) : (
-            <FlatList
-              data={visibleCombos}
-              keyExtractor={(c) => String(c.id)}
-              contentContainerStyle={[styles.listContent, { backgroundColor: T.bg, paddingHorizontal: 14 }]}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item }) => (
-                <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
-              )}
-            />
+            <ImageBackground
+              source={comboPageBgUri ? { uri: comboPageBgUri } : undefined}
+              style={{ flex: 1, backgroundColor: T.bg }}
+              resizeMode="cover"
+            >
+              {/* Dim the admin-set background so combo cards stay readable */}
+              <View style={{ flex: 1, backgroundColor: comboPageBgUri ? 'rgba(0,0,0,0.45)' : 'transparent' }}>
+                <FlatList
+                  data={visibleCombos}
+                  keyExtractor={(c) => String(c.id)}
+                  contentContainerStyle={[styles.listContent, { paddingHorizontal: 14 }]}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }) => (
+                    <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
+                  )}
+                />
+              </View>
+            </ImageBackground>
           )}
 
           <ComboFilterSheet

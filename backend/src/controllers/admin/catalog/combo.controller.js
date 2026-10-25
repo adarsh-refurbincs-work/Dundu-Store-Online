@@ -252,12 +252,13 @@ module.exports = { list, getOne, create, update, toggle, remove };
 
 
 // ── Combo appearance (strip icon + theme), stored in `settings` like festival/offer-badge ──
-const APPEARANCE_KEYS = ['combo_icon_url', 'combo_theme_enabled', 'combo_theme_color', 'combo_theme_bg_color'];
+const APPEARANCE_KEYS = ['combo_icon_url', 'combo_page_bg_url', 'combo_theme_enabled', 'combo_theme_color', 'combo_theme_bg_color'];
 const readAppearance = async () => {
   const { rows } = await db.query('SELECT key, value FROM settings WHERE key = ANY($1)', [APPEARANCE_KEYS]);
   const m = Object.fromEntries(rows.map((r) => [r.key, r.value]));
   return {
     icon_url: m.combo_icon_url || null,
+    page_bg_url: m.combo_page_bg_url || null,
     theme_enabled: m.combo_theme_enabled === 'true',
     theme_color: m.combo_theme_color || '#e91e8c',
     theme_bg_color: m.combo_theme_bg_color || '#1a0a12',
@@ -273,9 +274,14 @@ const getAppearance = async (_req, res) => ok(res, { appearance: await readAppea
 
 const updateAppearance = async (req, res) => {
   const { getFileUrl } = require('../../../utils/upload');
-  const { theme_enabled, theme_color, theme_bg_color, remove_icon } = req.body;
-  if (req.file) await putSetting('combo_icon_url', getFileUrl(req.file));
+  const { theme_enabled, theme_color, theme_bg_color, remove_icon, remove_bg_image } = req.body;
+  const files = req.files || (req.file ? [req.file] : []);
+  const iconFile = files.find((f) => f.fieldname === 'icon');
+  const bgFile = files.find((f) => f.fieldname === 'bg_image');
+  if (iconFile) await putSetting('combo_icon_url', getFileUrl(iconFile));
   else if (String(remove_icon) === 'true') await putSetting('combo_icon_url', '');
+  if (bgFile) await putSetting('combo_page_bg_url', getFileUrl(bgFile));
+  else if (String(remove_bg_image) === 'true') await putSetting('combo_page_bg_url', '');
   if (theme_enabled !== undefined) await putSetting('combo_theme_enabled', String(theme_enabled) === 'true' ? 'true' : 'false');
   if (theme_color !== undefined && HEX_RE.test(theme_color)) await putSetting('combo_theme_color', theme_color);
   if (theme_bg_color !== undefined && HEX_RE.test(theme_bg_color)) await putSetting('combo_theme_bg_color', theme_bg_color);

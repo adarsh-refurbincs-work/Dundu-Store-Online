@@ -8,14 +8,21 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { imageUrl } from '../../utils/image';
 import { formatPrice, discount } from '../../utils/format';
+import useSettingsStore from '../../store/settings.store';
 
 export default function Combos() {
   useDocumentTitle('Combo offers');
   const { data, isLoading } = useQuery({ queryKey: ['combos'], queryFn: comboApi.list });
   const combos = data?.data?.combos || [];
 
+  const pageBg = useSettingsStore((s) => s.comboPageBgUrl);
   return (
     <div className="container-x py-8 md:py-12">
+      {pageBg && (
+        /* Admin-set page background (Admin → Combos → icon & theme), dimmed so cards stay legible */
+        <div aria-hidden className="fixed inset-0 -z-10 bg-cover bg-center"
+          style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,.72), rgba(0,0,0,.55)), url(${imageUrl(pageBg)})` }} />
+      )}
       <PageHeader title="Combo offers" subtitle="Curated sets at one bundle price — pick your sizes and save." crumbs={[{ label: 'Combos' }]} />
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -371,6 +371,17 @@ function ComboAppearanceForm({ saved }) {
   const [iconPreview, setIconPreview] = useState(saved.icon_url || null);
   const [removeIcon, setRemoveIcon] = useState(false);
   const [cropper, setCropper] = useState({ isOpen: false, src: null });
+  const [bgFile, setBgFile] = useState(null);
+  const [bgPreview, setBgPreview] = useState(saved.page_bg_url || null);
+  const [removeBg, setRemoveBg] = useState(false);
+  const [bgCropper, setBgCropper] = useState({ isOpen: false, src: null });
+  const pickBg = (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please choose an image (JPEG, PNG, WebP)'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setBgCropper({ isOpen: true, src: reader.result });
+    reader.readAsDataURL(file);
+  };
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
 
@@ -389,6 +400,8 @@ function ComboAppearanceForm({ saved }) {
       const fd = new FormData();
       if (iconFile) fd.append('icon', iconFile);
       if (removeIcon && !iconFile) fd.append('remove_icon', 'true');
+      if (bgFile) fd.append('bg_image', bgFile);
+      if (removeBg && !bgFile) fd.append('remove_bg_image', 'true');
       fd.append('theme_enabled', themeEnabled);
       fd.append('theme_color', themeColor);
       fd.append('theme_bg_color', themeBgColor);
@@ -406,7 +419,7 @@ function ComboAppearanceForm({ saved }) {
           <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2"><PaletteIcon className="h-4 w-4 text-violet-600" /> Combo icon &amp; theme</h2>
           <p className="text-xs text-gray-400 mt-0.5">How the "Combos" circle looks in the category strip, and the colours shoppers see while browsing combos — same as a category theme.</p>
         </div>
-        <Button size="sm" onClick={save} loading={saving} disabled={!dirty && !iconFile && !removeIcon}>Save appearance</Button>
+        <Button size="sm" onClick={save} loading={saving} disabled={!dirty && !iconFile && !removeIcon && !bgFile && !removeBg}>Save appearance</Button>
       </div>
 
       {(
@@ -430,6 +443,26 @@ function ComboAppearanceForm({ saved }) {
               </button>
             )}
             <p className="text-[11px] text-gray-400">Shown as a round icon beside the categories on web and mobile.</p>
+
+            {/* Page background */}
+            <span className="block text-xs font-semibold text-gray-700 pt-2">Combo page background</span>
+            <label className="group relative block w-full aspect-[16/9] rounded-xl border-2 border-dashed border-gray-300 hover:border-violet-400 overflow-hidden bg-gray-50 cursor-pointer">
+              {bgPreview && !removeBg
+                ? <img src={bgPreview} alt="" className="w-full h-full object-cover" />
+                : <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-gray-400 text-[11px] font-semibold"><ImagePlusIcon className="h-4 w-4" /> Add background</span>}
+              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => { pickBg(e.target.files?.[0]); e.target.value = ''; }} />
+              {bgPreview && !removeBg && (
+                <span className="absolute inset-0 bg-black/55 text-white text-[11px] font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                  <ImagePlusIcon className="h-3.5 w-3.5" /> Change
+                </span>
+              )}
+            </label>
+            {bgPreview && !removeBg && (
+              <button type="button" onClick={() => { setRemoveBg(true); setBgFile(null); setDirty(true); }} className="text-xs text-rose-600 hover:underline flex items-center gap-1">
+                <XIcon className="h-3 w-3" /> Remove background
+              </button>
+            )}
+            <p className="text-[11px] text-gray-400">Shown behind the combo list on web and in the app, dimmed so cards stay readable.</p>
           </div>
 
           {/* Theme */}
@@ -474,7 +507,7 @@ function ComboAppearanceForm({ saved }) {
                   ))}
                 </div>
                 {/* Live preview */}
-                <div className="rounded-2xl p-4 flex items-center gap-4 border" style={{ backgroundColor: themeBgColor, borderColor: themeColor + '55' }}>
+                <div className="rounded-2xl p-4 flex items-center gap-4 border bg-cover bg-center" style={{ backgroundColor: themeBgColor, borderColor: themeColor + '55', backgroundImage: bgPreview && !removeBg ? `linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)), url(${bgPreview})` : undefined }}>
                   <div className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center border-2" style={{ borderColor: themeColor, backgroundColor: themeColor + '25' }}>
                     {iconPreview && !removeIcon ? <img src={iconPreview} alt="" className="w-full h-full object-cover" /> : <span className="text-xl">🎀</span>}
                   </div>
@@ -498,6 +531,15 @@ function ComboAppearanceForm({ saved }) {
         fileNamePrefix="combo-icon"
         onClose={() => setCropper({ isOpen: false, src: null })}
         onCropComplete={(file, url) => { setIconFile(file); setIconPreview(url); setRemoveIcon(false); setDirty(true); setCropper({ isOpen: false, src: null }); }}
+      />
+      <ImageCropperModal
+        isOpen={bgCropper.isOpen}
+        imageSrc={bgCropper.src}
+        aspectRatio={16 / 9}
+        allowRatioSwitch
+        fileNamePrefix="combo-bg"
+        onClose={() => setBgCropper({ isOpen: false, src: null })}
+        onCropComplete={(file, url) => { setBgFile(file); setBgPreview(url); setRemoveBg(false); setDirty(true); setBgCropper({ isOpen: false, src: null }); }}
       />
     </div>
   );
