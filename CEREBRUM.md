@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile: Combo opens without slide animation
+- `AppNavigator.jsx`: `ComboList` screen `options={{ animation: 'none' }}` so tapping Combos swaps in place like a category change (push and pop both instant).
+
 ### 2026-10-25 — Storefront: address list refresh, sticky strip overlap, /cart page
 - **Profile addresses** (`web/.../Profile.jsx`): after add/update/delete the returned row is merged into the `['addresses']` React Query cache immediately (`mergeAddressIntoCache`), then `refetch` is awaited — the new address shows the moment the form closes instead of waiting on a background refetch.
 - **Sticky header strip** (`components/layout/Header.jsx`): the category-circle strip inherited the translucent `.glass` header background, so form fields showed through it when scrolled. Strip wrapper now `bg-bg` (solid).

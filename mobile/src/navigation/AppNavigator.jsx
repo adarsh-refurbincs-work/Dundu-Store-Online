@@ -176,7 +176,8 @@ function AppStack() {
       <Stack.Screen name="CancellationPolicy" component={CancellationPolicyScreen} />
       <Stack.Screen name="TermsConditions" component={TermsConditionsScreen} />
       <Stack.Screen name="Payment" component={PaymentScreen} />
-      <Stack.Screen name="ComboList" component={ComboListScreen} />
+      {/* Combos swaps in instantly, like switching a category inside Shop (no slide). */}
+      <Stack.Screen name="ComboList" component={ComboListScreen} options={{ animation: 'none' }} />
       <Stack.Screen name="ComboDetail" component={ComboDetailScreen} />
     </Stack.Navigator>
   );
