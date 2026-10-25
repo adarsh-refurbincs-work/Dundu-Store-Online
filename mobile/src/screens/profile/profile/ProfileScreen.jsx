@@ -471,31 +471,58 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               )}
 
-              {/* Modern Dark Progress Container */}
+              {/* Next Reward Milestone */}
               <View style={styles.lcProgressCard}>
                 <View style={styles.lcProgressHeader}>
                   <View style={styles.lcMilestoneLeft}>
-                    <Ionicons name="sparkles" size={13} color="#B38B29" />
-                    <Text style={styles.lcProgressTitle}>Next Reward Milestone</Text>
+                    <View style={styles.lcMilestoneIcon}>
+                      <Ionicons name="trophy-outline" size={16} color="#B38B29" />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.lcProgressTitle}>Next Reward Milestone</Text>
+                      <Text style={styles.lcProgressSub}>Collect 200 pts to unlock ₹200 off</Text>
+                    </View>
                   </View>
                   <View style={styles.lcNeededBadge}>
-                    <Text style={styles.lcNeededText}>{200 - pointsAfterRedeem} pts needed</Text>
+                    <Text style={styles.lcNeededText}>{200 - pointsAfterRedeem} pts to go</Text>
                   </View>
                 </View>
 
-                {/* Progress Bar Track */}
+                {/* Big counter */}
+                <View style={styles.lcCounterRow}>
+                  <Text style={styles.lcCounterBig}>
+                    {pointsAfterRedeem}<Text style={styles.lcCounterSmall}> / 200 pts</Text>
+                  </Text>
+                  <Text style={styles.lcCounterPct}>{progress}%</Text>
+                </View>
+
+                {/* Track with sheen + knob */}
                 <View style={styles.lcProgressBarTrack}>
-                  <View style={[styles.lcProgressBarFill, { width: `${progress}%` }]} />
+                  <View style={[styles.lcProgressBarFill, { width: `${Math.max(progress, 2)}%` }]}>
+                    <View style={styles.lcProgressBarSheen} />
+                  </View>
+                  {progress > 0 && progress < 100 && (
+                    <View style={[styles.lcProgressKnob, { left: `${progress}%` }]} />
+                  )}
                 </View>
 
-                <View style={styles.lcProgressFooter}>
-                  <Text style={styles.lcProgressPointsText}>{pointsAfterRedeem} / 200 pts earned</Text>
-                  <Text style={styles.lcProgressTierHint}>200 pts = ₹200 OFF</Text>
+                {/* Milestone ticks */}
+                <View style={styles.lcTicksRow}>
+                  <View style={styles.lcTick}><View style={[styles.lcTickDot, styles.lcTickDotOn]} /><Text style={styles.lcTickText}>0</Text></View>
+                  <View style={[styles.lcTick, { alignItems: 'center' }]}><View style={[styles.lcTickDot, progress >= 50 && styles.lcTickDotOn]} /><Text style={styles.lcTickText}>100</Text></View>
+                  <View style={[styles.lcTick, { alignItems: 'flex-end' }]}><View style={[styles.lcTickDot, progress >= 100 && styles.lcTickDotOn]} /><Text style={[styles.lcTickText, styles.lcTickTextGold]}>200 · ₹200 off</Text></View>
                 </View>
 
-                <View style={styles.lcProgressPerkRow}>
-                  <Ionicons name="bag-check-outline" size={12} color={COLORS.textSecondary} style={{ marginRight: 5 }} />
-                  <Text style={styles.lcProgressHint}>Earn 20 pts for every ₹500 spent · In-store & Online</Text>
+                {/* How to earn */}
+                <View style={styles.lcPerkRow}>
+                  <View style={styles.lcPerkChip}>
+                    <Ionicons name="bag-check-outline" size={12} color="#374151" />
+                    <Text style={styles.lcPerkText}>20 pts per ₹500</Text>
+                  </View>
+                  <View style={styles.lcPerkChip}>
+                    <Ionicons name="storefront-outline" size={12} color="#374151" />
+                    <Text style={styles.lcPerkText}>In-store & Online</Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -1304,89 +1331,41 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#EADFC8',
+    borderColor: '#EEE6D6',
     shadowColor: '#B38B29',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 3,
   },
-  lcProgressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  lcMilestoneLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  lcProgressTitle: {
-    fontSize: 12.5,
-    fontWeight: '700',
-    color: COLORS.text,
-    letterSpacing: 0.3,
-  },
-  lcNeededBadge: {
-    backgroundColor: '#FBF3DC',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#EAD28C',
-  },
-  lcNeededText: {
-    fontSize: 10.5,
-    fontWeight: '800',
-    color: '#9A7420',
-  },
-  lcProgressBarTrack: {
-    height: 9,
-    borderRadius: 6,
-    backgroundColor: '#EFEAE0',
-    overflow: 'hidden',
-    marginBottom: 10,
-  },
-  lcProgressBarFill: {
-    height: '100%',
-    borderRadius: 6,
-    backgroundColor: '#D4AF37',
-    shadowColor: '#D4AF37',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  lcProgressFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  lcProgressPointsText: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: COLORS.text,
-  },
-  lcProgressTierHint: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: '#9A7420',
-  },
-  lcProgressPerkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#F0EAE0',
-  },
-  lcProgressHint: {
-    fontSize: 10.5,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
+  lcProgressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 14 },
+  lcMilestoneLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  lcMilestoneIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#FBF3DC', borderWidth: 1, borderColor: '#EAD28C', alignItems: 'center', justifyContent: 'center' },
+  lcProgressTitle: { fontSize: 14, fontWeight: '800', color: '#111827', letterSpacing: 0.2 },
+  lcProgressSub: { fontSize: 11.5, color: '#6B7280', marginTop: 1 },
+  lcNeededBadge: { backgroundColor: '#111827', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
+  lcNeededText: { fontSize: 10.5, fontWeight: '800', color: '#F5D061', letterSpacing: 0.3 },
+
+  lcCounterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 },
+  lcCounterBig: { fontSize: 24, fontWeight: '900', color: '#111827', letterSpacing: -0.3 },
+  lcCounterSmall: { fontSize: 12, fontWeight: '600', color: '#6B7280', letterSpacing: 0 },
+  lcCounterPct: { fontSize: 13, fontWeight: '800', color: '#9A7420' },
+
+  lcProgressBarTrack: { height: 10, borderRadius: 999, backgroundColor: '#F1ECE3', overflow: 'visible', marginBottom: 8, position: 'relative' },
+  lcProgressBarFill: { height: '100%', borderRadius: 999, backgroundColor: '#D4AF37', overflow: 'hidden' },
+  lcProgressBarSheen: { position: 'absolute', top: 1, left: 4, right: 4, height: 3, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.45)' },
+  lcProgressKnob: { position: 'absolute', top: -3, marginLeft: -8, width: 16, height: 16, borderRadius: 8, backgroundColor: '#FFFFFF', borderWidth: 3, borderColor: '#D4AF37', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 2, elevation: 2 },
+
+  lcTicksRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
+  lcTick: { alignItems: 'flex-start', gap: 3 },
+  lcTickDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#E5DFD2' },
+  lcTickDotOn: { backgroundColor: '#D4AF37' },
+  lcTickText: { fontSize: 10.5, fontWeight: '600', color: '#9CA3AF' },
+  lcTickTextGold: { color: '#9A7420', fontWeight: '800' },
+
+  lcPerkRow: { flexDirection: 'row', gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0EAE0' },
+  lcPerkChip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#F7F5F0', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
+  lcPerkText: { fontSize: 11, fontWeight: '600', color: '#374151' },
 
   // ── Guest styles ──────────────────────────
   guestScroll: {

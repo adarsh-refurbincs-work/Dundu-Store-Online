@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Profile: redesigned "Next Reward Milestone" card
+- White card, champagne border, trophy icon tile, title + subtitle, dark pill "N pts to go" in gold; big counter `n / 200 pts` + percent; gold track with sheen and a knob at the progress point; 0 / 100 / 200 ticks; "20 pts per ₹500" and "In-store & Online" chips. Old `lcProgress*` styles replaced.
+
 ### 2026-10-25 — Loyalty card: explicit size (content was collapsing)
 - `LuxuryLoyaltyCard`: `aspectRatio` replaced by `width:100%` + `height = (screenWidth-32)/1.586` on both container and inner view — with aspectRatio alone the inner `flex:1` content could collapse while the SVG background still painted (card looked empty). Profile falls back to a profile-name / 0-pt card when the API has none (hidden only when the account has no phone).
 
