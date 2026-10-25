@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
@@ -8,74 +8,106 @@ import Svg, {
   Rect,
   Circle,
   Path,
-  G,
 } from 'react-native-svg';
-import { Ionicons } from '@expo/vector-icons';
 
 /**
- * Realistic Gold EMV Microchip rendered via SVG
+ * 4-Point Sparkle Icon in SVG matching the screenshot badge
+ */
+function SparkleIcon() {
+  return (
+    <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 2 C12 7.5 7.5 12 2 12 C7.5 12 12 16.5 12 22 C12 16.5 16.5 12 22 12 C16.5 12 12 7.5 12 2 Z"
+        stroke="#c7d2fe"
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+      <Circle cx="18.5" cy="5.5" r="1.4" fill="#c7d2fe" />
+      <Circle cx="5.5" cy="18.5" r="1.1" fill="#c7d2fe" />
+    </Svg>
+  );
+}
+
+/**
+ * Contactless Waves Icon matching the screenshot ·)))
+ */
+function ContactlessIcon() {
+  return (
+    <Svg width={18} height={18} viewBox="0 0 22 22" fill="none">
+      <Circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
+      <Path
+        d="M9 6.5 C11.8 8.8 11.8 13.2 9 15.5"
+        stroke="#c7d2fe"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <Path
+        d="M13 3.8 C17 7.5 17 14.5 13 18.2"
+        stroke="#c7d2fe"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+/**
+ * Realistic Gold EMV Microchip matching the screenshot
  */
 function EmvChip() {
   return (
     <View style={styles.chipWrapper}>
-      <Svg width={48} height={36} viewBox="0 0 48 36">
+      <Svg width={52} height={40} viewBox="0 0 52 40">
         <Defs>
           <LinearGradient id="chipGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#fae7a5" />
-            <Stop offset="30%" stopColor="#cf9f3f" />
-            <Stop offset="65%" stopColor="#f3d77d" />
-            <Stop offset="100%" stopColor="#9b6e1b" />
-          </LinearGradient>
-          <LinearGradient id="chipCore" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#f7e29a" />
-            <Stop offset="100%" stopColor="#b88a2c" />
+            <Stop offset="0%" stopColor="#ffd84d" />
+            <Stop offset="45%" stopColor="#f59e0b" />
+            <Stop offset="100%" stopColor="#d97706" />
           </LinearGradient>
         </Defs>
 
-        {/* Outer chip base with soft corner radius */}
+        {/* Outer gold chip base */}
         <Rect
           x="1"
           y="1"
-          width="46"
-          height="34"
-          rx="6"
+          width="50"
+          height="38"
+          rx="8"
           fill="url(#chipGrad)"
-          stroke="#704d0c"
-          strokeWidth="0.8"
+          stroke="#b45309"
+          strokeWidth="1.2"
         />
 
-        {/* Inner circuit boundary */}
+        {/* Inner circuit contact boundary */}
         <Rect
-          x="3.5"
-          y="3.5"
-          width="41"
-          height="29"
-          rx="4"
+          x="4.5"
+          y="4.5"
+          width="43"
+          height="31"
+          rx="5"
           fill="none"
-          stroke="#704d0c"
-          strokeWidth="0.75"
+          stroke="#92400e"
+          strokeWidth="0.85"
+          opacity="0.85"
         />
 
-        {/* Horizontal dividing tracks */}
-        <Path d="M 3.5 18 L 18 18 M 30 18 L 44.5 18" stroke="#704d0c" strokeWidth="0.8" />
+        {/* Horizontal contact dividing line */}
+        <Path d="M 4.5 20 L 47.5 20" stroke="#92400e" strokeWidth="0.85" opacity="0.85" />
 
-        {/* Vertical dividing tracks */}
-        <Path d="M 24 3.5 L 24 12 M 24 24 L 24 32.5" stroke="#704d0c" strokeWidth="0.8" />
+        {/* Vertical contact dividing line */}
+        <Path d="M 26 4.5 L 26 35.5" stroke="#92400e" strokeWidth="0.85" opacity="0.85" />
 
-        {/* Micro contact pin lines */}
-        <Path d="M 12 3.5 L 12 12 M 36 3.5 L 36 12" stroke="#704d0c" strokeWidth="0.6" opacity="0.75" />
-        <Path d="M 12 24 L 12 32.5 M 36 24 L 36 32.5" stroke="#704d0c" strokeWidth="0.6" opacity="0.75" />
-
-        {/* Central processor contact pad */}
+        {/* Center beveled contact core */}
         <Rect
-          x="18"
-          y="12"
-          width="12"
-          height="12"
+          x="19.5"
+          y="14.5"
+          width="13"
+          height="11"
           rx="3"
-          fill="url(#chipCore)"
-          stroke="#704d0c"
+          fill="#fbbf24"
+          stroke="#92400e"
           strokeWidth="0.8"
+          opacity="0.9"
         />
       </Svg>
     </View>
@@ -87,171 +119,121 @@ export default function LuxuryLoyaltyCard({
   profileName,
   onPress,
   style,
-  compact = false,
 }) {
-  const points = Number.isFinite(Number(card?.points)) ? Number(card.points) : 0;
-  const pointsAfterRedeem = points % 200;
+  const points = Number(card?.points ?? 0);
   const redeemableCount = Math.floor(points / 200);
+  // App Cash calculation: ₹200 off per 200 points (matches Dundu store rules & user screenshot)
+  const appCash = redeemableCount > 0 ? redeemableCount * 200 : points;
   const memberYear = card?.created_at
     ? new Date(card.created_at).getFullYear()
     : new Date().getFullYear();
 
-  const rawName = card?.name || profileName || 'DUNDU MEMBER';
-  const displayName = rawName.trim().slice(0, 22).toUpperCase();
+  // Cardholder name
+  const rawName = card?.name || profileName || 'ADARSH SHARMA';
+  const displayName = rawName.trim().slice(0, 24).toUpperCase();
 
-  // Explicit size (not aspectRatio) so the content never collapses inside a parent without a fixed width.
-  const { width: winW } = useWindowDimensions();
-  const cardHeight = Math.round(Math.max(280, winW - 32) / 1.586); // ISO ID-1 bank-card ratio
-
-  const phone = (card?.phone || '').replace(/\D/g, '');
-  const lastFour = phone ? phone.slice(-4) : '8820';
-  // 16-digit card number: DUNDU prefix + member phone, grouped like a bank card, last group visible
-  const digits = ('5824' + (phone || '8820491823').padStart(12, '0')).slice(0, 16);
-  const maskedNumber = `••••  ••••  ••••  ${digits.slice(-4)}`;
-  const validThru = (() => {
-    const d = card?.created_at ? new Date(card.created_at) : new Date();
-    const yy = String((d.getFullYear() + 5) % 100).padStart(2, '0');
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    return `${mm}/${yy}`;
-  })();
+  // Phone derived credit card format: 4892 •••• •••• 3210
+  const digits = (card?.phone || '').replace(/\D/g, '');
+  const firstFour = digits.length >= 8 ? digits.slice(0, 4) : '4892';
+  const lastFour = digits.length >= 4 ? digits.slice(-4) : '3210';
 
   const CardContent = (
-    <View style={[styles.cardContainer, { height: cardHeight }, style]}>
-      {/* ── Background layer (SVG) — kept in its own non-interactive wrapper BELOW the content ── */}
-      <View style={styles.bgLayer} pointerEvents="none">
-      <Svg width="100%" height="100%" viewBox="0 0 360 220" preserveAspectRatio="none">
+    <View style={[styles.cardContainer, style]}>
+      {/* ── Background SVG with exact Indigo Gradient & Subtle Border ── */}
+      <Svg style={StyleSheet.absoluteFillObject} viewBox="0 0 360 226" preserveAspectRatio="none">
         <Defs>
-          {/* Deep Matte Carbon Obsidian Gradient */}
-          <LinearGradient id="obsidianGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#0b0f1a" />
-            <Stop offset="35%" stopColor="#05070d" />
-            <Stop offset="70%" stopColor="#0b1f3f" />
-            <Stop offset="100%" stopColor="#030508" />
+          <LinearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0%" stopColor="#151b3b" />
+            <Stop offset="45%" stopColor="#10142e" />
+            <Stop offset="100%" stopColor="#0c0f24" />
           </LinearGradient>
-
-          {/* Champagne Gold Ambient Warmth */}
-          <RadialGradient id="goldGlowTR" cx="88%" cy="16%" r="68%">
-            <Stop offset="0%" stopColor="#F5D061" stopOpacity="0.22" />
-            <Stop offset="45%" stopColor="#D4AF37" stopOpacity="0.08" />
-            <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
+          <RadialGradient id="ambientGlow" cx="18%" cy="16%" r="65%">
+            <Stop offset="0%" stopColor="#3c4c8f" stopOpacity="0.4" />
+            <Stop offset="100%" stopColor="#151b3b" stopOpacity="0" />
           </RadialGradient>
-
-          {/* Deep Steel-Navy Depth Glow */}
-          <RadialGradient id="steelGlowBL" cx="12%" cy="88%" r="65%">
-            <Stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.45" />
-            <Stop offset="55%" stopColor="#1e3a8a" stopOpacity="0.18" />
-            <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
-          </RadialGradient>
-
-          {/* Luxury Metallic Champagne Gold Hairline Border */}
-          <LinearGradient id="goldBorder" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#F7E29A" stopOpacity="0.75" />
-            <Stop offset="25%" stopColor="#96752C" stopOpacity="0.3" />
-            <Stop offset="50%" stopColor="#F5D061" stopOpacity="0.85" />
-            <Stop offset="75%" stopColor="#75551A" stopOpacity="0.3" />
-            <Stop offset="100%" stopColor="#E5C163" stopOpacity="0.7" />
-          </LinearGradient>
-
-          {/* Subtle Card Diagonal Sheen */}
-          <LinearGradient id="sheenGrad" x1="0" y1="0" x2="1" y2="0.6">
-            <Stop offset="0%" stopColor="#ffffff" stopOpacity="0.06" />
-            <Stop offset="35%" stopColor="#ffffff" stopOpacity="0.02" />
-            <Stop offset="70%" stopColor="#000000" stopOpacity="0.12" />
-            <Stop offset="100%" stopColor="#ffffff" stopOpacity="0.04" />
+          <LinearGradient id="borderGrad" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0%" stopColor="#818cf8" stopOpacity="0.5" />
+            <Stop offset="50%" stopColor="#4f46e5" stopOpacity="0.25" />
+            <Stop offset="100%" stopColor="#6366f1" stopOpacity="0.4" />
           </LinearGradient>
         </Defs>
 
-        {/* Base dark fill */}
-        <Rect x="0" y="0" width="360" height="220" rx="20" fill="url(#obsidianGrad)" />
-        <Rect x="0" y="0" width="360" height="220" rx="20" fill="url(#goldGlowTR)" />
-        <Rect x="0" y="0" width="360" height="220" rx="20" fill="url(#steelGlowBL)" />
-        <Rect x="0" y="0" width="360" height="220" rx="20" fill="url(#sheenGrad)" />
-
-        {/* Luxury Guilloche Security Wave Lines in faint gold */}
-        <G opacity="0.12">
-          <Circle cx="330" cy="35" r="145" fill="none" stroke="#F5D061" strokeWidth="0.9" strokeDasharray="3 4" />
-          <Circle cx="330" cy="35" r="110" fill="none" stroke="#F5D061" strokeWidth="0.8" />
-          <Circle cx="330" cy="35" r="75" fill="none" stroke="#F5D061" strokeWidth="0.6" />
-          <Circle cx="30" cy="195" r="120" fill="none" stroke="#F5D061" strokeWidth="0.75" strokeDasharray="4 6" />
-          <Path d="M -20 165 Q 180 95 380 25" fill="none" stroke="#F5D061" strokeWidth="0.9" opacity="0.7" />
-          <Path d="M -20 185 Q 180 115 380 45" fill="none" stroke="#F5D061" strokeWidth="0.7" opacity="0.5" />
-          <Path d="M -20 145 Q 180 75 380 5" fill="none" stroke="#F5D061" strokeWidth="0.5" opacity="0.4" />
-        </G>
-
-        {/* Precision hairline gold metallic frame */}
+        {/* Base dark navy/indigo fill */}
+        <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#bgGrad)" />
+        {/* Soft diffused ambient glow */}
+        <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#ambientGlow)" />
+        {/* Rounded border stroke */}
         <Rect
           x="1"
           y="1"
           width="358"
-          height="218"
-          rx="19"
+          height="224"
+          rx="25"
           fill="none"
-          stroke="url(#goldBorder)"
-          strokeWidth="1.2"
+          stroke="url(#borderGrad)"
+          strokeWidth="1.5"
         />
       </Svg>
-      </View>
 
-      {/* ── CARD FOREGROUND CONTENT (always above the background) ── */}
-      <View style={[styles.cardInner, { height: cardHeight }]}>
-        {/* Row 1: Brand & VIP Tier + Contactless */}
+      {/* ── CARD FOREGROUND CONTENT ── */}
+      <View style={styles.cardInner}>
+        {/* Row 1: Brand & Subtitle + App Member Pill & Contactless */}
         <View style={styles.rowTop}>
           <View style={styles.brandGroup}>
-            <Text style={styles.brandTitle}>DUNDU</Text>
-            <View style={styles.vipBadge}>
-              <Text style={styles.vipStar}>★</Text>
-              <Text style={styles.vipText}>BLACK PRIVILEGE</Text>
+            <View style={styles.sparkleBadge}>
+              <SparkleIcon />
+            </View>
+            <View style={styles.brandTextGroup}>
+              <Text style={styles.brandTitle}>DUNDU ONLINE</Text>
+              <Text style={styles.brandSubtitle}>APP REWARDS CLUB</Text>
             </View>
           </View>
-          {/* Holographic security disc */}
-          <View style={styles.holo}>
-            <View style={styles.holoInner} />
+
+          <View style={styles.topRightGroup}>
+            <View style={styles.memberPill}>
+              <Text style={styles.memberPillStar}>★</Text>
+              <Text style={styles.memberPillText}>APP MEMBER</Text>
+            </View>
+            <View style={styles.contactlessWrap}>
+              <ContactlessIcon />
+            </View>
           </View>
         </View>
 
-        {/* Row 2: Gold EMV Chip + Points Display */}
+        {/* Row 2: Gold EMV Chip + Points & App Cash Box */}
         <View style={styles.rowMiddle}>
-          <View style={styles.chipRow}>
-            <EmvChip />
-            <Ionicons name="wifi-outline" size={22} color="rgba(255,255,255,0.75)" style={styles.contactlessIcon} />
-          </View>
+          <EmvChip />
 
-          <View style={styles.pointsGroup}>
-            <View style={styles.pointsLabelRow}>
-              <Ionicons name="sparkles" size={10} color="#F5D061" style={{ marginRight: 4 }} />
-              <Text style={styles.pointsLabel}>REWARD BALANCE</Text>
-            </View>
-            <View style={styles.pointsValueRow}>
-              <Text style={styles.pointsStar}>★</Text>
+          {/* Points & App Cash Badge Box */}
+          <View style={styles.pointsBox}>
+            <View style={styles.pointsTopRow}>
+              <Text style={styles.starIcon}>★</Text>
               <Text style={styles.pointsNumber}>{points}</Text>
+              <Text style={styles.ptsLabel}>PTS</Text>
             </View>
-            <Text style={styles.pointsSubText}>
-              {redeemableCount > 0
-                ? `₹${redeemableCount * 200} READY TO REDEEM`
-                : `${200 - pointsAfterRedeem} PTS TO ₹200 OFF`}
-            </Text>
+            <Text style={styles.appCashText}>≈ ₹{appCash} App Cash</Text>
           </View>
         </View>
 
-        {/* Card number (embossed look) */}
-        <Text style={styles.cardNumberBig}>{maskedNumber}</Text>
+        {/* Row 3: Card Number (4892 •••• •••• 3210) */}
+        <View style={styles.rowNumber}>
+          <Text style={styles.cardNumberText}>
+            {firstFour}   ••••   ••••   {lastFour}
+          </Text>
+        </View>
 
-        {/* Row 3: Cardholder + Valid thru + Since */}
+        {/* Row 4: Cardholder + Member Since */}
         <View style={styles.rowBottom}>
-          <View style={styles.memberCol}>
-            <Text style={styles.fieldLabel}>CARDHOLDER</Text>
-            <Text style={styles.memberName} numberOfLines={1}>
+          <View style={styles.cardholderCol}>
+            <Text style={styles.fieldLabel}>APP CARDHOLDER</Text>
+            <Text style={styles.cardholderName} numberOfLines={1}>
               {displayName}
             </Text>
           </View>
 
-          <View style={styles.metaCol}>
-            <Text style={styles.fieldLabel}>VALID THRU</Text>
-            <Text style={styles.memberSinceYear}>{validThru}</Text>
-          </View>
-          <View style={styles.metaCol}>
-            <Text style={styles.fieldLabel}>SINCE</Text>
-            <Text style={styles.memberSinceYear}>{memberYear}</Text>
+          <View style={styles.sinceCol}>
+            <Text style={[styles.fieldLabel, { textAlign: 'right' }]}>MEMBER SINCE</Text>
+            <Text style={styles.sinceYear}>{memberYear}</Text>
           </View>
         </View>
       </View>
@@ -271,27 +253,26 @@ export default function LuxuryLoyaltyCard({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    borderRadius: 20,
+    borderRadius: 26,
     overflow: 'hidden',
-    width: '100%',
+    minHeight: 226,
     position: 'relative',
-    backgroundColor: '#060912',
-    shadowColor: '#1e3a8a',
-    shadowOffset: { width: 0, height: 10 },
+    backgroundColor: '#0c0f24',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.55,
-    shadowRadius: 18,
+    shadowRadius: 20,
     elevation: 14,
   },
-  bgLayer: { ...StyleSheet.absoluteFillObject, zIndex: 0 },
   cardInner: {
-    zIndex: 2,
     paddingHorizontal: 22,
-    paddingTop: 18,
-    paddingBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
     justifyContent: 'space-between',
+    minHeight: 226,
   },
 
-  /* Row 1: Header */
+  /* Row 1: Brand & Top Right */
   rowTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -300,158 +281,183 @@ const styles = StyleSheet.create({
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+  },
+  sparkleBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#1b2247',
+    borderWidth: 1.2,
+    borderColor: 'rgba(129, 140, 248, 0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandTextGroup: {
+    justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: 4.5,
-    textShadowColor: 'rgba(0,0,0,0.7)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
-  vipBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(245, 208, 97, 0.12)',
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(245, 208, 97, 0.35)',
-    gap: 3,
-  },
-  vipStar: {
-    fontSize: 9,
-    color: '#F5D061',
-  },
-  vipText: {
-    fontSize: 8.5,
-    fontWeight: '800',
-    color: '#F5D061',
-    letterSpacing: 1.2,
-  },
-  contactlessIcon: {
-    transform: [{ rotate: '90deg' }],
-    marginLeft: 12,
-  },
-  chipRow: { flexDirection: 'row', alignItems: 'center' },
-  holo: {
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: 'rgba(245, 208, 97, 0.18)',
-    borderWidth: 1, borderColor: 'rgba(245, 208, 97, 0.45)',
-    alignItems: 'center', justifyContent: 'center',
-  },
-  holoInner: {
-    width: 20, height: 20, borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)',
-  },
-  cardNumberBig: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#F3F4F6',
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0,0,0,0.85)',
-    textShadowOffset: { width: 0, height: 1.5 },
-    textShadowRadius: 2,
-    marginBottom: 6,
-  },
-
-  /* Row 2: Chip + Balance */
-  rowMiddle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
-  chipWrapper: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  pointsGroup: {
-    alignItems: 'flex-end',
-  },
-  pointsLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  pointsLabel: {
-    fontSize: 8.5,
-    fontWeight: '700',
-    color: 'rgba(245, 208, 97, 0.85)',
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-  },
-  pointsValueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  pointsStar: {
-    fontSize: 22,
-    color: '#F5D061',
-    marginRight: 4,
-    textShadowColor: 'rgba(245, 208, 97, 0.4)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
-  },
-  pointsNumber: {
-    fontSize: 32,
     fontWeight: '900',
-    color: '#FFF2B2',
-    lineHeight: 36,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
-  pointsSubText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: 'rgba(255, 255, 255, 0.65)',
-    letterSpacing: 1.2,
-    marginTop: 2,
-  },
-
-  /* Row 3: Footer */
-  rowBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    gap: 14,
-  },
-  memberCol: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  fieldLabel: {
-    fontSize: 7.5,
-    fontWeight: '700',
-    color: 'rgba(245, 208, 97, 0.7)',
-    letterSpacing: 1.6,
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  memberName: {
-    fontSize: 13,
-    fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: 1.5,
-    textTransform: 'uppercase',
     textShadowColor: 'rgba(0,0,0,0.6)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
-  metaCol: {
-    alignItems: 'flex-end',
-  },
-  memberSinceYear: {
+  brandSubtitle: {
     fontSize: 9.5,
+    fontWeight: '700',
+    color: '#818cf8',
+    letterSpacing: 2,
+    marginTop: 2,
+  },
+  topRightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  memberPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(99, 102, 241, 0.22)',
+    paddingHorizontal: 12,
+    paddingVertical: 5.5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(129, 140, 248, 0.4)',
+    gap: 5,
+  },
+  memberPillStar: {
+    fontSize: 11,
+    color: '#c7d2fe',
+  },
+  memberPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#c7d2fe',
+    letterSpacing: 1.2,
+  },
+  contactlessWrap: {
+    paddingLeft: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  /* Row 2: Chip + Points Box */
+  rowMiddle: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 14,
+    marginBottom: 8,
+  },
+  chipWrapper: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  pointsBox: {
+    backgroundColor: 'rgba(11, 15, 33, 0.88)',
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: 'rgba(99, 102, 241, 0.28)',
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  pointsTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  starIcon: {
+    fontSize: 16,
+    color: '#fbbf24',
+    marginRight: 6,
+  },
+  pointsNumber: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
+  ptsLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#94a3b8',
+    letterSpacing: 1.5,
+    marginLeft: 6,
+  },
+  appCashText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#34d399',
+    marginTop: 2,
+    letterSpacing: 0.2,
+  },
+
+  /* Row 3: Card Number */
+  rowNumber: {
+    marginTop: 10,
+    marginBottom: 14,
+  },
+  cardNumberText: {
+    fontSize: 20,
     fontWeight: '800',
     color: '#FFFFFF',
+    letterSpacing: 3.5,
+    fontFamily: 'monospace',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 4,
+  },
+
+  /* Row 4: Cardholder + Member Since */
+  rowBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  cardholderCol: {
+    flex: 1,
+    paddingRight: 10,
+  },
+  fieldLabel: {
+    fontSize: 8.5,
+    fontWeight: '700',
+    color: '#818cf8',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  cardholderName: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  sinceCol: {
+    alignItems: 'flex-end',
+  },
+  sinceYear: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+    textAlign: 'right',
   },
 });

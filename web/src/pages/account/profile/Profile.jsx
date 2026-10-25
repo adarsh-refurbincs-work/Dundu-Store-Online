@@ -402,76 +402,87 @@ export default function Profile() {
 
           {loyaltyCard ? (
             <>
-              {/* The Luxury Dark Obsidian & Gold Card */}
+              {/* The Dundu Online Rewards Card matching mobile screenshot */}
               <div
-                className="relative rounded-3xl overflow-hidden select-none transition-all duration-300 hover:scale-[1.01]"
+                className="relative rounded-[28px] overflow-hidden select-none transition-all duration-300 hover:scale-[1.01]"
                 style={{
-                  background: 'linear-gradient(135deg, #181b26 0%, #0d0f15 35%, #131622 70%, #07080b 100%)',
-                  padding: '26px 26px 22px',
-                  minHeight: '215px',
-                  border: '1.2px solid rgba(245, 208, 97, 0.4)',
-                  boxShadow: '0 16px 36px -10px rgba(0,0,0,0.7), 0 0 20px rgba(245, 208, 97, 0.05)',
+                  background: 'linear-gradient(145deg, #161c3b 0%, #11152e 45%, #0d1024 100%)',
+                  padding: '24px 26px 22px',
+                  minHeight: '226px',
+                  border: '1.5px solid rgba(129, 140, 248, 0.35)',
+                  boxShadow: '0 18px 38px -10px rgba(0,0,0,0.7), 0 0 20px rgba(99, 102, 241, 0.12)',
                 }}
               >
-                {/* SVG Luxury Guilloche & Security Pattern Overlay */}
-                <svg
-                  className="absolute inset-0 w-full h-full pointer-events-none opacity-15"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="90%" cy="15%" r="140" fill="none" stroke="#F5D061" strokeWidth="1" strokeDasharray="4 6" />
-                  <circle cx="90%" cy="15%" r="100" fill="none" stroke="#F5D061" strokeWidth="0.8" />
-                  <circle cx="90%" cy="15%" r="60" fill="none" stroke="#F5D061" strokeWidth="0.6" />
-                  <circle cx="10%" cy="85%" r="120" fill="none" stroke="#F5D061" strokeWidth="0.8" strokeDasharray="3 5" />
-                  <path d="M -20 160 Q 200 80 500 20" fill="none" stroke="#F5D061" strokeWidth="0.8" />
-                </svg>
-
-                {/* Ambient Warm Gold Glow TR */}
+                {/* Soft ambient lighting glow */}
                 <div
                   style={{
-                    position: 'absolute', top: '-40px', right: '-40px',
-                    width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
-                    background: 'radial-gradient(circle, rgba(245,208,97,0.18) 0%, transparent 70%)',
-                  }}
-                />
-                {/* Steel Depth Glow BL */}
-                <div
-                  style={{
-                    position: 'absolute', bottom: '-50px', left: '-30px',
-                    width: '200px', height: '200px', borderRadius: '50%', pointerEvents: 'none',
-                    background: 'radial-gradient(circle, rgba(46,56,82,0.3) 0%, transparent 70%)',
+                    position: 'absolute', top: '-40px', left: '-30px',
+                    width: '240px', height: '240px', borderRadius: '50%', pointerEvents: 'none',
+                    background: 'radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%)',
                   }}
                 />
 
-                {/* Row 1: Logo + VIP Badge + Contactless */}
-                <div className="relative flex items-center justify-between mb-5">
+                {/* Row 1: Brand with Sparkle Badge + App Member Pill & Waves */}
+                <div className="relative flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <span style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '20px', letterSpacing: '5px', textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
-                      DUNDU
-                    </span>
-                    <span
-                      className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider"
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
                       style={{
-                        background: 'rgba(245, 208, 97, 0.12)',
-                        border: '1px solid rgba(245, 208, 97, 0.35)',
-                        color: '#F5D061',
+                        backgroundColor: '#1b2247',
+                        border: '1.2px solid rgba(129, 140, 248, 0.45)',
                       }}
                     >
-                      ★ BLACK PRIVILEGE
-                    </span>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path
+                          d="M12 2 C12 7.5 7.5 12 2 12 C7.5 12 12 16.5 12 22 C12 16.5 16.5 12 22 12 C17 12 12 7.5 12 2 Z"
+                          stroke="#c7d2fe"
+                          strokeWidth="1.9"
+                          strokeLinejoin="round"
+                        />
+                        <circle cx="18.5" cy="5.5" r="1.4" fill="#c7d2fe" />
+                        <circle cx="5.5" cy="18.5" r="1.1" fill="#c7d2fe" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-white font-black text-base tracking-wider leading-none">
+                        DUNDU ONLINE
+                      </p>
+                      <p className="text-[10px] font-bold text-indigo-300 tracking-[2px] uppercase mt-1">
+                        APP REWARDS CLUB
+                      </p>
+                    </div>
                   </div>
-                  <Wifi className="h-5 w-5" style={{ color: '#F5D061', transform: 'rotate(90deg)' }} />
+
+                  <div className="flex items-center gap-2.5">
+                    <div
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide"
+                      style={{
+                        background: 'rgba(99, 102, 241, 0.22)',
+                        border: '1px solid rgba(129, 140, 248, 0.4)',
+                        color: '#c7d2fe',
+                      }}
+                    >
+                      <span>★</span>
+                      <span>APP MEMBER</span>
+                    </div>
+                    <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+                      <circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
+                      <path d="M9 6.5 C11.8 8.8 11.8 13.2 9 15.5" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M13 3.8 C17 7.5 17 14.5 13 18.2" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  </div>
                 </div>
 
-                {/* Row 2: Chip + Points */}
-                <div className="relative flex items-center justify-between mb-5">
+                {/* Row 2: Chip + Points Box */}
+                <div className="relative flex items-center justify-between my-3">
                   {/* Realistic Gold EMV Chip */}
                   <div
                     style={{
-                      width: '50px',
-                      height: '38px',
-                      background: 'linear-gradient(135deg, #fae7a5 0%, #cf9f3f 30%, #f3d77d 65%, #9b6e1b 100%)',
-                      borderRadius: '7px',
-                      border: '0.8px solid #704d0c',
+                      width: '52px',
+                      height: '40px',
+                      background: 'linear-gradient(135deg, #ffd84d 0%, #f59e0b 45%, #d97706 100%)',
+                      borderRadius: '8px',
+                      border: '1.2px solid #b45309',
                       boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
                       padding: '3px',
                       display: 'flex',
@@ -483,17 +494,18 @@ export default function Profile() {
                       style={{
                         width: '100%',
                         height: '100%',
-                        border: '0.8px solid #704d0c',
-                        borderRadius: '4px',
+                        border: '0.85px solid #92400e',
+                        borderRadius: '5px',
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
                         gridTemplateRows: '1fr 1fr',
                         position: 'relative',
+                        opacity: 0.9,
                       }}
                     >
-                      <div style={{ borderRight: '0.8px solid #704d0c', borderBottom: '0.8px solid #704d0c' }} />
-                      <div style={{ borderBottom: '0.8px solid #704d0c' }} />
-                      <div style={{ borderRight: '0.8px solid #704d0c' }} />
+                      <div style={{ borderRight: '0.85px solid #92400e', borderBottom: '0.85px solid #92400e' }} />
+                      <div style={{ borderBottom: '0.85px solid #92400e' }} />
+                      <div style={{ borderRight: '0.85px solid #92400e' }} />
                       <div />
                       <div
                         style={{
@@ -501,47 +513,63 @@ export default function Profile() {
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          width: '12px',
-                          height: '12px',
+                          width: '13px',
+                          height: '11px',
                           borderRadius: '3px',
-                          background: 'linear-gradient(180deg, #f7e29a, #b88a2c)',
-                          border: '0.8px solid #704d0c',
+                          background: '#fbbf24',
+                          border: '0.8px solid #92400e',
                         }}
                       />
                     </div>
                   </div>
 
-                  {/* Points Counter */}
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ color: 'rgba(245, 208, 97, 0.85)', fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '2px', fontWeight: 700 }}>
-                      Reward Balance
-                    </p>
-                    <p style={{ color: '#FFF2B2', fontWeight: 900, fontSize: '40px', lineHeight: 1, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
-                      <span style={{ fontSize: '24px', verticalAlign: 'middle', marginRight: '4px', color: '#F5D061' }}>★</span>
-                      {loyaltyCard.points}
-                    </p>
-                    <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '10px', marginTop: '2px', fontWeight: 600 }}>
-                      {redeemableCount > 0 ? `₹${redeemableCount * 200} Ready to Redeem` : `${200 - pointsAfterRedeem} pts to ₹200 off`}
+                  {/* Points Box */}
+                  <div
+                    className="px-4 py-2 rounded-2xl flex flex-col items-center justify-center min-w-[145px]"
+                    style={{
+                      background: 'rgba(11, 15, 33, 0.88)',
+                      border: '1.5px solid rgba(99, 102, 241, 0.28)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                    }}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-amber-400 text-sm">★</span>
+                      <span className="text-white font-black text-xl leading-none">
+                        {loyaltyCard.points}
+                      </span>
+                      <span className="text-slate-400 font-bold text-xs tracking-wider">
+                        PTS
+                      </span>
+                    </div>
+                    <p className="text-emerald-400 font-bold text-xs mt-1">
+                      ≈ ₹{redeemableCount > 0 ? redeemableCount * 200 : loyaltyCard.points} App Cash
                     </p>
                   </div>
                 </div>
 
-                {/* Row 3: Name + Card Mask + Since */}
-                <div className="relative flex items-end justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                {/* Row 3: Card Number (4892 •••• •••• 3210) */}
+                <div className="relative my-3">
+                  <p className="text-white font-mono font-bold text-xl tracking-[4px] leading-none">
+                    {phone.length >= 8 ? phone.slice(0, 4) : '4892'}   ••••   ••••   {phone.length >= 4 ? phone.slice(-4) : '3210'}
+                  </p>
+                </div>
+
+                {/* Row 4: Cardholder + Member Since */}
+                <div className="relative flex items-end justify-between pt-1">
                   <div>
-                    <p style={{ color: 'rgba(245, 208, 97, 0.7)', fontSize: '8px', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: '3px', fontWeight: 700 }}>
-                      Cardholder
+                    <p className="text-[9px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
+                      APP CARDHOLDER
                     </p>
-                    <p style={{ color: 'white', fontWeight: 800, fontSize: '13px', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                      {(loyaltyCard.name || user.name || 'Dundu Member').slice(0, 22)}
+                    <p className="text-white font-black text-sm tracking-wider uppercase">
+                      {(loyaltyCard.name || user.name || 'ADARSH SHARMA').slice(0, 24)}
                     </p>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', letterSpacing: '2px', fontWeight: 700 }}>
-                      •••• {((loyaltyCard.phone || '').replace(/\D/g, '')).slice(-4) || '8820'}
+                  <div className="text-right">
+                    <p className="text-[9px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
+                      MEMBER SINCE
                     </p>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '9px', marginTop: '1px' }}>
-                      SINCE <span style={{ color: '#fff', fontWeight: 700 }}>{memberYear}</span>
+                    <p className="text-white font-black text-sm tracking-wider">
+                      {memberYear}
                     </p>
                   </div>
                 </div>
