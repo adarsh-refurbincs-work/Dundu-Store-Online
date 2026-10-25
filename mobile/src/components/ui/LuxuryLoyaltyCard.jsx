@@ -1,9 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-
-// Explicit size (not aspectRatio) so the content never collapses inside a parent without a fixed width.
-const CARD_WIDTH = Dimensions.get('window').width - 32;
-const CARD_HEIGHT = Math.round(CARD_WIDTH / 1.586); // ISO ID-1 bank-card ratio
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
@@ -103,6 +99,10 @@ export default function LuxuryLoyaltyCard({
   const rawName = card?.name || profileName || 'DUNDU MEMBER';
   const displayName = rawName.trim().slice(0, 22).toUpperCase();
 
+  // Explicit size (not aspectRatio) so the content never collapses inside a parent without a fixed width.
+  const { width: winW } = useWindowDimensions();
+  const cardHeight = Math.round(Math.max(280, winW - 32) / 1.586); // ISO ID-1 bank-card ratio
+
   const phone = (card?.phone || '').replace(/\D/g, '');
   const lastFour = phone ? phone.slice(-4) : '8820';
   // 16-digit card number: DUNDU prefix + member phone, grouped like a bank card, last group visible
@@ -116,9 +116,10 @@ export default function LuxuryLoyaltyCard({
   })();
 
   const CardContent = (
-    <View style={[styles.cardContainer, style]}>
-      {/* ── SVG Luxury Dark Background with Guilloche Lines ── */}
-      <Svg style={StyleSheet.absoluteFillObject} viewBox="0 0 360 220" preserveAspectRatio="none">
+    <View style={[styles.cardContainer, { height: cardHeight }, style]}>
+      {/* ── Background layer (SVG) — kept in its own non-interactive wrapper BELOW the content ── */}
+      <View style={styles.bgLayer} pointerEvents="none">
+      <Svg width="100%" height="100%" viewBox="0 0 360 220" preserveAspectRatio="none">
         <Defs>
           {/* Deep Matte Carbon Obsidian Gradient */}
           <LinearGradient id="obsidianGrad" x1="0" y1="0" x2="1" y2="1">
@@ -189,9 +190,10 @@ export default function LuxuryLoyaltyCard({
           strokeWidth="1.2"
         />
       </Svg>
+      </View>
 
-      {/* ── CARD FOREGROUND CONTENT ── */}
-      <View style={styles.cardInner}>
+      {/* ── CARD FOREGROUND CONTENT (always above the background) ── */}
+      <View style={[styles.cardInner, { height: cardHeight }]}>
         {/* Row 1: Brand & VIP Tier + Contactless */}
         <View style={styles.rowTop}>
           <View style={styles.brandGroup}>
@@ -272,7 +274,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     width: '100%',
-    height: CARD_HEIGHT,
     position: 'relative',
     backgroundColor: '#060912',
     shadowColor: '#1e3a8a',
@@ -281,8 +282,9 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     elevation: 14,
   },
+  bgLayer: { ...StyleSheet.absoluteFillObject, zIndex: 0 },
   cardInner: {
-    height: CARD_HEIGHT,
+    zIndex: 2,
     paddingHorizontal: 22,
     paddingTop: 18,
     paddingBottom: 16,

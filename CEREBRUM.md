@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Loyalty card: SVG background moved below content
+- `LuxuryLoyaltyCard`: the absolute-fill `Svg` is now inside its own `pointerEvents="none"` wrapper with `zIndex 0`; the content view has `zIndex 2` and an explicit height from `useWindowDimensions` (no module-load `Dimensions`). Addresses the blank-looking card where the SVG layer could paint over the text on device.
+
 ### 2026-10-25 — Checkout button: never shows a subtotal-only estimate
 - `POST /orders/quote` no longer requires `address_id` (pricing is address-independent) so the quote runs the moment /checkout opens.
 - `Checkout.jsx`: quote keyed to the exact inputs (`payloadKey`); until a quote for the current inputs exists the button reads "Calculating total…" instead of the local estimate; on failure it logs `[checkout] quote failed …` with the server message and falls back. Under the button: "Includes ₹N shipping" / "Free shipping applied".
