@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Checkout button: never shows a subtotal-only estimate
+- `POST /orders/quote` no longer requires `address_id` (pricing is address-independent) so the quote runs the moment /checkout opens.
+- `Checkout.jsx`: quote keyed to the exact inputs (`payloadKey`); until a quote for the current inputs exists the button reads "Calculating total…" instead of the local estimate; on failure it logs `[checkout] quote failed …` with the server message and falls back. Under the button: "Includes ₹N shipping" / "Free shipping applied".
+- Verified (Playwright, threshold temporarily 2000): ₹999 item → Shipping ₹50 → button "Proceed to pay ₹1,049" + shipping note; quote without address OK; quote writes nothing.
+
 ### 2026-10-25 — Profile: redesigned "Next Reward Milestone" card
 - White card, champagne border, trophy icon tile, title + subtitle, dark pill "N pts to go" in gold; big counter `n / 200 pts` + percent; gold track with sheen and a knob at the progress point; 0 / 100 / 200 ticks; "20 pts per ₹500" and "In-store & Online" chips. Old `lcProgress*` styles replaced.
 

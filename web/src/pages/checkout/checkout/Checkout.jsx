@@ -172,27 +172,40 @@ export default function Checkout() {
   // birthday eligibility rules and the free-shipping reward, and computes shipping on the
   // amount after discounts. The local numbers above are only an instant estimate; once the
   // quote arrives it is the source of truth for the summary and the "Proceed to pay" button.
-  const [serverQuote, setServerQuote] = useState(null);
+  const [serverQuote, setServerQuote] = useState(null); // { key, quote } for the payload it was computed for
+  const [quoteError, setQuoteError] = useState(null);   // payload key whose quote failed
   const quotePayload = useMemo(() => ({
-    address_id: selectedAddress,
+    address_id: selectedAddress || undefined,
     coupon_code: appliedCoupon ? coupon : undefined,
     payment_method: paymentMethod,
     use_loyalty_points: useLoyaltyPoints,
     use_wallet: useWallet,
     ...(buyNow ? { buy_now_item: { product_id: buyNow.product_id, variant_id: buyNow.variant_id, quantity: buyNow.quantity || 1 } } : {}),
   }), [selectedAddress, appliedCoupon, coupon, paymentMethod, useLoyaltyPoints, useWallet, buyNow]);
+  const payloadKey = useMemo(() => JSON.stringify({ ...quotePayload, subtotal, n: items.length }), [quotePayload, subtotal, items.length]);
   useEffect(() => {
-    if (!selectedAddress || !(subtotal > 0)) return; // nothing to quote yet (q below falls back to the estimate)
+    if (!(subtotal > 0)) return; // empty cart — nothing to quote
     let cancelled = false;
     const t = setTimeout(() => {
       orderApi.quote(quotePayload)
-        .then((res) => { if (!cancelled) setServerQuote(res?.data?.quote || null); })
-        .catch(() => { if (!cancelled) setServerQuote(null); });
-    }, 350);
+        .then((res) => {
+          if (cancelled) return;
+          if (res?.data?.quote) setServerQuote({ key: payloadKey, quote: res.data.quote });
+          else setQuoteError(payloadKey);
+        })
+        .catch((e) => {
+          if (cancelled) return;
+          // Surface the reason in the console so a button/total mismatch is diagnosable.
+          console.warn('[checkout] quote failed — showing local estimate:', e?.message || e);
+          setQuoteError(payloadKey);
+        });
+    }, 300);
     return () => { cancelled = true; clearTimeout(t); };
-  }, [quotePayload, selectedAddress, subtotal, items.length]);
+  }, [quotePayload, payloadKey, subtotal]);
 
-  const q = selectedAddress && subtotal > 0 ? serverQuote : null;
+  // Only trust a quote computed for the current inputs; while a fresh one is pending show "Calculating…"
+  const q = subtotal > 0 && serverQuote?.key === payloadKey ? serverQuote.quote : null;
+  const quoting = subtotal > 0 && !q && quoteError !== payloadKey;
   const discountShown = q ? Number(q.discount) : discount;
   const loyaltyDiscountShown = q ? Number(q.loyalty_discount) : loyaltyDiscount;
   const shippingShown = q ? Number(q.shipping) : shipping;
@@ -546,8 +559,14 @@ export default function Checkout() {
                 setShowConfirm(true);
               }}
               fullWidth size="lg">
-              {paymentMethod === 'online' && payableShown > 0 ? `Proceed to pay ${formatPrice(payableShown)}` : 'Place order'}
+              {quoting ? 'Calculating total…' : paymentMethod === 'online' && payableShown > 0 ? `Proceed to pay ${formatPrice(payableShown)}` : 'Place order'}
             </Button>
+            {!quoting && shippingShown > 0 && (
+              <p className="text-[11px] text-center" style={{ color: '#888' }}>Includes {formatPrice(shippingShown)} shipping</p>
+            )}
+            {!quoting && shippingShown === 0 && paymentMethod === 'online' && payableShown > 0 && (
+              <p className="text-[11px] text-center" style={{ color: '#4ade80' }}>Free shipping applied</p>
+            )}
           </div>
         </aside>
       </div>

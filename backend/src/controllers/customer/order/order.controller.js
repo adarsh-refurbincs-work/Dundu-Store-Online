@@ -203,7 +203,7 @@ const placeOrder = async (req, res) => {
   if (!PAYMENT_METHODS.includes(method)) {
     return badRequest(res, 'Invalid payment method');
   }
-  if (!address_id) return badRequest(res, 'Delivery address is required');
+  if (!address_id && !req.quote) return badRequest(res, 'Delivery address is required');
 
   const client = await db.getClient();
   // Every early exit must roll the transaction back, otherwise the pooled connection is
@@ -217,10 +217,12 @@ const placeOrder = async (req, res) => {
     await client.query('BEGIN');
 
     // The address must belong to the buyer (it is joined into the order details later).
-    const { rows: addrRows } = await client.query(
-      'SELECT id FROM addresses WHERE id=$1 AND user_id=$2', [address_id, req.user.id]
-    );
-    if (!addrRows.length) return fail('Delivery address not found');
+    if (address_id || !req.quote) {
+      const { rows: addrRows } = await client.query(
+        'SELECT id FROM addresses WHERE id=$1 AND user_id=$2', [address_id, req.user.id]
+      );
+      if (!addrRows.length) return fail('Delivery address not found');
+    }
 
     if (method === 'cod') {
       const { rows: codSetting } = await client.query("SELECT value FROM settings WHERE key='cod_enabled'");
