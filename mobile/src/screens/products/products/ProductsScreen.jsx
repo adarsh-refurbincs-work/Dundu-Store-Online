@@ -437,7 +437,6 @@ export default function ProductsScreen() {
 
       {/* Search bar */}
       <View style={[styles.searchBar, { backgroundColor: festEnabled ? festNavBg : T.topBg, borderBottomColor: festEnabled ? festNavBg : T.border }]}>
-        <Text style={[styles.searchIcon, festEnabled && { color: festNavText }]}>🔍</Text>
         <TextInput
           style={[
             styles.searchInput,
@@ -577,7 +576,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     gap: 8,
   },
-  searchIcon: { fontSize: 15, color: '#888' },
   searchInput: {
     flex: 1,
     height: 38,

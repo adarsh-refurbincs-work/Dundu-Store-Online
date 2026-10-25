@@ -265,7 +265,6 @@ export default function HomeScreen() {
 
       {/* ── Search bar (always visible) ── */}
       <View style={[styles.searchBar, festEnabled && { backgroundColor: festNavBg, borderBottomColor: festNavBg }]}>
-        <Text style={[styles.searchIcon, festEnabled && { color: festNavText }]}>🔍</Text>
         <TextInput
           style={[
             styles.searchInput,
@@ -431,7 +430,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#1e1e1e',
   },
-  searchIcon: { fontSize: 15, marginRight: 8, color: '#666' },
   searchInput: {
     flex: 1,
     height: 38,
