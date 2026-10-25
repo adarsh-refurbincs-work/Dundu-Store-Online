@@ -649,7 +649,7 @@ export default function ProductsScreen() {
               style={[styles.chip, styles.hotChip, comboFilters.offer && styles.hotChipActive]}
               onPress={() => setComboFilters((f) => ({ ...f, offer: !f.offer }))}
             >
-              <Text style={[styles.chipText, styles.hotChipText, comboFilters.offer && styles.chipTextActive]}>🔥 Hot Offer</Text>
+              <Text style={[styles.chipText, styles.hotChipText, comboFilters.offer && styles.chipTextActive]}>Hot Offer</Text>
             </TouchableOpacity>
             <Text style={styles.resultCount}>{visibleCombos.length} combo{visibleCombos.length !== 1 ? 's' : ''}</Text>
             <TouchableOpacity
@@ -744,7 +744,7 @@ export default function ProductsScreen() {
           style={[styles.chip, styles.hotChip, offerOnly && styles.hotChipActive]}
           onPress={() => { setOfferOnly((p) => !p); setNewArrivalOnly(false); }}
         >
-          <Text style={[styles.chipText, styles.hotChipText, offerOnly && styles.chipTextActive]}>🔥 Hot Offer</Text>
+          <Text style={[styles.chipText, styles.hotChipText, offerOnly && styles.chipTextActive]}>Hot Offer</Text>
         </TouchableOpacity>
 
         <Text style={styles.resultCount}>{products.length}{hasMore ? '+' : ''} items</Text>
@@ -866,9 +866,9 @@ const styles = StyleSheet.create({
   sortRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    gap: 6,
     backgroundColor: '#0d0d0d',
     borderBottomWidth: 1,
     borderBottomColor: '#1e1e1e',
@@ -878,8 +878,8 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1.5,
     borderColor: COLORS.primary,
@@ -906,20 +906,20 @@ const styles = StyleSheet.create({
   },
   sortFilterBadgeText: { fontSize: 9, fontWeight: '800', color: '#fff' },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1.5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 16,
+    borderWidth: 1,
     borderColor: '#2e2e2e',
     backgroundColor: '#1a1a1a',
   },
   chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  chipText: { fontSize: 12, fontWeight: '600', color: '#555' },
+  chipText: { fontSize: 11, fontWeight: '600', color: '#555' },
   hotChip: { borderColor: '#f97316', backgroundColor: '#fff7ed' },
   hotChipActive: { backgroundColor: '#f97316', borderColor: '#f97316' },
   hotChipText: { color: '#c2410c' },
   chipTextActive: { color: '#fff' },
-  resultCount: { fontSize: 11, color: '#999', fontWeight: '500', flexShrink: 1 },
+  resultCount: { fontSize: 10, color: '#999', fontWeight: '500', flexShrink: 1 },
 
   /* Grid */
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },

@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile Shop sort bar compacted
+- `sortRow` padding 12/8→10/5, gap 6; chips 14/6→10/4, radius 16, border 1, text 12→11; filter button 12/6→9/4; result count 10px; Hot Offer chip without the 🔥 emoji.
+
 ### 2026-10-25 — Storefront: checkout amount from a server quote, product-page crash fix, route error boundary
 - **Checkout button/summary**: the web client stacked coupon + loyalty and ignored referral and the birthday eligibility rules, so its shipping-threshold check and total could differ from the order the server created (e.g. button without ₹50 shipping). New `POST /api/orders/quote` = `placeOrder` with `req.quote` → runs the full pricing inside the transaction, then **ROLLBACK** (coupon counters, loyalty deduction, locks all undone) and returns `{ subtotal, discount, discount_type, loyalty_discount, shipping, free_shipping_reward, total, wallet_amount, payable }`. `Checkout.jsx` debounces a quote on address / coupon / payment method / loyalty / wallet / cart changes and renders `*Shown` values from it (local maths is only the instant fallback). Verified: quote writes nothing; with threshold raised, button read "Proceed to pay ₹1,049" for a ₹999 item (+₹50 shipping).
 - **Blank product pages (root cause)**: the "See all reviews" `useState` had been placed *after* the `isLoading` / `!product` early returns → "Rendered more hooks than during the previous render" once data arrived (intermittent: only on uncached first load). Hook moved above the returns. Rule: in `ProductDetail.jsx` every hook must sit above line ~93.
