@@ -20,6 +20,7 @@ import { COLORS } from '../../../config';
 import useLoginPromptStore from '../../../store/loginPrompt.store';
 import { useTranslation } from '../../../store/language.store';
 import LanguageModal from '../../../components/ui/LanguageModal';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 function getInitials(name) {
   if (!name) return '?';
@@ -200,52 +201,52 @@ export default function ProfileScreen() {
 
   const menuItems = [
     {
-      icon: '🌐',
+      icon: 'globe-outline',
       label: `${t('languageSettings', 'Language Settings')} (${currentLangObj?.nativeName || 'English'})`,
       onPress: () => setShowLanguageModal(true),
     },
     {
-      icon: '✏️',
+      icon: 'create-outline',
       label: t('editProfile', 'Edit Profile'),
       onPress: openEdit,
     },
     {
-      icon: '📦',
+      icon: 'cube-outline',
       label: t('myOrders', 'My Orders'),
       onPress: () => navigation.navigate('Orders'),
     },
     {
-      icon: '📍',
+      icon: 'location-outline',
       label: t('savedAddresses', 'Saved Addresses'),
       onPress: openAddressModal,
     },
     {
-      icon: '❤️',
+      icon: 'heart-outline',
       label: t('wishlist', 'Wishlist'),
       onPress: () => navigation.navigate('Wishlist'),
     },
     {
-      icon: '🎁',
+      icon: 'gift-outline',
       label: t('referAndEarn', 'Refer & Earn'),
       onPress: () => navigation.navigate('Referral'),
     },
     {
-      icon: '⭐',
+      icon: 'star-outline',
       label: t('myLoyaltyCard', 'My Loyalty Card'),
       onPress: () => navigation.navigate('LoyaltyCard'),
     },
     {
-      icon: '💳',
+      icon: 'wallet-outline',
       label: t('myWallet', 'My Wallet'),
       onPress: () => navigation.navigate('Wallet'),
     },
     {
-      icon: '🔔',
+      icon: 'notifications-outline',
       label: t('notifications', 'Notifications'),
       onPress: () => navigation.navigate('Notifications'),
     },
     {
-      icon: '🆘',
+      icon: 'help-buoy-outline',
       label: t('helpAndSupport', 'Help & Support'),
       onPress: () => navigation.navigate('Help'),
     },
@@ -271,6 +272,7 @@ export default function ProfileScreen() {
       onPress: () => navigation.navigate('TermsConditions'),
     },
     {
+      icon: 'log-out-outline',
       label: t('logout', 'Logout'),
       onPress: confirmLogout,
       danger: true,
@@ -292,7 +294,7 @@ export default function ProfileScreen() {
             activeOpacity={0.7}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <Text style={{ fontSize: 20 }}>🌐</Text>
+              <Ionicons name="globe-outline" size={22} color={COLORS.primary} />
               <View>
                 <Text style={styles.guestLanguageTitle}>{t('languageSettings', 'Language')}</Text>
                 <Text style={styles.guestLanguageSub}>
@@ -306,7 +308,7 @@ export default function ProfileScreen() {
           {/* Hero */}
           <View style={styles.guestHero}>
             <View style={styles.guestAvatarWrap}>
-              <Text style={styles.guestAvatarIcon}>👤</Text>
+              <Ionicons name="person-outline" size={40} color="#fff" />
             </View>
             <Text style={styles.guestTitle}>{t('welcomeGuest', 'Welcome to Dundu')}</Text>
             <Text style={styles.guestSubtitle}>
@@ -325,14 +327,16 @@ export default function ProfileScreen() {
           {/* Feature highlights */}
           <View style={styles.guestFeatures}>
             {[
-              { icon: '📦', label: t('trackYourOrders', 'Track your orders') },
-              { icon: '❤️', label: t('saveToWishlist', 'Save to wishlist') },
-              { icon: '🎁', label: t('earnLoyaltyPoints', 'Earn loyalty points') },
-              { icon: '🤝', label: t('referFriendsEarn', 'Refer friends & earn') },
-              { icon: '⚡', label: t('fasterCheckout', 'Faster checkout') },
+              { icon: 'cube-outline', label: t('trackYourOrders', 'Track your orders') },
+              { icon: 'heart-outline', label: t('saveToWishlist', 'Save to wishlist') },
+              { icon: 'star-outline', label: t('earnLoyaltyPoints', 'Earn loyalty points') },
+              { icon: 'people-outline', label: t('referFriendsEarn', 'Refer friends & earn') },
+              { icon: 'flash-outline', label: t('fasterCheckout', 'Faster checkout') },
             ].map((f) => (
               <View key={f.icon} style={styles.guestFeatureRow}>
-                <Text style={styles.guestFeatureIcon}>{f.icon}</Text>
+                <View style={styles.guestFeatureIcon}>
+                  <Ionicons name={f.icon} size={16} color={COLORS.primary} />
+                </View>
                 <Text style={styles.guestFeatureText}>{f.label}</Text>
               </View>
             ))}
@@ -391,15 +395,24 @@ export default function ProfileScreen() {
               <View style={styles.profileInfo}>
                 <Text style={styles.userName} numberOfLines={1}>{profile?.name || 'User'}</Text>
                 {profile?.email && (
-                  <Text style={styles.userEmail} numberOfLines={1}>✉ {profile.email}</Text>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="mail-outline" size={13} color={COLORS.textSecondary} />
+                    <Text style={styles.userEmail} numberOfLines={1}>{profile.email}</Text>
+                  </View>
                 )}
                 {profile?.phone && (
-                  <Text style={styles.userPhone} numberOfLines={1}>📞 {profile.phone}</Text>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="call-outline" size={13} color={COLORS.textSecondary} />
+                    <Text style={styles.userPhone} numberOfLines={1}>{profile.phone}</Text>
+                  </View>
                 )}
                 {profile?.date_of_birth && (
-                  <Text style={styles.userPhone} numberOfLines={1}>
-                    🎂 {new Date(profile.date_of_birth).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </Text>
+                  <View style={styles.infoRow}>
+                    <Ionicons name="calendar-outline" size={13} color={COLORS.textSecondary} />
+                    <Text style={styles.userPhone} numberOfLines={1}>
+                      {new Date(profile.date_of_birth).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </Text>
+                  </View>
                 )}
               </View>
             </>
@@ -441,7 +454,7 @@ export default function ProfileScreen() {
                 {/* Row 1: DUNDU + contactless */}
                 <View style={styles.lcRow1}>
                   <Text style={styles.lcBrand}>DUNDU</Text>
-                  <Text style={styles.lcContactless}>📶</Text>
+                  <Ionicons name="wifi-outline" size={20} color="rgba(255,255,255,0.7)" style={styles.lcContactless} />
                 </View>
 
                 {/* Row 2: Chip + Points */}
@@ -484,7 +497,7 @@ export default function ProfileScreen() {
               {/* Redeemable banner */}
               {redeemableCount > 0 && (
                 <View style={styles.lcRedeemBanner}>
-                  <Text style={styles.lcRedeemIcon}>🎁</Text>
+                  <Ionicons name="gift-outline" size={22} color="#86efac" />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.lcRedeemTitle}>₹{redeemableCount * 200} Redeemable Now!</Text>
                     <Text style={styles.lcRedeemSub}>Show your card at billing counter to redeem</Text>
@@ -525,11 +538,15 @@ export default function ProfileScreen() {
                 onPress={item.onPress}
                 activeOpacity={0.7}
               >
-                {item.icon ? <Text style={styles.menuIcon}>{item.icon}</Text> : null}
+                {item.icon ? (
+                  <View style={[styles.menuIconWrap, item.danger && styles.menuIconWrapDanger]}>
+                    <Ionicons name={item.icon} size={18} color={item.danger ? COLORS.error : COLORS.primary} />
+                  </View>
+                ) : null}
                 <Text style={[styles.menuLabel, item.danger && styles.menuLabelDanger]}>
                   {item.label}
                 </Text>
-                {!item.danger && <Text style={styles.menuArrow}>›</Text>}
+                {!item.danger && <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} style={styles.menuArrow} />}
               </TouchableOpacity>
             );
           })}
@@ -599,7 +616,7 @@ export default function ProfileScreen() {
                   ? new Date(editDob + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
                   : 'Select date of birth'}
               </Text>
-              <Text style={{ fontSize: 18 }}>📅</Text>
+              <Ionicons name="calendar-outline" size={18} color={COLORS.textSecondary} />
             </TouchableOpacity>
 
             <Text style={[styles.emailNote, { marginTop: 8 }]}>
@@ -1077,10 +1094,21 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     backgroundColor: COLORS.surface,
   },
-  menuIcon: {
-    fontSize: 20,
-    width: 28,
-    textAlign: 'center',
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  menuIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: COLORS.primary + '14',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuIconWrapDanger: {
+    backgroundColor: COLORS.error + '14',
   },
   menuLabel: {
     flex: 1,
@@ -1092,9 +1120,7 @@ const styles = StyleSheet.create({
     color: COLORS.error,
   },
   menuArrow: {
-    fontSize: 20,
-    color: COLORS.textSecondary,
-    fontWeight: '300',
+    opacity: 0.7,
   },
   appVersion: {
     alignItems: 'center',
@@ -1314,8 +1340,6 @@ const styles = StyleSheet.create({
     textShadowRadius: 8,
   },
   lcContactless: {
-    fontSize: 20,
-    opacity: 0.7,
     transform: [{ rotate: '90deg' }],
   },
 
@@ -1402,7 +1426,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#166534',
   },
-  lcRedeemIcon: { fontSize: 22 },
   lcRedeemTitle: { fontSize: 14, fontWeight: '700', color: '#86efac' },
   lcRedeemSub: { fontSize: 11, color: '#4ade80', marginTop: 2 },
 
@@ -1485,7 +1508,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 20,
   },
-  guestAvatarIcon: { fontSize: 38 },
   guestTitle: {
     fontSize: 24,
     fontWeight: '800',
@@ -1528,7 +1550,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  guestFeatureIcon: { fontSize: 20, width: 30 },
+  guestFeatureIcon: { width: 30, height: 30, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
   guestFeatureText: { fontSize: 14, color: '#ccc', fontWeight: '500' },
   guestLegal: {
     marginTop: 20,

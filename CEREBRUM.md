@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile profile: emoji icons → Ionicons
+- `ProfileScreen.jsx`: every emoji icon (menu rows, guest hero/feature list, language card, contact info lines, loyalty-card contactless + redeem banner, DOB picker) replaced with `@expo/vector-icons/Ionicons` outline glyphs — same family the tab bar and AppHeader already use. Menu icons sit in a 34px tinted rounded square (`menuIconWrap`, primary tint; error tint for Logout), chevron is `chevron-forward`. Contact lines use `infoRow` (icon + text).
+
 ### 2026-10-25 — Admin sessions: 30-day sliding tokens, no hard logouts, product draft autosave
 Reported: admin panel logged out every few minutes, especially during image uploads. The JWT was already 7 days, so expiry was not the cause; the admin client treated *any* 401 (and any `/auth/me` failure, even a network blip while nodemon restarts) as "log out + full page reload", wiping the form. The TopBar polls 2 admin endpoints every 6 s, so one bad response per ~8 requests/min was enough.
 - **Backend**: `ADMIN_JWT_EXPIRES_IN` (default `30d`) for admin/super_admin tokens — `utils/jwt.js` `sign()` picks the lifetime by role; customers stay on `JWT_EXPIRES_IN` (7d). Sliding session: `authenticate` sets `X-Refreshed-Token` with a new token once less than half the lifetime remains. 401s now carry `X-Auth-Reason` (`TOKEN_EXPIRED` / `TOKEN_INVALID` / `ACCOUNT_NOT_FOUND` / `ACCOUNT_BLOCKED`) with a human message — `ACCOUNT_NOT_FOUND` is what you get when `DB_NAME` is switched under a logged-in admin. CORS exposes both headers.
