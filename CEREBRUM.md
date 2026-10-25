@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile: Combos is now a mode inside the Shop tab
+- Tapping Combos used to push `ComboListScreen`: categories vanished from the strip until that screen's own category fetch returned, and the whole screen swapped (different bg). Now `ProductsScreen` has `comboMode` (route param `combo: true` or Combo circle tap): same screen, same already-loaded strip (`isComboActive`), content area swaps to the combo list (`ComboCard` exported from `ComboListScreen.jsx`). Tapping a category/Offers leaves combo mode; tapping Combos again toggles it off. Home's Combo circle → `navigate('Shop', { combo: true })`. `ComboList` route still exists for deep links.
+
 ### 2026-10-25 — Mobile: Combo opens without slide animation
 - `AppNavigator.jsx`: `ComboList` screen `options={{ animation: 'none' }}` so tapping Combos swaps in place like a category change (push and pop both instant).
 

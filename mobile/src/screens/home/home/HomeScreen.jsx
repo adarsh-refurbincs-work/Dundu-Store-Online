@@ -289,7 +289,7 @@ export default function HomeScreen() {
         activeSlug={null}
         isOfferActive={false}
         onPressOffers={() => navigation.navigate('Shop', { offer: true })}
-        onPressCombo={() => navigation.navigate('ComboList')}
+        onPressCombo={() => navigation.navigate('Shop', { combo: true })}
         onPressCategory={(cat) =>
           navigation.navigate('Shop', { category: cat.slug, category_name: cat.name })
         }

@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { productApi, categoryApi } from '../../../api/index';
+import { productApi, categoryApi, comboApi } from '../../../api/index';
+import { ComboCard } from '../../combos/ComboListScreen';
 import { COLORS } from '../../../config';
 import ProductCard from '../../../components/product/ProductCard';
 import AppHeader from '../../../components/ui/AppHeader';
@@ -274,6 +275,10 @@ export default function ProductsScreen() {
   const [categoryName, setCategoryName] = useState(routeParams.category_name || null);
   const [offerOnly, setOfferOnly] = useState(!!routeParams.offer);
   const [newArrivalOnly, setNewArrivalOnly] = useState(!!routeParams.new_arrival);
+  // Combos behave like a category: same screen, same strip, content area swaps to the combo list.
+  const [comboMode, setComboMode] = useState(!!routeParams.combo);
+  const [combos, setCombos] = useState([]);
+  const [combosLoading, setCombosLoading] = useState(false);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const activeFilterCount = [
@@ -358,11 +363,24 @@ export default function ProductsScreen() {
     setCategoryName(routeParams.category_name || null);
     setOfferOnly(!!routeParams.offer);
     setNewArrivalOnly(!!routeParams.new_arrival);
+    setComboMode(!!routeParams.combo);
     setFilters(DEFAULT_FILTERS);
     const q = routeParams.search || '';
     setSearchInput(q);
     setSearch(q);
-  }, [routeParams.category, routeParams.category_name, routeParams.offer, routeParams.new_arrival, routeParams.search]);
+  }, [routeParams.category, routeParams.category_name, routeParams.offer, routeParams.new_arrival, routeParams.search, routeParams.combo]);
+
+  // Load combos whenever combo mode is entered (cached in state afterwards)
+  useEffect(() => {
+    if (!comboMode) return;
+    let cancelled = false;
+    setCombosLoading(true);
+    comboApi.list()
+      .then((res) => { if (!cancelled) setCombos(res.data?.combos || res.combos || []); })
+      .catch((e) => console.warn('combos fetch error', e))
+      .finally(() => { if (!cancelled) setCombosLoading(false); });
+    return () => { cancelled = true; };
+  }, [comboMode]);
 
   async function fetchProducts(pageNum, append = false) {
     if (pageNum === 1) setLoading(true);
@@ -409,10 +427,15 @@ export default function ProductsScreen() {
   function handleSearch() { setSearch(searchInput.trim()); }
 
   function handleCategoryPress(cat) {
+    setComboMode(false);
     if (cat.slug === activeSlug) { setActiveSlug(null); setCategoryName(null); }
     else { setActiveSlug(cat.slug); setCategoryName(cat.name); setOfferOnly(false); }
   }
-  function handleOffersPress() { setOfferOnly((p) => !p); setNewArrivalOnly(false); setActiveSlug(null); setCategoryName(null); }
+  function handleOffersPress() { setComboMode(false); setOfferOnly((p) => !p); setNewArrivalOnly(false); setActiveSlug(null); setCategoryName(null); }
+  function handleComboPress() {
+    if (comboMode) { setComboMode(false); return; }
+    setComboMode(true); setOfferOnly(false); setNewArrivalOnly(false); setActiveSlug(null); setCategoryName(null);
+  }
   function clearAll() { setActiveSlug(null); setCategoryName(null); setOfferOnly(false); setNewArrivalOnly(false); setFilters(DEFAULT_FILTERS); }
 
   const renderProduct = useCallback(
@@ -458,14 +481,39 @@ export default function ProductsScreen() {
       {/* Category strip */}
       <CategoryStrip
         categories={categories}
-        activeSlug={activeSlug}
-        isOfferActive={offerOnly}
+        activeSlug={comboMode ? null : activeSlug}
+        isOfferActive={!comboMode && offerOnly}
+        isComboActive={comboMode}
         onPressCategory={handleCategoryPress}
         onPressOffers={handleOffersPress}
-        onPressCombo={() => navigation.navigate('ComboList')}
+        onPressCombo={handleComboPress}
         themeColor={T.stripBorder}
       />
 
+      {comboMode ? (
+        /* ── Combo mode: same chrome, combo list in the content area ── */
+        combosLoading ? (
+          <View style={styles.center}><ActivityIndicator size="large" color={T.primary} /></View>
+        ) : combos.length === 0 ? (
+          <View style={styles.center}>
+            <Text style={styles.emptyIcon}>🎀</Text>
+            <Text style={styles.emptyTitle}>No combos yet</Text>
+            <Text style={styles.emptyHint}>Check back soon for combo deals</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={combos}
+            keyExtractor={(c) => String(c.id)}
+            contentContainerStyle={[styles.listContent, { backgroundColor: T.bg, paddingHorizontal: 14 }]}
+            showsVerticalScrollIndicator={false}
+            ListHeaderComponent={<Text style={[styles.resultCount, { marginBottom: 10 }]}>{combos.length} combo{combos.length !== 1 ? 's' : ''} available</Text>}
+            renderItem={({ item }) => (
+              <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
+            )}
+          />
+        )
+      ) : (
+      <>
       {/* Active filters tags row */}
       {hasAnyFilter && (
         <View style={[styles.filterSection, { backgroundColor: T.bg, borderBottomColor: T.border }]}>
@@ -550,6 +598,9 @@ export default function ProductsScreen() {
               : null
           }
         />
+      )}
+
+      </>
       )}
 
       {/* Filter bottom sheet */}

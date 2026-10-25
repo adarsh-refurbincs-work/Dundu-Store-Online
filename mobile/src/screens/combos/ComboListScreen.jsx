@@ -18,7 +18,7 @@ function getImageUri(src) {
   return UPLOADS_URL + (src.startsWith('/') ? src : '/' + src);
 }
 
-function ComboCard({ combo, onPress }) {
+export function ComboCard({ combo, onPress }) {
   const uri = getImageUri(combo.image_url);
   const hasOffer = combo.offer_price && parseFloat(combo.offer_price) > 0;
   const slotCount = combo.slots?.length || 0;
