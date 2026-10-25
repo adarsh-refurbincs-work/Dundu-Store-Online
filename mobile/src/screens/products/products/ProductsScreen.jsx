@@ -139,6 +139,82 @@ function SelectDropdown({ label, options, value, onChange }) {
   );
 }
 
+const COMBO_DEFAULT_FILTERS = { offer: false, price: '', items: '', slot: '' };
+const COMBO_PRICE_OPTS = [
+  { label: 'Under ₹500', value: 'lt500' },
+  { label: '₹500 – ₹1000', value: '500-1000' },
+  { label: '₹1000 – ₹2000', value: '1000-2000' },
+  { label: 'Above ₹2000', value: 'gt2000' },
+];
+const COMBO_ITEMS_OPTS = [
+  { label: '2 items', value: '2' },
+  { label: '3 items', value: '3' },
+  { label: '4+ items', value: '4+' },
+];
+export const comboEffectivePrice = (c) => {
+  const offer = parseFloat(c.offer_price);
+  return offer > 0 ? offer : (parseFloat(c.price) || 0);
+};
+
+function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] }) {
+  const [local, setLocal] = useState(filters);
+  const toggle = (k, v) => setLocal((p) => ({ ...p, [k]: p[k] === v ? '' : v }));
+  useEffect(() => { if (visible) setLocal(filters); }, [visible]);
+  const activeCount = [local.offer, local.price, local.items, local.slot].filter(Boolean).length;
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={onClose} />
+      <View style={styles.sheetCenter} pointerEvents="box-none">
+        <View style={styles.sheet}>
+          <View style={styles.sheetHeader}>
+            <Text style={styles.sheetTitle}>Combo Filters</Text>
+            <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
+              <Text style={styles.sheetReset}>Reset all</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+            <Text style={styles.sheetSection}>Deals</Text>
+            <View style={styles.chipRow}>
+              <Chip label="🏷️ On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
+            </View>
+
+            <Text style={styles.sheetSection}>Price</Text>
+            <View style={styles.chipRow}>
+              {COMBO_PRICE_OPTS.map((o) => (
+                <Chip key={o.value} label={o.label} active={local.price === o.value} onPress={() => toggle('price', o.value)} />
+              ))}
+            </View>
+
+            <Text style={styles.sheetSection}>Items in combo</Text>
+            <View style={styles.chipRow}>
+              {COMBO_ITEMS_OPTS.map((o) => (
+                <Chip key={o.value} label={o.label} active={local.items === o.value} onPress={() => toggle('items', o.value)} />
+              ))}
+            </View>
+
+            {slotLabels.length > 0 && (
+              <>
+                <Text style={styles.sheetSection}>Includes</Text>
+                <View style={styles.chipRow}>
+                  {slotLabels.map((l) => (
+                    <Chip key={l} label={l} active={local.slot === l} onPress={() => toggle('slot', l)} />
+                  ))}
+                </View>
+              </>
+            )}
+          </ScrollView>
+
+          <TouchableOpacity style={styles.applyBtn} onPress={() => { onApply(local); onClose(); }}>
+            <Text style={styles.applyBtnText}>Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
   const [local, setLocal] = useState(filters);
   const toggle = (k, v) => setLocal((p) => ({ ...p, [k]: p[k] === v ? '' : v }));
@@ -279,6 +355,36 @@ export default function ProductsScreen() {
   const [comboMode, setComboMode] = useState(!!routeParams.combo);
   const [combos, setCombos] = useState([]);
   const [combosLoading, setCombosLoading] = useState(false);
+  const [comboSort, setComboSort] = useState('newest');
+  const [comboFilters, setComboFilters] = useState(COMBO_DEFAULT_FILTERS);
+  const [showComboFilter, setShowComboFilter] = useState(false);
+  const comboFilterCount = [comboFilters.offer, comboFilters.price, comboFilters.items, comboFilters.slot].filter(Boolean).length;
+
+  // Slot labels across all combos → "Includes" filter options
+  const comboSlotLabels = [...new Set(combos.flatMap((c) => (c.slots || []).map((sl) => sl.slot_label).filter(Boolean)))];
+
+  // Combos are a single small list, so sort + filter happen client-side
+  const visibleCombos = combos
+    .filter((c) => {
+      if (comboFilters.offer && !(parseFloat(c.offer_price) > 0)) return false;
+      const price = comboEffectivePrice(c);
+      if (comboFilters.price === 'lt500' && !(price < 500)) return false;
+      if (comboFilters.price === '500-1000' && !(price >= 500 && price <= 1000)) return false;
+      if (comboFilters.price === '1000-2000' && !(price > 1000 && price <= 2000)) return false;
+      if (comboFilters.price === 'gt2000' && !(price > 2000)) return false;
+      const n = (c.slots || []).length;
+      if (comboFilters.items === '2' && n !== 2) return false;
+      if (comboFilters.items === '3' && n !== 3) return false;
+      if (comboFilters.items === '4+' && n < 4) return false;
+      if (comboFilters.slot && !(c.slots || []).some((sl) => sl.slot_label === comboFilters.slot)) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (comboSort === 'price_asc')  return comboEffectivePrice(a) - comboEffectivePrice(b);
+      if (comboSort === 'price_desc') return comboEffectivePrice(b) - comboEffectivePrice(a);
+      return new Date(b.created_at) - new Date(a.created_at); // newest
+    });
+  const clearComboFilters = () => setComboFilters(COMBO_DEFAULT_FILTERS);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
 
   const activeFilterCount = [
@@ -491,27 +597,80 @@ export default function ProductsScreen() {
       />
 
       {comboMode ? (
-        /* ── Combo mode: same chrome, combo list in the content area ── */
-        combosLoading ? (
-          <View style={styles.center}><ActivityIndicator size="large" color={T.primary} /></View>
-        ) : combos.length === 0 ? (
-          <View style={styles.center}>
-            <Text style={styles.emptyIcon}>🎀</Text>
-            <Text style={styles.emptyTitle}>No combos yet</Text>
-            <Text style={styles.emptyHint}>Check back soon for combo deals</Text>
+        /* ── Combo mode: same chrome; sort row + filters + combo list in the content area ── */
+        <>
+          {comboFilterCount > 0 && (
+            <View style={[styles.filterSection, { backgroundColor: T.bg, borderBottomColor: T.border }]}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeTagsRow}>
+                <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🎀 Combos</Text></View>
+                {comboFilters.offer && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🏷️ On offer</Text></View>}
+                {comboFilters.price && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>💰 {COMBO_PRICE_OPTS.find((o) => o.value === comboFilters.price)?.label}</Text></View>}
+                {comboFilters.items && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>📦 {COMBO_ITEMS_OPTS.find((o) => o.value === comboFilters.items)?.label}</Text></View>}
+                {comboFilters.slot && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{comboFilters.slot}</Text></View>}
+              </ScrollView>
+              <TouchableOpacity onPress={clearComboFilters} style={{ paddingHorizontal: 12 }}>
+                <Text style={[styles.clearText, { color: T.primary }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          <View style={[styles.sortRow, { backgroundColor: T.bg, borderBottomColor: T.border }]}>
+            {SORT_OPTIONS.map((opt) => (
+              <TouchableOpacity
+                key={opt.value}
+                style={[styles.chip, { backgroundColor: T.surface, borderColor: T.border }, comboSort === opt.value && { backgroundColor: T.primary, borderColor: T.primary }]}
+                onPress={() => setComboSort(opt.value)}
+              >
+                <Text style={[styles.chipText, comboSort === opt.value && styles.chipTextActive]}>{opt.label}</Text>
+              </TouchableOpacity>
+            ))}
+            <Text style={styles.resultCount}>{visibleCombos.length} combo{visibleCombos.length !== 1 ? 's' : ''}</Text>
+            <TouchableOpacity
+              style={[styles.sortFilterBtn, { borderColor: T.primary, backgroundColor: T.surface }, comboFilterCount > 0 && { backgroundColor: T.tagBg }]}
+              onPress={() => setShowComboFilter(true)}
+            >
+              <FilterIcon color={T.primary} size={16} />
+              {comboFilterCount > 0 && (
+                <View style={[styles.sortFilterBadge, { backgroundColor: T.primary }]}>
+                  <Text style={styles.sortFilterBadgeText}>{comboFilterCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
-        ) : (
-          <FlatList
-            data={combos}
-            keyExtractor={(c) => String(c.id)}
-            contentContainerStyle={[styles.listContent, { backgroundColor: T.bg, paddingHorizontal: 14 }]}
-            showsVerticalScrollIndicator={false}
-            ListHeaderComponent={<Text style={[styles.resultCount, { marginBottom: 10 }]}>{combos.length} combo{combos.length !== 1 ? 's' : ''} available</Text>}
-            renderItem={({ item }) => (
-              <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
-            )}
+
+          {combosLoading ? (
+            <View style={styles.center}><ActivityIndicator size="large" color={T.primary} /></View>
+          ) : visibleCombos.length === 0 ? (
+            <View style={styles.center}>
+              <Text style={styles.emptyIcon}>🎀</Text>
+              <Text style={styles.emptyTitle}>{combos.length === 0 ? 'No combos yet' : 'No combos match'}</Text>
+              <Text style={styles.emptyHint}>{combos.length === 0 ? 'Check back soon for combo deals' : 'Try adjusting your filters'}</Text>
+              {comboFilterCount > 0 && (
+                <TouchableOpacity style={[styles.clearAllBtn, { backgroundColor: T.primary }]} onPress={clearComboFilters}>
+                  <Text style={styles.clearAllBtnText}>Clear All Filters</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : (
+            <FlatList
+              data={visibleCombos}
+              keyExtractor={(c) => String(c.id)}
+              contentContainerStyle={[styles.listContent, { backgroundColor: T.bg, paddingHorizontal: 14 }]}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
+              )}
+            />
+          )}
+
+          <ComboFilterSheet
+            visible={showComboFilter}
+            onClose={() => setShowComboFilter(false)}
+            filters={comboFilters}
+            onApply={setComboFilters}
+            slotLabels={comboSlotLabels}
           />
-        )
+        </>
       ) : (
       <>
       {/* Active filters tags row */}

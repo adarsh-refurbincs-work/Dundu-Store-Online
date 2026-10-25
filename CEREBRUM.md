@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile combo mode: sorting + filters
+- `ProductsScreen.jsx` combo mode now has the same sort row (Newest / Price ↑ / Price ↓ on effective price), a filter button with badge and active-filter tag row, and a `ComboFilterSheet` (On offer, price band, items-in-combo count, "Includes" by slot label). All client-side over the loaded combo list (`visibleCombos`); `comboEffectivePrice` exported.
+
 ### 2026-10-25 — Mobile: Combos is now a mode inside the Shop tab
 - Tapping Combos used to push `ComboListScreen`: categories vanished from the strip until that screen's own category fetch returned, and the whole screen swapped (different bg). Now `ProductsScreen` has `comboMode` (route param `combo: true` or Combo circle tap): same screen, same already-loaded strip (`isComboActive`), content area swaps to the combo list (`ComboCard` exported from `ComboListScreen.jsx`). Tapping a category/Offers leaves combo mode; tapping Combos again toggles it off. Home's Combo circle → `navigate('Shop', { combo: true })`. `ComboList` route still exists for deep links.
 
