@@ -13,6 +13,7 @@ import AppHeader from '../../components/ui/AppHeader';
 import useCartStore from '../../store/cart.store';
 import useRequireAuth from '../../hooks/useRequireAuth';
 import { ComboCard } from './ComboListScreen';
+import LightboxViewer from '../../components/ui/LightboxViewer';
 
 // Price a shopper would pay for a product on its own (offer 0 / "0.00" = no offer)
 const unitPrice = (p) => (Number(p?.offer_price) > 0 ? Number(p.offer_price) : Number(p?.price) || 0);
@@ -238,6 +239,7 @@ export default function ComboDetailScreen() {
   const [cartSuccess, setCartSuccess] = useState(false);
   const [otherCombos, setOtherCombos] = useState([]);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [lightbox, setLightbox] = useState(null); // image uri when the zoom viewer is open
   const [reviews, setReviews] = useState([]); // reviews of every product that can be in this combo
   const [showAllReviews, setShowAllReviews] = useState(false);
 
@@ -439,7 +441,9 @@ export default function ComboDetailScreen() {
               onMomentumScrollEnd={(e) => setHeroIndex(Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH))}
             >
               {galleryUris.map((uri, i) => (
-                <Image key={uri + i} source={{ uri }} style={[styles.heroImage, { width: SCREEN_WIDTH }]} resizeMode="cover" />
+                <TouchableOpacity key={uri + i} activeOpacity={0.95} onPress={() => setLightbox(uri)} accessibilityLabel="Zoom image">
+                  <Image source={{ uri }} style={[styles.heroImage, { width: SCREEN_WIDTH }]} resizeMode="cover" />
+                </TouchableOpacity>
               ))}
             </ScrollView>
           ) : (
@@ -570,7 +574,9 @@ export default function ComboDetailScreen() {
               {r.product_name && <Text style={styles.reviewProduct} numberOfLines={1}>on {r.product_name}</Text>}
               {(r.review || r.comment) ? <Text style={styles.reviewText}>{r.review || r.comment}</Text> : null}
               {r.image_url && (
-                <Image source={{ uri: getImageUri(r.image_url) }} style={styles.reviewImage} resizeMode="cover" />
+                <TouchableOpacity onPress={() => setLightbox(getImageUri(r.image_url))} activeOpacity={0.9}>
+                  <Image source={{ uri: getImageUri(r.image_url) }} style={styles.reviewImage} resizeMode="cover" />
+                </TouchableOpacity>
               )}
             </View>
           ))}
@@ -602,6 +608,9 @@ export default function ComboDetailScreen() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {/* Tap any gallery / review photo to zoom (pinch) */}
+      <LightboxViewer uri={lightbox} onClose={() => setLightbox(null)} />
     </SafeAreaView>
   );
 }

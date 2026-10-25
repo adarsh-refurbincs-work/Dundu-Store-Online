@@ -14,7 +14,6 @@ import {
   Animated,
   TextInput,
 } from 'react-native';
-import { PinchGestureHandler, State } from 'react-native-gesture-handler';
 import * as ImagePicker from 'expo-image-picker';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +27,7 @@ import { COLORS, UPLOADS_URL } from '../../../config';
 import { formatPrice } from '../../../utils/format';
 import ProductCard from '../../../components/product/ProductCard';
 import AppHeader from '../../../components/ui/AppHeader';
+import LightboxViewer from '../../../components/ui/LightboxViewer';
 import WishlistHeart from '../../../components/ui/WishlistHeart';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -44,38 +44,6 @@ function getImageUri(src) {
 function StarRating({ rating }) {
   const n = Math.round(Number(rating) || 0);
   return <Text style={styles.stars}>{'★'.repeat(n)}{'☆'.repeat(5 - n)}</Text>;
-}
-
-function LightboxViewer({ uri, onClose }) {
-  const scale     = React.useRef(new Animated.Value(1)).current;
-  const scaleBase = React.useRef(1);
-
-  const onPinchEvent = Animated.event([{ nativeEvent: { scale } }], { useNativeDriver: true });
-
-  const onPinchStateChange = (e) => {
-    if (e.nativeEvent.oldState === State.ACTIVE) {
-      scaleBase.current *= e.nativeEvent.scale;
-      const next = Math.min(Math.max(scaleBase.current, 1), 5);
-      scaleBase.current = next;
-      scale.setValue(next);
-    }
-  };
-
-  return (
-    <View style={styles.lightboxBackdrop}>
-      <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
-      <PinchGestureHandler onGestureEvent={onPinchEvent} onHandlerStateChange={onPinchStateChange}>
-        <Animated.Image
-          source={{ uri }}
-          style={[styles.lightboxImage, { transform: [{ scale }] }]}
-          resizeMode="contain"
-        />
-      </PinchGestureHandler>
-      <TouchableOpacity style={styles.lightboxClose} onPress={onClose}>
-        <Text style={styles.lightboxCloseText}>✕</Text>
-      </TouchableOpacity>
-    </View>
-  );
 }
 
 export default function ProductDetailScreen() {
@@ -695,12 +663,8 @@ export default function ProductDetailScreen() {
         </TouchableOpacity>
       </Modal>
 
-      {/* 🔍 Lightbox with pinch-to-zoom */}
-      {lightbox && (
-        <Modal visible transparent animationType="fade" onRequestClose={() => setLightbox(null)}>
-          <LightboxViewer uri={lightbox} onClose={() => setLightbox(null)} />
-        </Modal>
-      )}
+      {/* Lightbox with pinch-to-zoom (shared component) */}
+      <LightboxViewer uri={lightbox} onClose={() => setLightbox(null)} />
 
       {/* ✏️ Write a Review Modal */}
       <Modal
@@ -1213,28 +1177,6 @@ const styles = StyleSheet.create({
   },
   rvCharCount: { fontSize: 11, color: COLORS.textSecondary, textAlign: 'right', marginTop: 6 },
 
-  lightboxBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.95)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lightboxImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_WIDTH * 1.2,
-  },
-  lightboxClose: {
-    position: 'absolute',
-    top: 48,
-    right: 20,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lightboxCloseText: { fontSize: 18, color: '#fff', fontWeight: '600' },
   reviewImage: {
     width: 80,
     height: 80,

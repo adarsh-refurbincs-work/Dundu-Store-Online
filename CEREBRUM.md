@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo detail: tap-to-zoom images; shared LightboxViewer
+- New `components/ui/LightboxViewer.jsx` (pinch-to-zoom Modal, renders nothing when `uri` is falsy) extracted from `ProductDetailScreen` (local copy + styles removed). `ComboDetailScreen`: hero gallery images and review photos open it.
+
 ### 2026-10-25 — Filter sheets: close icon, centred, compact text
 - Both `FilterSheet` (products) and `ComboFilterSheet` share the compact `comboSheet` sizing (86%/340px, ≤62% height), `statusBarTranslucent` centring, a round ✕ close button beside Reset, smaller title/section/Reset text, compact chips, slimmer Apply; dropdown trigger/items 12px.
 
