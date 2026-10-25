@@ -215,6 +215,13 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile login: tab switcher background removed
+- `LoginScreen.jsx` `tabContainer` background `#1A1A1A` → transparent; active tab keeps the primary pill.
+
+### 2026-10-25 — Variant SKU collisions + 50 MB upload limit
+- **SKU**: `ProductForm.buildSku` used the colour's first letter (`CODE-B-S1`), so Black + Beige on one product produced identical SKUs and `product_variants.sku` UNIQUE blew up with a 500 on publish. Now `CODE-<FULL COLOUR SLUG>-S<n>` (e.g. `CODE-BLACK-S1`, `CODE-BEIGE-S1`); the form also refuses to submit with duplicate SKUs (toast names both variants), and the backend maps `product_variants_sku_key` 23505 to a 400 with the offending SKU (create + update).
+- **Uploads**: nginx (`admin/nginx.conf`, `web/nginx.conf`) `client_max_body_size 50M` (server + `/api/`), `proxy_request_buffering off`, 300 s read timeout. Multer per-file cap default raised 5 MB → 50 MB (`MAX_FILE_SIZE=52428800` in `.env`/`.env.example`). Express JSON/urlencoded limits stay 1 MB — multipart doesn't go through them.
+
 ### 2026-10-25 — Mobile profile: emoji icons → Ionicons
 - `ProfileScreen.jsx`: every emoji icon (menu rows, guest hero/feature list, language card, contact info lines, loyalty-card contactless + redeem banner, DOB picker) replaced with `@expo/vector-icons/Ionicons` outline glyphs — same family the tab bar and AppHeader already use. Menu icons sit in a 34px tinted rounded square (`menuIconWrap`, primary tint; error tint for Logout), chevron is `chevron-forward`. Contact lines use `infoRow` (icon + text).
 

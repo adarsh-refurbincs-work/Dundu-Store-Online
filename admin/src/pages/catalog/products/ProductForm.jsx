@@ -556,9 +556,12 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
 
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
+  // SKU = <product code>-<COLOUR SLUG>-S<n>. The full colour name (not its first
+  // letter) keeps e.g. Black and Beige from colliding on the UNIQUE sku column.
+  const slugColor = (color) => String(color || '').toUpperCase().replace(/[^A-Z0-9]+/g, '').slice(0, 24);
   const buildSku = (code, color, idx) => {
     if (!code || !color) return '';
-    return `${code}-${color[0].toUpperCase()}-S${idx + 1}`;
+    return `${code}-${slugColor(color)}-S${idx + 1}`;
   };
 
   const handleCategoryChange = async (e) => {
@@ -740,6 +743,19 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
       const flatVariants = colorVariants.flatMap((cv) =>
         cv.sizes.map((s) => ({ color: cv.color, size: s.size, stock: Number(s.stock) || 0, sku: s.sku }))
       ).filter((v) => v.color || v.size);
+      // Catch duplicate SKUs here instead of letting the DB UNIQUE constraint 500 on publish.
+      const skuSeen = new Map();
+      for (const v of flatVariants) {
+        if (!v.sku) continue;
+        const key = v.sku.trim().toUpperCase();
+        if (skuSeen.has(key)) {
+          const first = skuSeen.get(key);
+          toast.error(`Duplicate SKU "${v.sku}" on ${first.color || '—'} ${first.size || ''} and ${v.color || '—'} ${v.size || ''}. Each variant needs a unique SKU.`);
+          setLoading(false);
+          return;
+        }
+        skuSeen.set(key, v);
+      }
       if (flatVariants.length) fd.append('variants', JSON.stringify(flatVariants));
 
       const imageColors = images.map((img) => img.color || null);

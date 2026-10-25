@@ -153,6 +153,10 @@ const create = async (req, res) => {
     if (err.code === '23505' && err.constraint === 'products_product_code_key') {
       return badRequest(res, `Product code "${product_code}" already exists. Change it and try again.`);
     }
+    if (err.code === '23505' && err.constraint === 'product_variants_sku_key') {
+      const dup = /\((.*?)\)=\((.*?)\)/.exec(err.detail || '')?.[2];
+      return badRequest(res, `Variant SKU${dup ? ` "${dup}"` : ''} is already in use (by this or another product). Every variant SKU must be unique.`);
+    }
     error(res, err.message || 'Failed to create product');
   } finally {
     client.release();
@@ -249,6 +253,10 @@ const update = async (req, res) => {
     await client.query('ROLLBACK');
     if (err.code === '23505' && err.constraint === 'products_product_code_key') {
       return badRequest(res, `Product code "${product_code}" already exists. Change it and try again.`);
+    }
+    if (err.code === '23505' && err.constraint === 'product_variants_sku_key') {
+      const dup = /\((.*?)\)=\((.*?)\)/.exec(err.detail || '')?.[2];
+      return badRequest(res, `Variant SKU${dup ? ` "${dup}"` : ''} is already in use (by this or another product). Every variant SKU must be unique.`);
     }
     error(res, err.message || 'Failed to update product');
   } finally {

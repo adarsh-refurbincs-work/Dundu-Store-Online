@@ -71,7 +71,8 @@ const filesLookValid = (req) => {
 
 const withVerify = (mw) => (req, res, next) => mw(req, res, (err) => (err ? next(err) : verifyImages(req, res, next)));
 
-const limits = { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024 };
+// Per-file cap for multipart uploads (default 50 MB so full-resolution product photos fit).
+const limits = { fileSize: parseInt(process.env.MAX_FILE_SIZE) || 50 * 1024 * 1024 };
 
 let uploadMiddleware;
 
