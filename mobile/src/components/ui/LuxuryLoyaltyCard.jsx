@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+
+// Explicit size (not aspectRatio) so the content never collapses inside a parent without a fixed width.
+const CARD_WIDTH = Dimensions.get('window').width - 32;
+const CARD_HEIGHT = Math.round(CARD_WIDTH / 1.586); // ISO ID-1 bank-card ratio
 import Svg, {
   Defs,
   LinearGradient,
@@ -89,7 +93,7 @@ export default function LuxuryLoyaltyCard({
   style,
   compact = false,
 }) {
-  const points = Number(card?.points ?? 0);
+  const points = Number.isFinite(Number(card?.points)) ? Number(card.points) : 0;
   const pointsAfterRedeem = points % 200;
   const redeemableCount = Math.floor(points / 200);
   const memberYear = card?.created_at
@@ -267,7 +271,8 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 20,
     overflow: 'hidden',
-    aspectRatio: 1.586, // ISO/IEC 7810 ID-1 — same proportions as a bank card
+    width: '100%',
+    height: CARD_HEIGHT,
     position: 'relative',
     backgroundColor: '#060912',
     shadowColor: '#1e3a8a',
@@ -277,7 +282,7 @@ const styles = StyleSheet.create({
     elevation: 14,
   },
   cardInner: {
-    flex: 1,
+    height: CARD_HEIGHT,
     paddingHorizontal: 22,
     paddingTop: 18,
     paddingBottom: 16,

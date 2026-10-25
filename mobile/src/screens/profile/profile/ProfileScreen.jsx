@@ -75,7 +75,10 @@ export default function ProfileScreen() {
       // Fetch loyalty card
       try {
         const lRes = await loyaltyApi.myCard();
-        setLoyaltyCard(lRes?.card || lRes?.data?.card || null);
+        const c = lRes?.card || lRes?.data?.card || null;
+        const needsPhone = !!(lRes?.needs_phone ?? lRes?.data?.needs_phone);
+        // Show the card with the profile name and 0 pts rather than hiding the whole section
+        setLoyaltyCard(c || (needsPhone ? null : { name: p?.name, phone: p?.phone, points: 0, total_spent: 0, created_at: p?.created_at }));
       } catch (_) {}
     } catch (err) {
       // silent — user data from auth store is fallback

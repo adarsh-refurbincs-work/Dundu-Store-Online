@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Loyalty card: explicit size (content was collapsing)
+- `LuxuryLoyaltyCard`: `aspectRatio` replaced by `width:100%` + `height = (screenWidth-32)/1.586` on both container and inner view — with aspectRatio alone the inner `flex:1` content could collapse while the SVG background still painted (card looked empty). Profile falls back to a profile-name / 0-pt card when the API has none (hidden only when the account has no phone).
+
 ### 2026-10-25 — Profile: light theme for the blocks under the loyalty card
 - `ProfileScreen` "Next Reward Milestone" card → white with champagne border, dark text, gold `#D4AF37` fill on a light track, muted gold badge; redeem banner → light green. Card itself stays black/blue/gold.
 
