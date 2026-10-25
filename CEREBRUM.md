@@ -215,6 +215,10 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Web product detail blank screen (missing `useEffect` import)
+- `web/src/pages/products/product-detail/ProductDetail.jsx` used `useEffect` but imported only `useMemo, useState` → `ReferenceError: useEffect is not defined`, blank page for every product. Import fixed. Swept every `.jsx` in `web/` and `admin/` for hooks used without import — no others.
+- Verified with headless Chromium (Playwright, scratchpad) against a Vite dev server on :3100: all 7 product detail pages render the product name with zero page errors. Note: local port 3000 is often taken by another project's Vite (`WORK/Looser/frontend`) — when the Dundu storefront "shows a login page", check `lsof -iTCP:3000`.
+
 ### 2026-10-25 — Combo screen: fixed 'Shop' navigation
 - `ComboListScreen` is in the root stack, `Shop` is a tab inside `MainTabs` → `navigate('Shop')` was unhandled. Category / Offers / search now use `navigate('MainTabs', { screen: 'Shop', params })`.
 

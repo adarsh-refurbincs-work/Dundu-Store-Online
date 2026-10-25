@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, ShoppingBag, Star, ImageOff, Zap, Truck, ShieldCheck, RotateCcw, PackageCheck, Camera, Minus, Plus, ChevronRight } from 'lucide-react';
