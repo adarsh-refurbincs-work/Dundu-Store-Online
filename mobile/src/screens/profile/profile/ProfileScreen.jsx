@@ -458,13 +458,13 @@ export default function ProfileScreen() {
                   style={styles.lcRedeemBanner}
                 >
                   <View style={styles.lcRedeemIconWrap}>
-                    <Ionicons name="gift" size={20} color="#F5D061" />
+                    <Ionicons name="gift" size={20} color="#B38B29" />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.lcRedeemTitle}>₹{redeemableCount * 200} Voucher Ready to Redeem!</Text>
                     <Text style={styles.lcRedeemSub}>Show card barcode at billing counter or use at checkout</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={18} color="#A7F3D0" />
+                  <Ionicons name="chevron-forward" size={18} color="#059669" />
                 </TouchableOpacity>
               )}
 
@@ -472,7 +472,7 @@ export default function ProfileScreen() {
               <View style={styles.lcProgressCard}>
                 <View style={styles.lcProgressHeader}>
                   <View style={styles.lcMilestoneLeft}>
-                    <Ionicons name="sparkles" size={13} color="#F5D061" />
+                    <Ionicons name="sparkles" size={13} color="#B38B29" />
                     <Text style={styles.lcProgressTitle}>Next Reward Milestone</Text>
                   </View>
                   <View style={styles.lcNeededBadge}>
@@ -491,7 +491,7 @@ export default function ProfileScreen() {
                 </View>
 
                 <View style={styles.lcProgressPerkRow}>
-                  <Ionicons name="bag-check-outline" size={12} color="rgba(255,255,255,0.45)" style={{ marginRight: 5 }} />
+                  <Ionicons name="bag-check-outline" size={12} color={COLORS.textSecondary} style={{ marginRight: 5 }} />
                   <Text style={styles.lcProgressHint}>Earn 20 pts for every ₹500 spent · In-store & Online</Text>
                 </View>
               </View>
@@ -1272,10 +1272,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#071F14',
+    backgroundColor: '#ECFDF5',
     borderWidth: 1.2,
-    borderColor: '#166534',
-    shadowColor: '#052E16',
+    borderColor: '#A7F3D0',
+    shadowColor: '#065F46',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 8,
@@ -1291,20 +1291,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lcRedeemTitle: { fontSize: 13.5, fontWeight: '800', color: '#BBF7D0', letterSpacing: 0.2 },
-  lcRedeemSub: { fontSize: 11, color: '#86EFAC', marginTop: 2 },
+  lcRedeemTitle: { fontSize: 13.5, fontWeight: '800', color: '#047857', letterSpacing: 0.2 },
+  lcRedeemSub: { fontSize: 11, color: '#059669', marginTop: 2 },
 
   /* Modern Dark Progress Container */
   lcProgressCard: {
     marginTop: 12,
     borderRadius: 18,
     padding: 16,
-    backgroundColor: '#0D0F16',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#1E2333',
-    shadowColor: '#000',
+    borderColor: '#EADFC8',
+    shadowColor: '#B38B29',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.12,
     shadowRadius: 8,
     elevation: 4,
   },
@@ -1322,36 +1322,36 @@ const styles = StyleSheet.create({
   lcProgressTitle: {
     fontSize: 12.5,
     fontWeight: '700',
-    color: '#E5E7EB',
+    color: COLORS.text,
     letterSpacing: 0.3,
   },
   lcNeededBadge: {
-    backgroundColor: 'rgba(245, 208, 97, 0.12)',
+    backgroundColor: '#FBF3DC',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: 'rgba(245, 208, 97, 0.25)',
+    borderColor: '#EAD28C',
   },
   lcNeededText: {
     fontSize: 10.5,
     fontWeight: '800',
-    color: '#F5D061',
+    color: '#9A7420',
   },
   lcProgressBarTrack: {
     height: 9,
     borderRadius: 6,
-    backgroundColor: '#1C2130',
+    backgroundColor: '#EFEAE0',
     overflow: 'hidden',
     marginBottom: 10,
   },
   lcProgressBarFill: {
     height: '100%',
     borderRadius: 6,
-    backgroundColor: '#F5D061',
-    shadowColor: '#F5D061',
+    backgroundColor: '#D4AF37',
+    shadowColor: '#D4AF37',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 2,
   },
@@ -1364,12 +1364,12 @@ const styles = StyleSheet.create({
   lcProgressPointsText: {
     fontSize: 11.5,
     fontWeight: '700',
-    color: '#9CA3AF',
+    color: COLORS.text,
   },
   lcProgressTierHint: {
     fontSize: 11.5,
     fontWeight: '800',
-    color: '#F5D061',
+    color: '#9A7420',
   },
   lcProgressPerkRow: {
     flexDirection: 'row',
@@ -1377,11 +1377,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+    borderTopColor: '#F0EAE0',
   },
   lcProgressHint: {
     fontSize: 10.5,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     fontWeight: '500',
   },
 
