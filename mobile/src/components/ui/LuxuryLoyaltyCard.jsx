@@ -4,7 +4,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 /**
  * Realistic Gold EMV Microchip built with pure React Native Views.
- * Guaranteed 100% cross-platform rendering with zero SVG layering or occluding issues.
  */
 function EmvChip() {
   return (
@@ -25,8 +24,6 @@ export default function LuxuryLoyaltyCard({
   style,
 }) {
   const points = Number(card?.points ?? 0);
-  const redeemableCount = Math.floor(points / 200);
-  const appCash = redeemableCount > 0 ? redeemableCount * 200 : points;
   const memberYear = card?.created_at
     ? new Date(card.created_at).getFullYear()
     : new Date().getFullYear();
@@ -40,65 +37,73 @@ export default function LuxuryLoyaltyCard({
   const rawName = card?.name || profileName || 'ADARSH SHARMA';
   const displayName = rawName.trim().slice(0, 24).toUpperCase();
 
-  // 16-digit card number format: 4892 •••• •••• 3210
-  const digits = (card?.phone || '').replace(/\D/g, '');
-  const firstFour = digits.length >= 8 ? digits.slice(0, 4) : '4892';
-  const lastFour = digits.length >= 4 ? digits.slice(-4) : '3210';
+  // Complete 16-digit card number: 4 unmasked groups of 4 digits
+  const rawPhone = (card?.phone || '').replace(/\D/g, '');
+  const rawNumber = (card?.card_number || '').replace(/\D/g, '');
+  const full16 = rawNumber.length >= 16
+    ? rawNumber.slice(0, 16)
+    : ('4892' + (rawPhone || '882049183210')).padEnd(16, '9').slice(0, 16);
+
+  const g1 = full16.slice(0, 4);
+  const g2 = full16.slice(4, 8);
+  const g3 = full16.slice(8, 12);
+  const g4 = full16.slice(12, 16);
+  const fullCardNumber = `${g1}   ${g2}   ${g3}   ${g4}`;
 
   const CardContent = (
     <View style={[styles.cardContainer, { height: cardHeight, minHeight: cardHeight }, style]}>
       {/* Decorative ambient subtle glow */}
       <View style={styles.ambientGlow} pointerEvents="none" />
 
-      {/* Row 1: Brand (DUNDU ONLINE / APP REWARDS CLUB) + Member Pill & Contactless */}
+      {/* Row 1: Brand + Shop Member Pill & Contactless */}
       <View style={styles.rowTop}>
         <View style={styles.brandGroup}>
           <View style={styles.sparkleBadge}>
-            <Ionicons name="sparkles" size={17} color="#c7d2fe" />
+            <Ionicons name="sparkles" size={15} color="#c7d2fe" />
           </View>
           <View style={styles.brandTextGroup}>
             <Text style={styles.brandTitle}>DUNDU ONLINE</Text>
-            <Text style={styles.brandSubtitle}>APP REWARDS CLUB</Text>
+            <Text style={styles.brandSubtitle}>STORE REWARDS CLUB</Text>
           </View>
         </View>
 
         <View style={styles.topRightGroup}>
           <View style={styles.memberPill}>
             <Text style={styles.memberPillStar}>★</Text>
-            <Text style={styles.memberPillText}>APP MEMBER</Text>
+            <Text style={styles.memberPillText}>SHOP MEMBER</Text>
           </View>
           <View style={styles.contactlessWrap}>
-            <Ionicons name="wifi-outline" size={19} color="#c7d2fe" />
+            <Ionicons name="wifi-outline" size={17} color="#c7d2fe" />
           </View>
         </View>
       </View>
 
-      {/* Row 2: Gold EMV Chip + Points & App Cash Box */}
+      {/* Row 2: Gold EMV Chip + Points Only Box (no ≈ or cash value) */}
       <View style={styles.rowMiddle}>
         <EmvChip />
 
-        {/* Points & App Cash Badge Box */}
+        {/* Clean Points Box */}
         <View style={styles.pointsBox}>
-          <View style={styles.pointsTopRow}>
-            <Text style={styles.starIcon}>★</Text>
-            <Text style={styles.pointsNumber}>{points}</Text>
-            <Text style={styles.ptsLabel}>PTS</Text>
-          </View>
-          <Text style={styles.appCashText}>≈ ₹{appCash} App Cash</Text>
+          <Text style={styles.starIcon}>★</Text>
+          <Text style={styles.pointsNumber}>{points}</Text>
+          <Text style={styles.ptsLabel}>PTS</Text>
         </View>
       </View>
 
-      {/* Row 3: Card Number (4892 •••• •••• 3210) */}
+      {/* Row 3: Complete 16-Digit Card Number */}
       <View style={styles.rowNumber}>
-        <Text style={styles.cardNumberText}>
-          {firstFour}   ••••   ••••   {lastFour}
+        <Text style={styles.cardNumberText} numberOfLines={1} adjustsFontSizeToFit>
+          {fullCardNumber}
         </Text>
       </View>
+
+      {/* Thin Horizontal Divider Line */}
+      <View style={styles.cardDivider} />
 
       {/* Row 4: Cardholder + Member Since */}
       <View style={styles.rowBottom}>
         <View style={styles.cardholderCol}>
-          <Text style={styles.fieldLabel}>APP CARDHOLDER</Text>
+          <Text style={styles.fieldLabel}>CARDHOLDER</Text>
           <Text style={styles.cardholderName} numberOfLines={1}>
             {displayName}
           </Text>
@@ -127,26 +132,26 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 24,
     backgroundColor: '#0f142e',
-    borderWidth: 1.5,
-    borderColor: 'rgba(129, 140, 248, 0.42)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(129, 140, 248, 0.4)',
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 16,
     justifyContent: 'space-between',
     overflow: 'hidden',
     position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 18,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    elevation: 6,
   },
   ambientGlow: {
     position: 'absolute',
-    top: -50,
-    left: -50,
-    width: 220,
-    height: 220,
-    borderRadius: 110,
+    top: -45,
+    left: -45,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
     backgroundColor: '#3b82f6',
     opacity: 0.12,
   },
@@ -160,15 +165,15 @@ const styles = StyleSheet.create({
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 9,
   },
   sparkleBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#1c234a',
-    borderWidth: 1.2,
-    borderColor: 'rgba(129, 140, 248, 0.5)',
+    borderWidth: 1,
+    borderColor: 'rgba(129, 140, 248, 0.45)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -176,50 +181,50 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 16,
+    fontSize: 14.5,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 1.6,
+    letterSpacing: 1.4,
   },
   brandSubtitle: {
-    fontSize: 9.5,
+    fontSize: 8.5,
     fontWeight: '700',
     color: '#818cf8',
-    letterSpacing: 2,
-    marginTop: 2,
+    letterSpacing: 1.8,
+    marginTop: 1.5,
   },
   topRightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 7,
   },
   memberPill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(99, 102, 241, 0.22)',
-    paddingHorizontal: 11,
-    paddingVertical: 5,
-    borderRadius: 14,
+    paddingHorizontal: 9,
+    paddingVertical: 4.5,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(129, 140, 248, 0.45)',
-    gap: 5,
+    borderColor: 'rgba(129, 140, 248, 0.4)',
+    gap: 4,
   },
   memberPillStar: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#c7d2fe',
   },
   memberPillText: {
-    fontSize: 10.5,
+    fontSize: 9.5,
     fontWeight: '800',
     color: '#c7d2fe',
-    letterSpacing: 1.2,
+    letterSpacing: 1,
   },
   contactlessWrap: {
     paddingLeft: 2,
     transform: [{ rotate: '90deg' }],
   },
 
-  /* Row 2: Chip + Points Box */
+  /* Row 2: Chip + Clean Points Box */
   rowMiddle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -227,8 +232,8 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   chipOuter: {
-    width: 48,
-    height: 36,
+    width: 44,
+    height: 33,
     borderRadius: 7,
     backgroundColor: '#d97706',
     padding: 2,
@@ -237,10 +242,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.35,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 2,
   },
   chipInner: {
     width: '100%',
@@ -259,7 +264,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: 1,
     backgroundColor: '#92400e',
-    opacity: 0.8,
+    opacity: 0.75,
   },
   chipVLine: {
     position: 'absolute',
@@ -267,62 +272,51 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: 1,
     backgroundColor: '#92400e',
-    opacity: 0.8,
+    opacity: 0.75,
   },
   chipCenter: {
-    width: 13,
-    height: 11,
+    width: 12,
+    height: 10,
     borderRadius: 3,
     backgroundColor: '#fbbf24',
     borderWidth: 0.8,
     borderColor: '#92400e',
   },
 
+  /* Points Only Box */
   pointsBox: {
-    backgroundColor: 'rgba(11, 15, 33, 0.92)',
-    borderRadius: 16,
-    borderWidth: 1.5,
+    backgroundColor: 'rgba(11, 15, 33, 0.9)',
+    borderRadius: 14,
+    borderWidth: 1.2,
     borderColor: 'rgba(99, 102, 241, 0.35)',
-    paddingVertical: 7,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 135,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  pointsTopRow: {
+    paddingVertical: 6,
+    paddingHorizontal: 13,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 3,
   },
   starIcon: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#fbbf24',
     marginRight: 5,
   },
   pointsNumber: {
-    fontSize: 21,
+    fontSize: 18,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 0.5,
   },
   ptsLabel: {
-    fontSize: 10.5,
+    fontSize: 9.5,
     fontWeight: '800',
     color: '#94a3b8',
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
     marginLeft: 5,
-  },
-  appCashText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#34d399',
-    marginTop: 2,
-    letterSpacing: 0.2,
   },
 
   /* Row 3: Card Number */
@@ -330,14 +324,22 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   cardNumberText: {
-    fontSize: 19,
+    fontSize: 16.5,
     fontWeight: '800',
     color: '#FFFFFF',
-    letterSpacing: 3.2,
+    letterSpacing: 2.2,
     fontFamily: 'monospace',
     textShadowColor: 'rgba(0,0,0,0.8)',
     textShadowOffset: { width: 0, height: 1.5 },
     textShadowRadius: 3,
+  },
+
+  /* Thin Divider Line */
+  cardDivider: {
+    height: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    marginTop: 4,
+    marginBottom: 6,
   },
 
   /* Row 4: Cardholder + Member Since */
@@ -351,18 +353,18 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   fieldLabel: {
-    fontSize: 8,
+    fontSize: 7.5,
     fontWeight: '700',
     color: '#818cf8',
-    letterSpacing: 1.8,
+    letterSpacing: 1.6,
     textTransform: 'uppercase',
-    marginBottom: 3,
+    marginBottom: 2.5,
   },
   cardholderName: {
-    fontSize: 14.5,
+    fontSize: 13.5,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 1.4,
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
     textShadowColor: 'rgba(0,0,0,0.6)',
     textShadowOffset: { width: 0, height: 1 },
@@ -372,10 +374,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   sinceYear: {
-    fontSize: 14.5,
+    fontSize: 13.5,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
     textAlign: 'right',
   },
 });

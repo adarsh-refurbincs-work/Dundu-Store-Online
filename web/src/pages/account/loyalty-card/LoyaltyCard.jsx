@@ -164,14 +164,14 @@ export default function LoyaltyCard() {
                     DUNDU ONLINE
                   </p>
                   <p className="text-[10px] font-bold text-indigo-300 tracking-[2px] uppercase mt-1">
-                    APP REWARDS CLUB
+                    STORE REWARDS CLUB
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2.5">
                 <div
-                  className="flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-extrabold tracking-wide"
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide"
                   style={{
                     background: 'rgba(99, 102, 241, 0.22)',
                     border: '1px solid rgba(129, 140, 248, 0.4)',
@@ -179,9 +179,9 @@ export default function LoyaltyCard() {
                   }}
                 >
                   <span>★</span>
-                  <span>APP MEMBER</span>
+                  <span>SHOP MEMBER</span>
                 </div>
-                <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
                   <circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
                   <path d="M9 6.5 C11.8 8.8 11.8 13.2 9 15.5" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
                   <path d="M13 3.8 C17 7.5 17 14.5 13 18.2" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
@@ -189,17 +189,17 @@ export default function LoyaltyCard() {
               </div>
             </div>
 
-            {/* Row 2: Chip + Points Box */}
-            <div className="relative flex items-center justify-between my-4">
+            {/* Row 2: Chip + Points Only Box */}
+            <div className="relative flex items-center justify-between my-3">
               {/* Realistic Gold EMV Chip */}
               <div
                 style={{
-                  width: '54px',
-                  height: '42px',
+                  width: '46px',
+                  height: '35px',
                   background: 'linear-gradient(135deg, #ffd84d 0%, #f59e0b 45%, #d97706 100%)',
-                  borderRadius: '9px',
+                  borderRadius: '7px',
                   border: '1.2px solid #b45309',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
                   padding: '3px',
                   display: 'flex',
                   alignItems: 'center',
@@ -211,7 +211,7 @@ export default function LoyaltyCard() {
                     width: '100%',
                     height: '100%',
                     border: '0.85px solid #92400e',
-                    borderRadius: '6px',
+                    borderRadius: '5px',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gridTemplateRows: '1fr 1fr',
@@ -229,8 +229,8 @@ export default function LoyaltyCard() {
                       top: '50%',
                       left: '50%',
                       transform: 'translate(-50%, -50%)',
-                      width: '14px',
-                      height: '12px',
+                      width: '12px',
+                      height: '10px',
                       borderRadius: '3px',
                       background: '#fbbf24',
                       border: '0.8px solid #92400e',
@@ -239,52 +239,53 @@ export default function LoyaltyCard() {
                 </div>
               </div>
 
-              {/* Points Box */}
+              {/* Clean Points Box (No ≈ or cash value) */}
               <div
-                className="px-5 py-2.5 rounded-2xl flex flex-col items-center justify-center min-w-[155px]"
+                className="px-4 py-2 rounded-xl flex items-center gap-1.5"
                 style={{
-                  background: 'rgba(11, 15, 33, 0.88)',
-                  border: '1.5px solid rgba(99, 102, 241, 0.28)',
-                  boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                  background: 'rgba(11, 15, 33, 0.9)',
+                  border: '1.2px solid rgba(99, 102, 241, 0.35)',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
                 }}
               >
-                <div className="flex items-center gap-1.5">
-                  <span className="text-amber-400 text-base">★</span>
-                  <span className="text-white font-black text-2xl leading-none">
-                    {card.points}
-                  </span>
-                  <span className="text-slate-400 font-bold text-xs tracking-wider">
-                    PTS
-                  </span>
-                </div>
-                <p className="text-emerald-400 font-bold text-xs mt-1.5">
-                  ≈ ₹{redeemableCount > 0 ? redeemableAmount : card.points} App Cash
-                </p>
+                <span className="text-amber-400 text-sm">★</span>
+                <span className="text-white font-black text-xl leading-none">
+                  {card.points}
+                </span>
+                <span className="text-slate-400 font-bold text-xs tracking-wider ml-1">
+                  PTS
+                </span>
               </div>
             </div>
 
-            {/* Row 3: Card Number (4892 •••• •••• 3210) */}
-            <div className="relative my-3.5">
-              <p className="text-white font-mono font-bold text-2xl tracking-[5px] leading-none">
-                {rawPhone.length >= 8 ? rawPhone.slice(0, 4) : '4892'}   ••••   ••••   {rawPhone.length >= 4 ? rawPhone.slice(-4) : '3210'}
+            {/* Row 3: Complete 16-Digit Card Number */}
+            <div className="relative my-3">
+              <p className="text-white font-mono font-bold text-lg tracking-[3.5px] leading-none">
+                {(() => {
+                  const full16 = ('4892' + (rawPhone || '882049183210')).padEnd(16, '9').slice(0, 16);
+                  return `${full16.slice(0, 4)}   ${full16.slice(4, 8)}   ${full16.slice(8, 12)}   ${full16.slice(12, 16)}`;
+                })()}
               </p>
             </div>
+
+            {/* Thin Divider Line */}
+            <div className="my-2.5 h-[1px] bg-white/10" />
 
             {/* Row 4: Cardholder + Member Since */}
             <div className="relative flex items-end justify-between pt-1">
               <div>
-                <p className="text-[9.5px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
-                  APP CARDHOLDER
+                <p className="text-[8.5px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
+                  CARDHOLDER
                 </p>
-                <p className="text-white font-black text-base tracking-wider uppercase">
+                <p className="text-white font-black text-sm tracking-wider uppercase">
                   {(card.name || user?.name || 'ADARSH SHARMA').slice(0, 24)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[9.5px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
+                <p className="text-[8.5px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
                   MEMBER SINCE
                 </p>
-                <p className="text-white font-black text-base tracking-wider">
+                <p className="text-white font-black text-sm tracking-wider">
                   {memberYear}
                 </p>
               </div>

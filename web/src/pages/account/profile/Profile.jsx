@@ -448,7 +448,7 @@ export default function Profile() {
                         DUNDU ONLINE
                       </p>
                       <p className="text-[10px] font-bold text-indigo-300 tracking-[2px] uppercase mt-1">
-                        APP REWARDS CLUB
+                        STORE REWARDS CLUB
                       </p>
                     </div>
                   </div>
@@ -463,7 +463,7 @@ export default function Profile() {
                       }}
                     >
                       <span>★</span>
-                      <span>APP MEMBER</span>
+                      <span>SHOP MEMBER</span>
                     </div>
                     <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
                       <circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
@@ -473,15 +473,15 @@ export default function Profile() {
                   </div>
                 </div>
 
-                {/* Row 2: Chip + Points Box */}
-                <div className="relative flex items-center justify-between my-3">
+                {/* Row 2: Chip + Points Only Box */}
+                <div className="relative flex items-center justify-between my-2.5">
                   {/* Realistic Gold EMV Chip */}
                   <div
                     style={{
-                      width: '52px',
-                      height: '40px',
+                      width: '46px',
+                      height: '35px',
                       background: 'linear-gradient(135deg, #ffd84d 0%, #f59e0b 45%, #d97706 100%)',
-                      borderRadius: '8px',
+                      borderRadius: '7px',
                       border: '1.2px solid #b45309',
                       boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
                       padding: '3px',
@@ -513,8 +513,8 @@ export default function Profile() {
                           top: '50%',
                           left: '50%',
                           transform: 'translate(-50%, -50%)',
-                          width: '13px',
-                          height: '11px',
+                          width: '12px',
+                          height: '10px',
                           borderRadius: '3px',
                           background: '#fbbf24',
                           border: '0.8px solid #92400e',
@@ -523,52 +523,53 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  {/* Points Box */}
+                  {/* Clean Points Box (No ≈ or cash value) */}
                   <div
-                    className="px-4 py-2 rounded-2xl flex flex-col items-center justify-center min-w-[145px]"
+                    className="px-3.5 py-1.5 rounded-xl flex items-center gap-1.5"
                     style={{
-                      background: 'rgba(11, 15, 33, 0.88)',
-                      border: '1.5px solid rgba(99, 102, 241, 0.28)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                      background: 'rgba(11, 15, 33, 0.9)',
+                      border: '1.2px solid rgba(99, 102, 241, 0.35)',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
                     }}
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-amber-400 text-sm">★</span>
-                      <span className="text-white font-black text-xl leading-none">
-                        {loyaltyCard.points}
-                      </span>
-                      <span className="text-slate-400 font-bold text-xs tracking-wider">
-                        PTS
-                      </span>
-                    </div>
-                    <p className="text-emerald-400 font-bold text-xs mt-1">
-                      ≈ ₹{redeemableCount > 0 ? redeemableCount * 200 : loyaltyCard.points} App Cash
-                    </p>
+                    <span className="text-amber-400 text-sm">★</span>
+                    <span className="text-white font-black text-lg leading-none">
+                      {loyaltyCard.points}
+                    </span>
+                    <span className="text-slate-400 font-bold text-[10px] tracking-wider ml-1">
+                      PTS
+                    </span>
                   </div>
                 </div>
 
-                {/* Row 3: Card Number (4892 •••• •••• 3210) */}
-                <div className="relative my-3">
-                  <p className="text-white font-mono font-bold text-xl tracking-[4px] leading-none">
-                    {phone.length >= 8 ? phone.slice(0, 4) : '4892'}   ••••   ••••   {phone.length >= 4 ? phone.slice(-4) : '3210'}
+                {/* Row 3: Complete 16-Digit Card Number */}
+                <div className="relative my-2.5">
+                  <p className="text-white font-mono font-bold text-base tracking-[3px] leading-none">
+                    {(() => {
+                      const full16 = ('4892' + (phone || '882049183210')).padEnd(16, '9').slice(0, 16);
+                      return `${full16.slice(0, 4)}   ${full16.slice(4, 8)}   ${full16.slice(8, 12)}   ${full16.slice(12, 16)}`;
+                    })()}
                   </p>
                 </div>
+
+                {/* Thin Divider Line */}
+                <div className="my-2 h-[1px] bg-white/10" />
 
                 {/* Row 4: Cardholder + Member Since */}
                 <div className="relative flex items-end justify-between pt-1">
                   <div>
-                    <p className="text-[9px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
-                      APP CARDHOLDER
+                    <p className="text-[8px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
+                      CARDHOLDER
                     </p>
-                    <p className="text-white font-black text-sm tracking-wider uppercase">
+                    <p className="text-white font-black text-xs tracking-wider uppercase">
                       {(loyaltyCard.name || user.name || 'ADARSH SHARMA').slice(0, 24)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[9px] font-bold text-indigo-400 tracking-[2px] uppercase mb-1">
+                    <p className="text-[8px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
                       MEMBER SINCE
                     </p>
-                    <p className="text-white font-black text-sm tracking-wider">
+                    <p className="text-white font-black text-xs tracking-wider">
                       {memberYear}
                     </p>
                   </div>
