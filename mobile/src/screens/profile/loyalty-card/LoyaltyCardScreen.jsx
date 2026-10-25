@@ -251,11 +251,11 @@ const styles = StyleSheet.create({
   /* Redeemable */
   redeemBanner: {
     borderRadius: 14, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10,
-    backgroundColor: '#052e16', borderWidth: 1, borderColor: '#166534', marginBottom: 12,
+    backgroundColor: '#ecfdf5', borderWidth: 1, borderColor: '#a7f3d0', marginBottom: 12,
   },
   redeemIcon: { fontSize: 22 },
-  redeemTitle: { fontSize: 14, fontWeight: '700', color: '#86efac' },
-  redeemSub: { fontSize: 11, color: '#4ade80', marginTop: 2 },
+  redeemTitle: { fontSize: 14, fontWeight: '700', color: '#047857' },
+  redeemSub: { fontSize: 11, color: '#059669', marginTop: 2 },
 
   /* Progress */
   progressCard: {

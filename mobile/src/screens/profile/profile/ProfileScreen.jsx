@@ -497,7 +497,7 @@ export default function ProfileScreen() {
               {/* Redeemable banner */}
               {redeemableCount > 0 && (
                 <View style={styles.lcRedeemBanner}>
-                  <Ionicons name="gift-outline" size={22} color="#86efac" />
+                  <Ionicons name="gift-outline" size={22} color="#047857" />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.lcRedeemTitle}>₹{redeemableCount * 200} Redeemable Now!</Text>
                     <Text style={styles.lcRedeemSub}>Show your card at billing counter to redeem</Text>
@@ -1272,7 +1272,7 @@ const styles = StyleSheet.create({
   /* ── ATM Loyalty Card ── */
   lcSection: { marginHorizontal: 14, marginBottom: 14 },
   lcSectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  lcSectionTitle: { fontSize: 15, fontWeight: '700', color: '#ddd' },
+  lcSectionTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
   lcSectionLink: { fontSize: 12, fontWeight: '600', color: COLORS.primary },
 
   lcCard: {
@@ -1422,29 +1422,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: '#052e16',
+    backgroundColor: '#ecfdf5',
     borderWidth: 1,
-    borderColor: '#166534',
+    borderColor: '#a7f3d0',
   },
-  lcRedeemTitle: { fontSize: 14, fontWeight: '700', color: '#86efac' },
-  lcRedeemSub: { fontSize: 11, color: '#4ade80', marginTop: 2 },
+  lcRedeemTitle: { fontSize: 14, fontWeight: '700', color: '#047857' },
+  lcRedeemSub: { fontSize: 11, color: '#059669', marginTop: 2 },
 
   /* Progress */
   lcProgress: {
     marginTop: 10,
     borderRadius: 14,
     padding: 14,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: '#2e2e2e',
+    borderColor: COLORS.border,
   },
   lcProgressRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  lcProgressLeft: { fontSize: 11, color: '#ccc' },
-  lcProgressRight: { fontSize: 11, color: '#666' },
+  lcProgressLeft: { fontSize: 11, color: COLORS.text, fontWeight: '600' },
+  lcProgressRight: { fontSize: 11, color: COLORS.textSecondary },
   lcProgressBg: {
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#2a2a2a',
+    backgroundColor: '#e5e7eb',
     overflow: 'hidden',
     marginBottom: 8,
   },
@@ -1457,7 +1457,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 6,
   },
-  lcProgressHint: { fontSize: 10, color: '#555', textAlign: 'center' },
+  lcProgressHint: { fontSize: 10, color: COLORS.textSecondary, textAlign: 'center' },
 
   // ── Guest styles ──────────────────────────
   guestScroll: {

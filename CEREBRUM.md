@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile profile loyalty section: light-theme fix
+- The blocks around the blue loyalty card were styled for a dark page (title `#ddd`, progress box `#1a1a1a`/`#2e2e2e`, hint `#555`, redeem banner `#052e16`) but the profile page is white → near-invisible title and black boxes. `ProfileScreen`: title `COLORS.text`, progress card white with `COLORS.border`, text `COLORS.text/textSecondary`, track `#e5e7eb`; redeem banner light green (`#ecfdf5`/`#a7f3d0`, text `#047857`/`#059669`, icon `#047857`). Same light-green banner applied in `LoyaltyCardScreen`.
+
 ### 2026-10-25 — Combo offer badge gets the ⚡ prefix like product cards
 - `ComboCard.saveBadge` and `ComboDetail.offPill` read "⚡ N% OFF" (black bg, green text kept).
 
