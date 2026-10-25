@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile Home: "Combo Deals" rail
+- `HomeScreen`: fetches `comboApi.list()` and shows a horizontal `ComboCard` rail (250px cards) between New Arrivals and Trending; "View all →" opens Shop in combo mode (`{ combo: true }`); hidden when there are no combos.
+
 ### 2026-10-25 — Mobile Shop: "🔥 Hot Offer" chip in the sort row
 - `ProductsScreen`: orange Hot Offer chip after Newest / Price chips toggles `offerOnly` (products) or `comboFilters.offer` (combo mode).
 

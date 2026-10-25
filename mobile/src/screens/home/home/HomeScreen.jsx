@@ -18,7 +18,8 @@ import {
 import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { homeApi, settingsApi } from '../../../api/index';
+import { homeApi, settingsApi, comboApi } from '../../../api/index';
+import { ComboCard } from '../../combos/ComboListScreen';
 import { COLORS, UPLOADS_URL } from '../../../config';
 import ProductCard from '../../../components/product/ProductCard';
 import AppHeader from '../../../components/ui/AppHeader';
@@ -152,6 +153,14 @@ export default function HomeScreen() {
   const navigation = useNavigation();
   const openSpinWheel = useSpinWheelStore((s) => s.openSpinWheel);
   const [homeData, setHomeData] = useState(null);
+  const [combos, setCombos] = useState([]);
+
+  // Live combos for the Home "Combo Deals" rail
+  useEffect(() => {
+    comboApi.list()
+      .then((res) => setCombos(res?.data?.combos || res?.combos || []))
+      .catch(() => {});
+  }, []);
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [updateModal, setUpdateModal] = useState({ visible: false, message: '' });
@@ -338,6 +347,30 @@ export default function HomeScreen() {
             </View>
           )}
 
+          {/* Combo Deals */}
+          {combos.length > 0 && (
+            <View style={styles.section}>
+              <SectionHeader
+                title="Combo Deals 🎀"
+                titleColor="#7c3aed"
+                onViewAll={() => navigation.navigate('Shop', { combo: true })}
+              />
+              <FlatList
+                data={combos.slice(0, 8)}
+                keyExtractor={(item) => String(item.id)}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.hList}
+                initialNumToRender={3}
+                renderItem={({ item }) => (
+                  <View style={styles.comboCard}>
+                    <ComboCard combo={item} onPress={() => navigation.navigate('ComboDetail', { comboId: item.id })} />
+                  </View>
+                )}
+              />
+            </View>
+          )}
+
           {/* Trending */}
           {trending.length > 0 && (
             <View style={styles.section}>
@@ -480,6 +513,7 @@ const styles = StyleSheet.create({
 
   hList: { paddingHorizontal: 10 },
   hCard: { width: 148, marginHorizontal: 4, flex: 0 },
+  comboCard: { width: 250, marginHorizontal: 4 },
 
   offersSection: {
     marginTop: 24,
