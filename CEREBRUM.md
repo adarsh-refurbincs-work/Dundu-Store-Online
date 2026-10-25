@@ -215,6 +215,10 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Loyalty card: bank-card proportions + ATM-style details
+- `components/ui/LuxuryLoyaltyCard.jsx` (shared by Profile + Loyalty page): `aspectRatio 1.586` (ID-1 bank card) instead of `minHeight`; EMV chip + contactless mark together on the left, holographic disc top-right; embossed masked 16-digit number (`••••  ••••  ••••  1234`, last 4 of member phone); footer CARDHOLDER / VALID THRU (issue +5y) / SINCE; balance block slightly smaller; tighter spacing.
+- Note: commit `082604b` ("fix(api)…") also contained the user's own loyalty UI rewrite (ProfileScreen dark loyalty section, LuxuryLoyaltyCard, LoyaltyCardScreen redesign) swept in by `git add -A` — message is narrower than its contents.
+
 ### 2026-10-25 — Combo savings line colours
 - `ComboDetailScreen` "You save X vs. buying separately (Y)": base text grey `#777`, saved amount green `#15803d`, separate total red `#dc2626`.
 

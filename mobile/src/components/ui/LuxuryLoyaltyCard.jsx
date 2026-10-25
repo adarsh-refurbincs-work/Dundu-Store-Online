@@ -101,6 +101,15 @@ export default function LuxuryLoyaltyCard({
 
   const phone = (card?.phone || '').replace(/\D/g, '');
   const lastFour = phone ? phone.slice(-4) : '8820';
+  // 16-digit card number: DUNDU prefix + member phone, grouped like a bank card, last group visible
+  const digits = ('5824' + (phone || '8820491823').padStart(12, '0')).slice(0, 16);
+  const maskedNumber = `••••  ••••  ••••  ${digits.slice(-4)}`;
+  const validThru = (() => {
+    const d = card?.created_at ? new Date(card.created_at) : new Date();
+    const yy = String((d.getFullYear() + 5) % 100).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${mm}/${yy}`;
+  })();
 
   const CardContent = (
     <View style={[styles.cardContainer, style]}>
@@ -187,19 +196,18 @@ export default function LuxuryLoyaltyCard({
               <Text style={styles.vipText}>BLACK PRIVILEGE</Text>
             </View>
           </View>
-          <View style={styles.contactlessContainer}>
-            <Ionicons
-              name="wifi-outline"
-              size={20}
-              color="rgba(245, 208, 97, 0.85)"
-              style={styles.contactlessIcon}
-            />
+          {/* Holographic security disc */}
+          <View style={styles.holo}>
+            <View style={styles.holoInner} />
           </View>
         </View>
 
         {/* Row 2: Gold EMV Chip + Points Display */}
         <View style={styles.rowMiddle}>
-          <EmvChip />
+          <View style={styles.chipRow}>
+            <EmvChip />
+            <Ionicons name="wifi-outline" size={22} color="rgba(255,255,255,0.75)" style={styles.contactlessIcon} />
+          </View>
 
           <View style={styles.pointsGroup}>
             <View style={styles.pointsLabelRow}>
@@ -218,7 +226,10 @@ export default function LuxuryLoyaltyCard({
           </View>
         </View>
 
-        {/* Row 3: Cardholder + Member Since + Masked Number */}
+        {/* Card number (embossed look) */}
+        <Text style={styles.cardNumberBig}>{maskedNumber}</Text>
+
+        {/* Row 3: Cardholder + Valid thru + Since */}
         <View style={styles.rowBottom}>
           <View style={styles.memberCol}>
             <Text style={styles.fieldLabel}>CARDHOLDER</Text>
@@ -228,11 +239,12 @@ export default function LuxuryLoyaltyCard({
           </View>
 
           <View style={styles.metaCol}>
-            <Text style={styles.cardNumber}>•••• {lastFour}</Text>
-            <View style={styles.sinceRow}>
-              <Text style={styles.fieldLabel}>SINCE </Text>
-              <Text style={styles.memberSinceYear}>{memberYear}</Text>
-            </View>
+            <Text style={styles.fieldLabel}>VALID THRU</Text>
+            <Text style={styles.memberSinceYear}>{validThru}</Text>
+          </View>
+          <View style={styles.metaCol}>
+            <Text style={styles.fieldLabel}>SINCE</Text>
+            <Text style={styles.memberSinceYear}>{memberYear}</Text>
           </View>
         </View>
       </View>
@@ -254,7 +266,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 20,
     overflow: 'hidden',
-    minHeight: 212,
+    aspectRatio: 1.586, // ISO/IEC 7810 ID-1 — same proportions as a bank card
     position: 'relative',
     backgroundColor: '#0a0c10',
     shadowColor: '#000',
@@ -264,11 +276,11 @@ const styles = StyleSheet.create({
     elevation: 14,
   },
   cardInner: {
+    flex: 1,
     paddingHorizontal: 22,
-    paddingTop: 20,
-    paddingBottom: 18,
+    paddingTop: 18,
+    paddingBottom: 16,
     justifyContent: 'space-between',
-    minHeight: 212,
   },
 
   /* Row 1: Header */
@@ -312,11 +324,31 @@ const styles = StyleSheet.create({
     color: '#F5D061',
     letterSpacing: 1.2,
   },
-  contactlessContainer: {
-    padding: 4,
-  },
   contactlessIcon: {
     transform: [{ rotate: '90deg' }],
+    marginLeft: 12,
+  },
+  chipRow: { flexDirection: 'row', alignItems: 'center' },
+  holo: {
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: 'rgba(245, 208, 97, 0.18)',
+    borderWidth: 1, borderColor: 'rgba(245, 208, 97, 0.45)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  holoInner: {
+    width: 20, height: 20, borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)',
+  },
+  cardNumberBig: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#F3F4F6',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 2,
+    marginBottom: 6,
   },
 
   /* Row 2: Chip + Balance */
@@ -324,7 +356,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: 14,
+    marginVertical: 8,
   },
   chipWrapper: {
     shadowColor: '#000',
@@ -361,10 +393,10 @@ const styles = StyleSheet.create({
     textShadowRadius: 8,
   },
   pointsNumber: {
-    fontSize: 38,
+    fontSize: 32,
     fontWeight: '900',
     color: '#FFF2B2',
-    lineHeight: 42,
+    lineHeight: 36,
     textShadowColor: 'rgba(0,0,0,0.8)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
@@ -382,9 +414,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.08)',
-    paddingTop: 10,
+    gap: 14,
   },
   memberCol: {
     flex: 1,
@@ -410,17 +440,6 @@ const styles = StyleSheet.create({
   },
   metaCol: {
     alignItems: 'flex-end',
-  },
-  cardNumber: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: 'rgba(255, 255, 255, 0.75)',
-    letterSpacing: 2,
-    marginBottom: 2,
-  },
-  sinceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   memberSinceYear: {
     fontSize: 9.5,
