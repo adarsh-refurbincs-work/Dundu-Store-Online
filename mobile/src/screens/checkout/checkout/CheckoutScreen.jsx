@@ -269,7 +269,11 @@ export default function CheckoutScreen() {
         coupon_code: couponData ? couponCode.trim() : undefined,
         use_loyalty_points: useLoyalty && loyaltyAvailable,
         use_wallet: walletSettings.enabled && useWallet,
-        ...(buyNow ? { buy_now_item: { product_id: buyNow.product_id, variant_id: buyNow.variant_id ?? null, quantity: buyNow.quantity || 1 } } : {}),
+        ...(buyNow
+          ? buyNow.combo_id
+            ? { buy_now_item: { combo_id: buyNow.combo_id, combo_selections: buyNow.combo_selections || [], quantity: buyNow.quantity || 1 } }
+            : { buy_now_item: { product_id: buyNow.product_id, variant_id: buyNow.variant_id ?? null, quantity: buyNow.quantity || 1 } }
+          : {}),
       };
 
       const res = await orderApi.place(orderData);

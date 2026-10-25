@@ -113,15 +113,9 @@ const computeShipping = async (client, userId, amountAfterDiscounts) => {
 // Turns the customer's combo cart rows into ordinary line items. Validates that every
 // slot has a selection, that the chosen product belongs to the slot and the variant to
 // the product, and prices each line as its share of the combo price.
-const expandComboCartRows = async (client, userId) => {
-  const { rows: comboRows } = await client.query(
-    `SELECT c.id AS cart_id, c.quantity, c.combo_selections, cb.id AS combo_id, cb.name AS combo_name,
-            cb.price AS combo_price, cb.offer_price AS combo_offer_price, cb.stock AS combo_stock, cb.is_active
-     FROM cart c JOIN combos cb ON cb.id = c.combo_id
-     WHERE c.user_id=$1 AND c.combo_id IS NOT NULL
-     FOR UPDATE OF cb`,
-    [userId]
-  );
+// Shared by the cart path and the Buy-Now path: `comboRows` are
+// { quantity, combo_selections, combo_id, combo_name, combo_price, combo_offer_price, combo_stock, is_active }.
+const expandComboRows = async (client, comboRows) => {
   const items = [];
   for (const row of comboRows) {
     if (!row.is_active) return { error: `${row.combo_name} is no longer available. Please remove it from your cart.` };
@@ -190,6 +184,18 @@ const expandComboCartRows = async (client, userId) => {
   return { items };
 };
 
+const expandComboCartRows = async (client, userId) => {
+  const { rows: comboRows } = await client.query(
+    `SELECT c.id AS cart_id, c.quantity, c.combo_selections, cb.id AS combo_id, cb.name AS combo_name,
+            cb.price AS combo_price, cb.offer_price AS combo_offer_price, cb.stock AS combo_stock, cb.is_active
+     FROM cart c JOIN combos cb ON cb.id = c.combo_id
+     WHERE c.user_id=$1 AND c.combo_id IS NOT NULL
+     FOR UPDATE OF cb`,
+    [userId]
+  );
+  return expandComboRows(client, comboRows);
+};
+
 
 const placeOrder = async (req, res) => {
   const { address_id, coupon_code, payment_method, buy_now_item, use_loyalty_points, use_wallet } = req.body;
@@ -238,7 +244,23 @@ const placeOrder = async (req, res) => {
 
     let cartItems;
 
-    if (buy_now_item) {
+    if (buy_now_item && buy_now_item.combo_id) {
+      // Buy Now on a combo: same validation + proportional price split as a combo cart row.
+      const quantity = parseQuantity(buy_now_item.quantity);
+      if (quantity === null) return fail(`Quantity must be a whole number between 1 and ${MAX_QTY}`);
+      const { rows: cbs } = await client.query(
+        `SELECT id AS combo_id, name AS combo_name, price AS combo_price, offer_price AS combo_offer_price,
+                stock AS combo_stock, is_active
+         FROM combos WHERE id=$1 AND deleted_at IS NULL FOR UPDATE`,
+        [buy_now_item.combo_id]
+      );
+      if (!cbs.length) return fail('Combo not found');
+      let selections = buy_now_item.combo_selections;
+      if (typeof selections === 'string') { try { selections = JSON.parse(selections); } catch { selections = []; } }
+      const expansion = await expandComboRows(client, [{ ...cbs[0], quantity, combo_selections: Array.isArray(selections) ? selections : [] }]);
+      if (expansion.error) return fail(expansion.error);
+      cartItems = expansion.items;
+    } else if (buy_now_item) {
       const { product_id, variant_id } = buy_now_item;
       const quantity = parseQuantity(buy_now_item.quantity);
       if (quantity === null) return fail(`Quantity must be a whole number between 1 and ${MAX_QTY}`);

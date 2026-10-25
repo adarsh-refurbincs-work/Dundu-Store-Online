@@ -12,6 +12,10 @@ import { formatPrice } from '../../utils/format';
 import AppHeader from '../../components/ui/AppHeader';
 import useCartStore from '../../store/cart.store';
 import useRequireAuth from '../../hooks/useRequireAuth';
+import { ComboCard } from './ComboListScreen';
+
+// Price a shopper would pay for a product on its own (offer 0 / "0.00" = no offer)
+const unitPrice = (p) => (Number(p?.offer_price) > 0 ? Number(p.offer_price) : Number(p?.price) || 0);
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -212,6 +216,14 @@ export default function ComboDetailScreen() {
   const [loading, setLoading] = useState(true);
   const [cartLoading, setCartLoading] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
+  const [otherCombos, setOtherCombos] = useState([]);
+
+  // Suggestions: every other live combo
+  useEffect(() => {
+    comboApi.list()
+      .then((res) => setOtherCombos((res?.data?.combos || res?.combos || []).filter((c) => c.id !== comboId)))
+      .catch(() => {});
+  }, [comboId]);
 
   // selections[slotIndex] = { product_id, color, size, variant_id }
   const [selections, setSelections] = useState({});
@@ -269,6 +281,39 @@ export default function ComboDetailScreen() {
     return errors.length > 0 ? errors : null;
   };
 
+  // One entry per slot — the same shape the cart and the order API expect
+  const buildSlotSelections = () => combo.slots.map((slot, i) => ({
+    slot_id: slot.id,
+    slot_label: slot.slot_label,
+    requires_selection: slot.requires_selection,
+    product_id: selections[i]?.product_id || slot.products?.[0]?.id,
+    variant_id: selections[i]?.variant_id || null,
+    color: selections[i]?.color || null,
+    size: selections[i]?.size || null,
+  }));
+
+  const handleBuyNow = () => {
+    requireAuth(() => {
+      const errors = validateSelections();
+      if (errors) { Alert.alert('Please complete your selection', errors.join('\n')); return; }
+      navigation.navigate('Checkout', {
+        buyNow: {
+          combo_id: combo.id,
+          combo_name: combo.name,
+          combo_image: combo.image_url || null,
+          combo_price: combo.price,
+          combo_offer_price: combo.offer_price,
+          combo_selections: buildSlotSelections(),
+          // generic fields read by the checkout summary
+          product_name: combo.name,
+          image: combo.image_url || null,
+          price: bundlePrice,
+          quantity: 1,
+        },
+      });
+    }, 'Login to buy this combo');
+  };
+
   const handleAddToCart = async () => {
     requireAuth(async () => {
       const errors = validateSelections();
@@ -280,15 +325,7 @@ export default function ComboDetailScreen() {
       setCartLoading(true);
       try {
         // Build payload — one cart item per combo
-        const slotSelections = combo.slots.map((slot, i) => ({
-          slot_id: slot.id,
-          slot_label: slot.slot_label,
-          requires_selection: slot.requires_selection,
-          product_id: selections[i]?.product_id || slot.products?.[0]?.id,
-          variant_id: selections[i]?.variant_id || null,
-          color: selections[i]?.color || null,
-          size: selections[i]?.size || null,
-        }));
+        const slotSelections = buildSlotSelections();
 
         await addItem({
           combo_id: combo.id,
@@ -307,11 +344,31 @@ export default function ComboDetailScreen() {
   };
 
   const hasOffer = combo?.offer_price && parseFloat(combo.offer_price) > 0;
+  // What the shopper pays for the bundle (offer wins over MRP), and what the chosen
+  // items would cost bought separately — same rule as admin, web and the order API.
+  const bundlePrice = combo ? (hasOffer ? Number(combo.offer_price) : Number(combo.price) || 0) : 0;
+  const regularTotal = combo ? combo.slots.reduce((sum, slot, i) => {
+    const chosen = slot.products?.find((p) => p.id === selections[i]?.product_id) || slot.products?.[0];
+    return sum + unitPrice(chosen);
+  }, 0) : 0;
+  const savings = regularTotal > bundlePrice ? regularTotal - bundlePrice : 0;
+  const inStock = combo ? (combo.stock == null || Number(combo.stock) > 0) : false;
+
+  // Same chrome as the product detail page: back on the left, logo on the right
+  const header = (
+    <AppHeader
+      showBack
+      title="Back"
+      rightComponent={
+        <Image source={require('../../../assets/dundulogo.png')} style={{ height: 32, width: 110 }} resizeMode="contain" />
+      }
+    />
+  );
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <AppHeader title="Combo" onBack={() => navigation.goBack()} />
+      <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
+        {header}
         <View style={styles.center}><ActivityIndicator size="large" color={COLORS.primary} /></View>
       </SafeAreaView>
     );
@@ -322,8 +379,8 @@ export default function ComboDetailScreen() {
   const comboUri = getImageUri(combo.image_url);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <AppHeader title={combo.name} onBack={() => navigation.goBack()} />
+    <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
+      {header}
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Hero image */}
@@ -357,6 +414,12 @@ export default function ComboDetailScreen() {
             )}
           </View>
 
+          {savings > 0 && (
+            <Text style={styles.savingsText}>
+              You save {formatPrice(savings)} vs. buying separately ({formatPrice(regularTotal)})
+            </Text>
+          )}
+
           {combo.description ? (
             <Text style={styles.description}>{combo.description}</Text>
           ) : null}
@@ -386,33 +449,55 @@ export default function ComboDetailScreen() {
           ))}
         </View>
 
-        {/* Bottom spacer for the fixed button */}
-        <View style={{ height: 100 }} />
-      </ScrollView>
-
-      {/* Sticky Add to Cart */}
-      <View style={styles.stickyBar}>
-        <View style={styles.stickyPrice}>
-          <Text style={styles.stickyPriceLabel}>Total</Text>
-          <Text style={styles.stickyPriceValue}>
-            {hasOffer ? formatPrice(combo.offer_price) : formatPrice(combo.price)}
-          </Text>
+        {/* Total + Add to Cart / Buy Now — same layout as the product page */}
+        <View style={styles.actionBlock}>
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Bundle total</Text>
+            <Text style={styles.totalValue}>{formatPrice(bundlePrice)}</Text>
+          </View>
+          <View style={styles.actionRow}>
+            <TouchableOpacity
+              style={[styles.cartBtn, (!inStock || cartLoading || cartSuccess) && styles.actionBtnDisabled]}
+              onPress={handleAddToCart}
+              disabled={!inStock || cartLoading || cartSuccess}
+              activeOpacity={0.85}
+            >
+              {cartLoading
+                ? <ActivityIndicator color="#fff" size="small" />
+                : <Text style={styles.cartBtnText}>{!inStock ? 'Out of Stock' : cartSuccess ? '✓ Added to Cart' : '🛒  Add to Cart'}</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.buyBtn, !inStock && styles.actionBtnDisabled]}
+              onPress={handleBuyNow}
+              disabled={!inStock}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.buyBtnText}>{inStock ? '⚡  Buy Now' : 'Out of Stock'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <TouchableOpacity
-          style={[styles.addBtn, (cartLoading || cartSuccess) && styles.addBtnDisabled]}
-          onPress={handleAddToCart}
-          activeOpacity={0.85}
-          disabled={cartLoading || cartSuccess}
-        >
-          {cartLoading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : cartSuccess ? (
-            <Text style={styles.addBtnText}>✓ Added to Cart!</Text>
-          ) : (
-            <Text style={styles.addBtnText}>Add Combo to Cart 🛒</Text>
-          )}
-        </TouchableOpacity>
-      </View>
+
+        {/* Other combos */}
+        {otherCombos.length > 0 && (
+          <View style={styles.moreSection}>
+            <Text style={styles.moreTitle}>More combos you may like</Text>
+            <FlatList
+              data={otherCombos.slice(0, 8)}
+              keyExtractor={(c) => String(c.id)}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingRight: 8 }}
+              renderItem={({ item }) => (
+                <View style={styles.moreCard}>
+                  <ComboCard combo={item} onPress={() => navigation.push('ComboDetail', { comboId: item.id })} />
+                </View>
+              )}
+            />
+          </View>
+        )}
+
+        <View style={{ height: 24 }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -421,6 +506,24 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#fff0f6' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scrollContent: { paddingBottom: 20 },
+  savingsText: { fontSize: 12, fontWeight: '700', color: '#15803d', marginTop: 6 },
+
+  /* Total + action buttons (mirrors ProductDetailScreen) */
+  actionBlock: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 },
+  totalLabel: { fontSize: 13, color: '#666', fontWeight: '600' },
+  totalValue: { fontSize: 22, fontWeight: '900', color: COLORS.primary },
+  actionRow: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  cartBtn: { flex: 1, backgroundColor: '#1565C0', borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
+  cartBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  buyBtn: { flex: 1, backgroundColor: COLORS.primary, borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
+  buyBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  actionBtnDisabled: { backgroundColor: COLORS.textSecondary },
+
+  /* Other combos */
+  moreSection: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0d6e8' },
+  moreTitle: { fontSize: 16, fontWeight: '800', color: '#1a1a1a', marginBottom: 12, paddingHorizontal: 16 },
+  moreCard: { width: 260, marginRight: 12 },
 
   // Hero
   heroWrap: { height: 280, width: '100%', position: 'relative' },

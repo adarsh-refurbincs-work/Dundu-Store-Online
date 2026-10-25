@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile combo detail rebuilt + combo Buy Now
+- **Mobile `ComboDetailScreen`**: same header as the product page (back + logo, safe-area edges left/right/bottom); "You save ₹X vs. buying separately" computed from the *chosen* slot products (`unitPrice` = offer>0 ? offer : price — same rule as admin/web/order API); sticky bar replaced by a "Bundle total" row + **Add to Cart** (blue) / **Buy Now** (pink) like `ProductDetailScreen`; out-of-stock combos disable both; "More combos you may like" horizontal rail (`ComboCard`, `navigation.push('ComboDetail')`).
+- **Buy Now for combos**: `CheckoutScreen` sends `buy_now_item: { combo_id, combo_selections, quantity }`; backend `placeOrder` handles it via the new `expandComboRows` (shared with the cart path — slot/product/variant validation, proportional price split, combo stock lock). Unknown combo → "Combo not found"; missing slot → names the slot.
+- Verified end-to-end (scratchpad `pw/combo-buynow.mjs`): admin creates combo → customer buy-now → 2 order lines summing to the bundle price (841.62 + 757.38 = 1599), variant & combo stock −1, cart untouched; negatives rejected. Test combo/order/user removed, stock restored.
+- Pricing audit: admin (`bundle = offer>0 ? offer : price`, savings vs `regular_total`), backend `unitPrice`, web `Price`/"You save", mobile all agree; `% OFF` badges compare offer to the combo MRP (`price`), the savings line compares to the items bought separately — intentional, both shown.
+
 ### 2026-10-25 — Combo page background image (admin-set)
 - Appearance settings gain `combo_page_bg_url` (multipart `bg_image`, `remove_bg_image=true` clears). `PUT /api/admin/combos/appearance` now uses `upload.any()` and picks `icon` / `bg_image` by fieldname. Public `/api/settings/payment` exposes `combo_page_bg_url`.
 - Admin card: "Combo page background" 16:9 upload (cropper, ratio switch allowed) + remove; live preview shows it dimmed.
