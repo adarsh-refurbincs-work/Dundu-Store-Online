@@ -21,6 +21,7 @@ import useLoginPromptStore from '../../../store/loginPrompt.store';
 import { useTranslation } from '../../../store/language.store';
 import LanguageModal from '../../../components/ui/LanguageModal';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import LuxuryLoyaltyCard from '../../../components/ui/LuxuryLoyaltyCard';
 
 function getInitials(name) {
   if (!name) return '?';
@@ -419,102 +420,80 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* ── ATM Loyalty Card ── */}
+        {/* ── Luxury Loyalty Card ── */}
         {loyaltyCard && (() => {
-          const pointsAfterRedeem = loyaltyCard.points % 200;
-          const redeemableCount = Math.floor(loyaltyCard.points / 200);
-          const progress = Math.round((pointsAfterRedeem / 200) * 100);
-          const memberYear = loyaltyCard.created_at ? new Date(loyaltyCard.created_at).getFullYear() : new Date().getFullYear();
+          const points = Number(loyaltyCard.points ?? 0);
+          const pointsAfterRedeem = points % 200;
+          const redeemableCount = Math.floor(points / 200);
+          const progress = Math.min(100, Math.round((pointsAfterRedeem / 200) * 100));
           return (
             <View style={styles.lcSection}>
               <View style={styles.lcSectionRow}>
-                <Text style={styles.lcSectionTitle}>My Loyalty Card</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('LoyaltyCard')}>
+                <View style={styles.lcHeaderLeft}>
+                  <Text style={styles.lcSectionTitle}>My Loyalty Card</Text>
+                  <View style={styles.lcVipBadge}>
+                    <Text style={styles.lcVipText}>VIP</Text>
+                  </View>
+                </View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('LoyaltyCard')}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
                   <Text style={styles.lcSectionLink}>View Details →</Text>
                 </TouchableOpacity>
               </View>
 
-              {/* The Card — tap to open detail */}
-              <TouchableOpacity
+              {/* Luxury Obsidian Gold Card */}
+              <LuxuryLoyaltyCard
+                card={loyaltyCard}
+                profileName={profile?.name || user?.name}
                 onPress={() => navigation.navigate('LoyaltyCard')}
-                activeOpacity={0.88}
-              >
-                <View style={styles.lcCard}>
-                {/* Blue gradient layers */}
-                <View style={styles.lcGradBase} />
-                <View style={styles.lcGradMid} />
-                <View style={styles.lcGradTop} />
-                {/* Shine overlay */}
-                <View style={styles.lcShine} />
-                {/* Top-right glow circle */}
-                <View style={styles.lcGlowTR} />
-                {/* Bottom-left deep glow */}
-                <View style={styles.lcGlowBL} />
+              />
 
-                {/* Row 1: DUNDU + contactless */}
-                <View style={styles.lcRow1}>
-                  <Text style={styles.lcBrand}>DUNDU</Text>
-                  <Ionicons name="wifi-outline" size={20} color="rgba(255,255,255,0.7)" style={styles.lcContactless} />
-                </View>
-
-                {/* Row 2: Chip + Points */}
-                <View style={styles.lcRow2}>
-                  {/* Golden EMV chip */}
-                  <View style={styles.lcChip}>
-                    <View style={styles.lcChipInner}>
-                      <View style={styles.lcChipQ1} />
-                      <View style={styles.lcChipQ2} />
-                      <View style={styles.lcChipQ3} />
-                      <View style={styles.lcChipQ4} />
-                    </View>
-                  </View>
-                  {/* Points */}
-                  <View style={styles.lcPointsBox}>
-                    <Text style={styles.lcPointsLabel}>Points Balance</Text>
-                    <Text style={styles.lcPointsValue}>
-                      <Text style={styles.lcStar}>★ </Text>
-                      {loyaltyCard.points}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Row 3: Name + Since */}
-                <View style={styles.lcRow3}>
-                  <View>
-                    <Text style={styles.lcMemberLabel}>MEMBER</Text>
-                    <Text style={styles.lcMemberName}>
-                      {(loyaltyCard.name || profile?.name || 'Dundu Member').slice(0, 20).toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={{ alignItems: 'flex-end' }}>
-                    <Text style={styles.lcMemberLabel}>SINCE</Text>
-                    <Text style={styles.lcMemberName}>{memberYear}</Text>
-                  </View>
-                </View>
-              </View>
-              </TouchableOpacity>
-
-              {/* Redeemable banner */}
+              {/* Redeemable Celebration Banner */}
               {redeemableCount > 0 && (
-                <View style={styles.lcRedeemBanner}>
-                  <Ionicons name="gift-outline" size={22} color="#047857" />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.lcRedeemTitle}>₹{redeemableCount * 200} Redeemable Now!</Text>
-                    <Text style={styles.lcRedeemSub}>Show your card at billing counter to redeem</Text>
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => navigation.navigate('LoyaltyCard')}
+                  style={styles.lcRedeemBanner}
+                >
+                  <View style={styles.lcRedeemIconWrap}>
+                    <Ionicons name="gift" size={20} color="#F5D061" />
                   </View>
-                </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.lcRedeemTitle}>₹{redeemableCount * 200} Voucher Ready to Redeem!</Text>
+                    <Text style={styles.lcRedeemSub}>Show card barcode at billing counter or use at checkout</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color="#A7F3D0" />
+                </TouchableOpacity>
               )}
 
-              {/* Progress bar */}
-              <View style={styles.lcProgress}>
-                <View style={styles.lcProgressRow}>
-                  <Text style={styles.lcProgressLeft}>{pointsAfterRedeem} pts toward next redemption</Text>
-                  <Text style={styles.lcProgressRight}>{200 - pointsAfterRedeem} more needed</Text>
+              {/* Modern Dark Progress Container */}
+              <View style={styles.lcProgressCard}>
+                <View style={styles.lcProgressHeader}>
+                  <View style={styles.lcMilestoneLeft}>
+                    <Ionicons name="sparkles" size={13} color="#F5D061" />
+                    <Text style={styles.lcProgressTitle}>Next Reward Milestone</Text>
+                  </View>
+                  <View style={styles.lcNeededBadge}>
+                    <Text style={styles.lcNeededText}>{200 - pointsAfterRedeem} pts needed</Text>
+                  </View>
                 </View>
-                <View style={styles.lcProgressBg}>
-                  <View style={[styles.lcProgressFill, { width: `${progress}%` }]} />
+
+                {/* Progress Bar Track */}
+                <View style={styles.lcProgressBarTrack}>
+                  <View style={[styles.lcProgressBarFill, { width: `${progress}%` }]} />
                 </View>
-                <Text style={styles.lcProgressHint}>Earn 20 pts every ₹500 spent · 200 pts = ₹200 off</Text>
+
+                <View style={styles.lcProgressFooter}>
+                  <Text style={styles.lcProgressPointsText}>{pointsAfterRedeem} / 200 pts earned</Text>
+                  <Text style={styles.lcProgressTierHint}>200 pts = ₹200 OFF</Text>
+                </View>
+
+                <View style={styles.lcProgressPerkRow}>
+                  <Ionicons name="bag-check-outline" size={12} color="rgba(255,255,255,0.45)" style={{ marginRight: 5 }} />
+                  <Text style={styles.lcProgressHint}>Earn 20 pts for every ₹500 spent · In-store & Online</Text>
+                </View>
               </View>
             </View>
           );
@@ -1269,195 +1248,142 @@ const styles = StyleSheet.create({
   addrSaveBtn: { flex: 1, backgroundColor: COLORS.primary, borderRadius: 10, paddingVertical: 11, alignItems: 'center' },
   addrSaveText: { fontSize: 14, fontWeight: '700', color: '#fff' },
 
-  /* ── ATM Loyalty Card ── */
-  lcSection: { marginHorizontal: 14, marginBottom: 14 },
+  /* ── Luxury Loyalty Card Section ── */
+  lcSection: { marginHorizontal: 16, marginBottom: 16 },
   lcSectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  lcSectionTitle: { fontSize: 15, fontWeight: '700', color: COLORS.text },
-  lcSectionLink: { fontSize: 12, fontWeight: '600', color: COLORS.primary },
+  lcHeaderLeft: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  lcSectionTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, letterSpacing: 0.2 },
+  lcVipBadge: {
+    backgroundColor: 'rgba(212, 175, 55, 0.15)',
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 175, 55, 0.35)',
+  },
+  lcVipText: { fontSize: 9, fontWeight: '800', color: '#B38B29', letterSpacing: 1 },
+  lcSectionLink: { fontSize: 12.5, fontWeight: '700', color: COLORS.primary },
 
-  lcCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    minHeight: 200,
-    padding: 22,
-    shadowColor: '#1565c0',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 12,
-    position: 'relative',
-  },
-  lcGradBase: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#0a1628',
-  },
-  lcGradMid: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#1565c0',
-    opacity: 0.55,
-  },
-  lcGradTop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#42a5f5',
-    opacity: 0.25,
-  },
-  lcShine: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  lcGlowTR: {
-    position: 'absolute',
-    top: -50,
-    right: -50,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(224,244,255,0.22)',
-  },
-  lcGlowBL: {
-    position: 'absolute',
-    bottom: -60,
-    left: -30,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(13,45,94,0.55)',
-  },
-
-  lcRow1: {
+  /* Redeemable Celebration Banner */
+  lcRedeemBanner: {
+    marginTop: 12,
+    borderRadius: 16,
+    padding: 14,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 18,
+    gap: 12,
+    backgroundColor: '#071F14',
+    borderWidth: 1.2,
+    borderColor: '#166534',
+    shadowColor: '#052E16',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  lcBrand: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#fff',
-    letterSpacing: 5,
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
-  },
-  lcContactless: {
-    transform: [{ rotate: '90deg' }],
-  },
-
-  lcRow2: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  lcRedeemIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: 'rgba(245, 208, 97, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 208, 97, 0.3)',
     alignItems: 'center',
-    marginBottom: 18,
-  },
-  lcChip: {
-    width: 52,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: '#f5c518',
     justifyContent: 'center',
-    alignItems: 'center',
+  },
+  lcRedeemTitle: { fontSize: 13.5, fontWeight: '800', color: '#BBF7D0', letterSpacing: 0.2 },
+  lcRedeemSub: { fontSize: 11, color: '#86EFAC', marginTop: 2 },
+
+  /* Modern Dark Progress Container */
+  lcProgressCard: {
+    marginTop: 12,
+    borderRadius: 18,
+    padding: 16,
+    backgroundColor: '#0D0F16',
+    borderWidth: 1,
+    borderColor: '#1E2333',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 6,
-    elevation: 6,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  lcChipInner: {
-    width: 36,
-    height: 26,
-    borderWidth: 1.5,
-    borderColor: 'rgba(160,100,0,0.55)',
-    borderRadius: 4,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  lcChipQ1: { width: '50%', height: '50%', borderRightWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(160,100,0,0.4)' },
-  lcChipQ2: { width: '50%', height: '50%', borderBottomWidth: 1, borderColor: 'rgba(160,100,0,0.4)' },
-  lcChipQ3: { width: '50%', height: '50%', borderRightWidth: 1, borderColor: 'rgba(160,100,0,0.4)' },
-  lcChipQ4: { width: '50%', height: '50%' },
-
-  lcPointsBox: { alignItems: 'flex-end' },
-  lcPointsLabel: {
-    fontSize: 8,
-    color: 'rgba(255,255,255,0.6)',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  lcPointsValue: {
-    fontSize: 38,
-    fontWeight: '900',
-    color: '#ffd700',
-    lineHeight: 42,
-  },
-  lcStar: {
-    fontSize: 20,
-    color: '#ffd700',
-  },
-
-  lcRow3: {
+  lcProgressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 10,
   },
-  lcMemberLabel: {
-    fontSize: 8,
-    color: 'rgba(255,255,255,0.45)',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 3,
-  },
-  lcMemberName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 1.5,
-  },
-
-  /* Redeemable banner */
-  lcRedeemBanner: {
-    marginTop: 10,
-    borderRadius: 14,
-    padding: 14,
+  lcMilestoneLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    backgroundColor: '#ecfdf5',
-    borderWidth: 1,
-    borderColor: '#a7f3d0',
+    gap: 6,
   },
-  lcRedeemTitle: { fontSize: 14, fontWeight: '700', color: '#047857' },
-  lcRedeemSub: { fontSize: 11, color: '#059669', marginTop: 2 },
-
-  /* Progress */
-  lcProgress: {
-    marginTop: 10,
-    borderRadius: 14,
-    padding: 14,
-    backgroundColor: COLORS.white,
-    borderWidth: 1,
-    borderColor: COLORS.border,
+  lcProgressTitle: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#E5E7EB',
+    letterSpacing: 0.3,
   },
-  lcProgressRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  lcProgressLeft: { fontSize: 11, color: COLORS.text, fontWeight: '600' },
-  lcProgressRight: { fontSize: 11, color: COLORS.textSecondary },
-  lcProgressBg: {
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#e5e7eb',
+  lcNeededBadge: {
+    backgroundColor: 'rgba(245, 208, 97, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 208, 97, 0.25)',
+  },
+  lcNeededText: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    color: '#F5D061',
+  },
+  lcProgressBarTrack: {
+    height: 9,
+    borderRadius: 6,
+    backgroundColor: '#1C2130',
     overflow: 'hidden',
+    marginBottom: 10,
+  },
+  lcProgressBarFill: {
+    height: '100%',
+    borderRadius: 6,
+    backgroundColor: '#F5D061',
+    shadowColor: '#F5D061',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  lcProgressFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  lcProgressFill: {
-    height: '100%',
-    borderRadius: 5,
-    backgroundColor: '#42a5f5',
-    shadowColor: '#42a5f5',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 6,
+  lcProgressPointsText: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: '#9CA3AF',
   },
-  lcProgressHint: { fontSize: 10, color: COLORS.textSecondary, textAlign: 'center' },
+  lcProgressTierHint: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#F5D061',
+  },
+  lcProgressPerkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  lcProgressHint: {
+    fontSize: 10.5,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
 
   // ── Guest styles ──────────────────────────
   guestScroll: {

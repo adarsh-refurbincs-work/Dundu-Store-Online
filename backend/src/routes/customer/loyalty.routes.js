@@ -19,7 +19,7 @@ router.get('/my-card', authenticate, ah(async (req, res) => {
   const phone = (userRows[0]?.phone || '').replace(/\D/g, '');
   if (!phone) return ok(res, { card: null });
   const { rows } = await db.query(
-    'SELECT id, phone, name, points, total_spent FROM loyalty_cards WHERE phone=$1',
+    'SELECT id, phone, name, points, total_spent, created_at, updated_at FROM loyalty_cards WHERE phone=$1',
     [phone]
   );
   ok(res, { card: rows[0] || null });

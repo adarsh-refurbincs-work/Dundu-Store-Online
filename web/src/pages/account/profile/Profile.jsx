@@ -402,127 +402,226 @@ export default function Profile() {
 
           {loyaltyCard ? (
             <>
-              {/* The Card */}
-              <div className="relative rounded-3xl overflow-hidden select-none"
+              {/* The Luxury Dark Obsidian & Gold Card */}
+              <div
+                className="relative rounded-3xl overflow-hidden select-none transition-all duration-300 hover:scale-[1.01]"
                 style={{
-                  background: 'linear-gradient(135deg, #0a1628 0%, #0d2d5e 25%, #1565c0 55%, #42a5f5 80%, #e0f4ff 100%)',
-                  padding: '26px 24px 22px',
-                  boxShadow: 'none',
-                  minHeight: '205px',
-                }}>
+                  background: 'linear-gradient(135deg, #181b26 0%, #0d0f15 35%, #131622 70%, #07080b 100%)',
+                  padding: '26px 26px 22px',
+                  minHeight: '215px',
+                  border: '1.2px solid rgba(245, 208, 97, 0.4)',
+                  boxShadow: '0 16px 36px -10px rgba(0,0,0,0.7), 0 0 20px rgba(245, 208, 97, 0.05)',
+                }}
+              >
+                {/* SVG Luxury Guilloche & Security Pattern Overlay */}
+                <svg
+                  className="absolute inset-0 w-full h-full pointer-events-none opacity-15"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle cx="90%" cy="15%" r="140" fill="none" stroke="#F5D061" strokeWidth="1" strokeDasharray="4 6" />
+                  <circle cx="90%" cy="15%" r="100" fill="none" stroke="#F5D061" strokeWidth="0.8" />
+                  <circle cx="90%" cy="15%" r="60" fill="none" stroke="#F5D061" strokeWidth="0.6" />
+                  <circle cx="10%" cy="85%" r="120" fill="none" stroke="#F5D061" strokeWidth="0.8" strokeDasharray="3 5" />
+                  <path d="M -20 160 Q 200 80 500 20" fill="none" stroke="#F5D061" strokeWidth="0.8" />
+                </svg>
 
-                {/* Shine overlay */}
-                <div style={{
-                  position: 'absolute', inset: 0, pointerEvents: 'none',
-                  background: 'linear-gradient(130deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 40%, rgba(0,0,0,0.15) 100%)',
-                }} />
-                {/* Top-right white-blue glow */}
-                <div style={{
-                  position: 'absolute', top: '-50px', right: '-50px',
-                  width: '200px', height: '200px', borderRadius: '50%', pointerEvents: 'none',
-                  background: 'radial-gradient(circle, rgba(224,244,255,0.55) 0%, transparent 70%)',
-                }} />
-                {/* Bottom-left deep blue glow */}
-                <div style={{
-                  position: 'absolute', bottom: '-70px', left: '-30px',
-                  width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
-                  background: 'radial-gradient(circle, rgba(13,45,94,0.7) 0%, transparent 70%)',
-                }} />
+                {/* Ambient Warm Gold Glow TR */}
+                <div
+                  style={{
+                    position: 'absolute', top: '-40px', right: '-40px',
+                    width: '220px', height: '220px', borderRadius: '50%', pointerEvents: 'none',
+                    background: 'radial-gradient(circle, rgba(245,208,97,0.18) 0%, transparent 70%)',
+                  }}
+                />
+                {/* Steel Depth Glow BL */}
+                <div
+                  style={{
+                    position: 'absolute', bottom: '-50px', left: '-30px',
+                    width: '200px', height: '200px', borderRadius: '50%', pointerEvents: 'none',
+                    background: 'radial-gradient(circle, rgba(46,56,82,0.3) 0%, transparent 70%)',
+                  }}
+                />
 
-                {/* Row 1: Logo + Contactless */}
+                {/* Row 1: Logo + VIP Badge + Contactless */}
                 <div className="relative flex items-center justify-between mb-5">
-                  <span style={{ color: 'white', fontWeight: 900, fontSize: '19px', letterSpacing: '5px', textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
-                    DUNDU
-                  </span>
-                  <Wifi className="h-6 w-6" style={{ color: 'rgba(255,255,255,0.65)', transform: 'rotate(90deg)' }} />
+                  <div className="flex items-center gap-3">
+                    <span style={{ color: '#FFFFFF', fontWeight: 900, fontSize: '20px', letterSpacing: '5px', textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}>
+                      DUNDU
+                    </span>
+                    <span
+                      className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider"
+                      style={{
+                        background: 'rgba(245, 208, 97, 0.12)',
+                        border: '1px solid rgba(245, 208, 97, 0.35)',
+                        color: '#F5D061',
+                      }}
+                    >
+                      ★ BLACK PRIVILEGE
+                    </span>
+                  </div>
+                  <Wifi className="h-5 w-5" style={{ color: '#F5D061', transform: 'rotate(90deg)' }} />
                 </div>
 
                 {/* Row 2: Chip + Points */}
                 <div className="relative flex items-center justify-between mb-5">
-                  {/* Golden EMV chip */}
-                  <div style={{
-                    width: '52px', height: '40px',
-                    background: 'linear-gradient(135deg, #fce37a 0%, #f5c518 30%, #e6a000 60%, #ffd700 100%)',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.3)',
-                    border: '1px solid rgba(255,255,255,0.25)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <div style={{
-                      width: '36px', height: '26px',
-                      border: '1.5px solid rgba(160,100,0,0.55)',
-                      borderRadius: '4px',
-                      display: 'grid', gridTemplateColumns: '1fr 1fr',
-                      gridTemplateRows: '1fr 1fr',
-                    }}>
-                      <div style={{ borderRight: '1px solid rgba(160,100,0,0.4)', borderBottom: '1px solid rgba(160,100,0,0.4)' }} />
-                      <div style={{ borderBottom: '1px solid rgba(160,100,0,0.4)' }} />
-                      <div style={{ borderRight: '1px solid rgba(160,100,0,0.4)' }} />
+                  {/* Realistic Gold EMV Chip */}
+                  <div
+                    style={{
+                      width: '50px',
+                      height: '38px',
+                      background: 'linear-gradient(135deg, #fae7a5 0%, #cf9f3f 30%, #f3d77d 65%, #9b6e1b 100%)',
+                      borderRadius: '7px',
+                      border: '0.8px solid #704d0c',
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                      padding: '3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '0.8px solid #704d0c',
+                        borderRadius: '4px',
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gridTemplateRows: '1fr 1fr',
+                        position: 'relative',
+                      }}
+                    >
+                      <div style={{ borderRight: '0.8px solid #704d0c', borderBottom: '0.8px solid #704d0c' }} />
+                      <div style={{ borderBottom: '0.8px solid #704d0c' }} />
+                      <div style={{ borderRight: '0.8px solid #704d0c' }} />
                       <div />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: '12px',
+                          height: '12px',
+                          borderRadius: '3px',
+                          background: 'linear-gradient(180deg, #f7e29a, #b88a2c)',
+                          border: '0.8px solid #704d0c',
+                        }}
+                      />
                     </div>
                   </div>
 
-                  {/* Points */}
+                  {/* Points Counter */}
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '9px', letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '2px' }}>
-                      Points Balance
+                    <p style={{ color: 'rgba(245, 208, 97, 0.85)', fontSize: '9px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '2px', fontWeight: 700 }}>
+                      Reward Balance
                     </p>
-                    <p style={{ color: '#ffd700', fontWeight: 900, fontSize: '42px', lineHeight: 1 }}>
-                      <span style={{ fontSize: '22px', verticalAlign: 'middle', marginRight: '3px', opacity: 0.85 }}>★</span>{loyaltyCard.points}
+                    <p style={{ color: '#FFF2B2', fontWeight: 900, fontSize: '40px', lineHeight: 1, textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                      <span style={{ fontSize: '24px', verticalAlign: 'middle', marginRight: '4px', color: '#F5D061' }}>★</span>
+                      {loyaltyCard.points}
+                    </p>
+                    <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '10px', marginTop: '2px', fontWeight: 600 }}>
+                      {redeemableCount > 0 ? `₹${redeemableCount * 200} Ready to Redeem` : `${200 - pointsAfterRedeem} pts to ₹200 off`}
                     </p>
                   </div>
                 </div>
 
-                {/* Row 3: Name + Since */}
-                <div className="relative flex items-end justify-between">
+                {/* Row 3: Name + Card Mask + Since */}
+                <div className="relative flex items-end justify-between pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                   <div>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '8px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '3px' }}>
-                      Member
+                    <p style={{ color: 'rgba(245, 208, 97, 0.7)', fontSize: '8px', letterSpacing: '1.8px', textTransform: 'uppercase', marginBottom: '3px', fontWeight: 700 }}>
+                      Cardholder
                     </p>
-                    <p style={{ color: 'white', fontWeight: 700, fontSize: '13px', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+                    <p style={{ color: 'white', fontWeight: 800, fontSize: '13px', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
                       {(loyaltyCard.name || user.name || 'Dundu Member').slice(0, 22)}
                     </p>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '8px', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '3px' }}>
-                      Since
+                    <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '11px', letterSpacing: '2px', fontWeight: 700 }}>
+                      •••• {((loyaltyCard.phone || '').replace(/\D/g, '')).slice(-4) || '8820'}
                     </p>
-                    <p style={{ color: 'white', fontWeight: 700, fontSize: '13px' }}>{memberYear}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: '9px', marginTop: '1px' }}>
+                      SINCE <span style={{ color: '#fff', fontWeight: 700 }}>{memberYear}</span>
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Redeemable banner */}
+              {/* Redeemable Celebration Banner */}
               {redeemableCount > 0 && (
-                <div className="mt-4 rounded-2xl px-5 py-4 flex items-center gap-3"
-                  style={{ background: 'linear-gradient(135deg, #052e16 0%, #064e25 100%)', border: '1px solid #166534' }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #16a34a, #4ade80)' }}>
-                    <Gift className="h-5 w-5 text-white" />
+                <div
+                  className="mt-4 rounded-2xl px-5 py-4 flex items-center justify-between gap-3"
+                  style={{
+                    background: 'linear-gradient(135deg, #071F14 0%, #0d3822 100%)',
+                    border: '1.2px solid #166534',
+                    boxShadow: '0 8px 20px -6px rgba(5,46,22,0.5)',
+                  }}
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                      style={{ background: 'rgba(245, 208, 97, 0.15)', border: '1px solid rgba(245, 208, 97, 0.3)' }}
+                    >
+                      <Gift className="h-5 w-5" style={{ color: '#F5D061' }} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm" style={{ color: '#BBF7D0' }}>
+                        ₹{redeemableCount * 200} Voucher Ready to Redeem!
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: '#86EFAC' }}>
+                        Show card at billing counter or apply at checkout
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-bold" style={{ color: '#86efac' }}>₹{redeemableCount * 200} Redeemable Now!</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#4ade80' }}>Show your card at the billing counter to redeem</p>
-                  </div>
+                  <Link
+                    to="/account/loyalty-card"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg text-emerald-300 bg-emerald-950/60 border border-emerald-800 hover:bg-emerald-900 transition-colors"
+                  >
+                    View Details →
+                  </Link>
                 </div>
               )}
 
-              {/* Progress bar */}
-              <div className="mt-3 rounded-2xl p-4 space-y-2" style={{ backgroundColor: '#1a1a1a', border: '1px solid #2e2e2e' }}>
-                <div className="flex justify-between text-xs">
-                  <span style={{ color: '#ccc' }}>{pointsAfterRedeem} pts toward next redemption</span>
-                  <span style={{ color: '#666' }}>{200 - pointsAfterRedeem} more needed</span>
+              {/* Modern Dark Progress Container */}
+              <div
+                className="mt-3 rounded-2xl p-4.5 space-y-2.5"
+                style={{ backgroundColor: '#0D0F16', border: '1px solid #1E2333' }}
+              >
+                <div className="flex justify-between items-center text-xs">
+                  <div className="flex items-center gap-1.5">
+                    <span style={{ color: '#F5D061' }}>★</span>
+                    <span className="font-semibold" style={{ color: '#E5E7EB' }}>Reward Milestone</span>
+                  </div>
+                  <span
+                    className="px-2 py-0.5 rounded text-[10px] font-bold"
+                    style={{
+                      background: 'rgba(245, 208, 97, 0.12)',
+                      border: '1px solid rgba(245, 208, 97, 0.25)',
+                      color: '#F5D061',
+                    }}
+                  >
+                    {200 - pointsAfterRedeem} pts to ₹200
+                  </span>
                 </div>
-                <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: '#2a2a2a' }}>
-                  <div className="h-full rounded-full transition-all duration-700"
+
+                <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1C2130' }}>
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
                     style={{
                       width: `${progress}%`,
-                      background: 'linear-gradient(90deg, #0d2d5e, #1565c0, #42a5f5, #e0f4ff)',
-                      boxShadow: '0 0 10px rgba(66,165,245,0.7)',
-                    }} />
+                      background: 'linear-gradient(90deg, #9b6e1b, #F5D061, #FFF2B2)',
+                      boxShadow: '0 0 10px rgba(245,208,97,0.7)',
+                    }}
+                  />
                 </div>
-                <p className="text-xs text-center" style={{ color: '#555' }}>
-                  Earn 20 pts every ₹500 spent · 200 pts = ₹200 off
+
+                <div className="flex justify-between text-xs pt-0.5">
+                  <span style={{ color: '#9CA3AF' }}>{pointsAfterRedeem} / 200 pts earned</span>
+                  <span className="font-bold" style={{ color: '#F5D061' }}>200 pts = ₹200 OFF</span>
+                </div>
+
+                <p className="text-xs text-center pt-1" style={{ color: '#6B7280', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  Earn 20 pts every ₹500 spent · Works in-store & online
                 </p>
               </div>
             </>
