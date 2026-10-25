@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, FlatList, TouchableOpacity, Image,
+  View, Text, FlatList, TouchableOpacity, Image, TextInput,
   StyleSheet, ActivityIndicator, RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { comboApi } from '../../api/index';
+import { comboApi, categoryApi } from '../../api/index';
 import { COLORS, UPLOADS_URL } from '../../config';
 import { formatPrice } from '../../utils/format';
 import AppHeader from '../../components/ui/AppHeader';
+import CategoryStrip from '../../components/ui/CategoryStrip';
+import useSettingsStore from '../../store/settings.store';
 
 function getImageUri(src) {
   if (!src) return null;
@@ -86,8 +88,20 @@ function ComboCard({ combo, onPress }) {
 export default function ComboListScreen() {
   const navigation = useNavigation();
   const [combos, setCombos] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Same festival theming as the Home / Shop top bars
+  const festEnabled = useSettingsStore((s) => s.festivalEnabled);
+  const festNavBg   = useSettingsStore((s) => s.festivalNavbarColor);
+  const festNavText = useSettingsStore((s) => s.festivalNavbarTextColor);
+
+  const handleSearch = () => {
+    const q = searchText.trim();
+    if (q) { navigation.navigate('Shop', { search: q }); setSearchText(''); }
+  };
 
   const fetchCombos = async () => {
     try {
@@ -101,11 +115,44 @@ export default function ComboListScreen() {
     }
   };
 
-  useEffect(() => { fetchCombos(); }, []);
+  useEffect(() => {
+    fetchCombos();
+    categoryApi.list()
+      .then((res) => setCategories(res.categories || res.data?.categories || res || []))
+      .catch(() => {});
+  }, []);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <AppHeader title="Combo Deals 🎀" onBack={() => navigation.goBack()} />
+    <SafeAreaView style={[styles.safe, festEnabled && { backgroundColor: festNavBg }]} edges={['left', 'right', 'bottom']}>
+      {/* Same top bar as Home / Shop: logo + cart + wishlist */}
+      <AppHeader logo showCart showWishlist />
+
+      {/* Search bar — searches the main catalogue */}
+      <View style={[styles.searchBar, festEnabled && { backgroundColor: festNavBg, borderBottomColor: festNavBg }]}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            festEnabled && { backgroundColor: 'rgba(255,255,255,0.18)', borderColor: 'rgba(255,255,255,0.25)', color: festNavText },
+          ]}
+          placeholder="Search products, brands..."
+          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : '#666'}
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+      </View>
+
+      {/* Category strip with Combos highlighted; other circles jump to that category */}
+      <CategoryStrip
+        categories={categories}
+        activeSlug={null}
+        isOfferActive={false}
+        isComboActive
+        onPressCombo={() => {}}
+        onPressOffers={() => navigation.navigate('Shop', { offer: true })}
+        onPressCategory={(cat) => navigation.navigate('Shop', { category: cat.slug, category_name: cat.name })}
+      />
 
       {loading ? (
         <View style={styles.center}>
@@ -152,6 +199,27 @@ export default function ComboListScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#fff0f6' },
+
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1a1a1a',
+  },
+  searchInput: {
+    flex: 1,
+    height: 38,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    fontSize: 13,
+    color: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#2e2e2e',
+  },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
 
   list: { padding: 14, paddingBottom: 100 },

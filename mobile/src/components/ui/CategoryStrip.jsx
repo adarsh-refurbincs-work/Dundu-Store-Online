@@ -23,6 +23,7 @@ export default function CategoryStrip({
   filterCount = 0,
   onPressFilter,
   onPressCombo,
+  isComboActive = false,
   themeColor,
 }) {
   const festEnabled = useSettingsStore((s) => s.festivalEnabled);
@@ -48,10 +49,10 @@ export default function CategoryStrip({
             onPress={onPressCombo}
             activeOpacity={0.75}
           >
-            <View style={[styles.comboCircle, { borderColor: activeColor }]}>
+            <View style={[styles.comboCircle, { borderColor: activeColor }, isComboActive && { borderWidth: 2.5, backgroundColor: activeColor + '33' }]}>
               <Text style={styles.comboCircleIcon}>🎀</Text>
             </View>
-            <Text style={[styles.label, { color: '#fff' }]} numberOfLines={1}>Combos</Text>
+            <Text style={[styles.label, { color: '#fff' }, isComboActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
           </TouchableOpacity>
         )}
 

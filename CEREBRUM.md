@@ -215,6 +215,13 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile Combo screen matches category pages
+- `ComboListScreen.jsx`: replaced the back-arrow title header with the same chrome as Home/Shop — `AppHeader logo showCart showWishlist`, the search bar (submits to `Shop { search }`), and `CategoryStrip` (categories load via `categoryApi.list`; tapping one navigates to `Shop { category, category_name }`, Offers → `Shop { offer: true }`). Festival nav colours honoured.
+- `CategoryStrip.jsx`: new `isComboActive` prop highlights the Combo circle/label like an active category.
+
+### 2026-10-25 — Mobile wishlist heart: no bubble, white outline
+- `components/ui/WishlistHeart.jsx`: white round background + shadow removed (transparent); outline colour grey → white with a faint text shadow for light photos; saved state stays solid red.
+
 ### 2026-10-25 — Mobile login: tab switcher background removed
 - `LoginScreen.jsx` `tabContainer` background `#1A1A1A` → transparent; active tab keeps the primary pill.
 

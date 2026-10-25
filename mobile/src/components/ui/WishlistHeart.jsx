@@ -2,10 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, TouchableOpacity, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-// Flipkart-style wishlist heart: grey outline on a round white button, solid red when saved,
-// with a short "pop" when it turns on. Used on product cards and the product page.
+// Wishlist heart: white outline sitting directly on the product photo (no bubble),
+// solid red when saved, with a short "pop" when it turns on. Used on product cards
+// and the product page.
 export const WISHLIST_RED = '#FF4343';
-const OUTLINE_GREY = '#878787';
+const OUTLINE_WHITE = '#FFFFFF';
 
 export default function WishlistHeart({ active, onPress, disabled, size = 18, style }) {
   const scale = useRef(new Animated.Value(1)).current;
@@ -34,7 +35,8 @@ export default function WishlistHeart({ active, onPress, disabled, size = 18, st
         <Ionicons
           name={active ? 'heart' : 'heart-outline'}
           size={size}
-          color={active ? WISHLIST_RED : OUTLINE_GREY}
+          color={active ? WISHLIST_RED : OUTLINE_WHITE}
+          style={styles.icon}
         />
       </Animated.View>
     </TouchableOpacity>
@@ -43,13 +45,14 @@ export default function WishlistHeart({ active, onPress, disabled, size = 18, st
 
 const styles = StyleSheet.create({
   bubble: {
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 3,
-    elevation: 3,
+  },
+  // Soft shadow under the glyph so the white outline stays readable on light photos.
+  icon: {
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
