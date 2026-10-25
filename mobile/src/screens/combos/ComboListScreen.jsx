@@ -264,11 +264,11 @@ const styles = StyleSheet.create({
 
   saveBadge: {
     position: 'absolute', top: 10, left: 10,
-    backgroundColor: '#e91e8c',
+    backgroundColor: '#000',
     paddingHorizontal: 8, paddingVertical: 4,
     borderRadius: 10,
   },
-  saveBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800' },
+  saveBadgeText: { color: '#22c55e', fontSize: 11, fontWeight: '800' },
 
   comboBadge: {
     position: 'absolute', top: 10, right: 10,

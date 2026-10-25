@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo offer tag: black bg, green text
+- Mobile `ComboCard.saveBadge` and `ComboDetail.offPill` ("N% OFF") → background `#000`, text `#22c55e`.
+
 ### 2026-10-25 — Mobile combo mode polish
 - Combo theme `T.surface`/`tagBg` → off-white `#fdf8f3` so Newest / Price sort chips and the filter button look like other categories (was dark `#111720`).
 - `ComboFilterSheet`: `statusBarTranslucent`, `comboSheet` style (`alignSelf:center`, `maxWidth 420`, bottom padding) so it sits centred on every device.
