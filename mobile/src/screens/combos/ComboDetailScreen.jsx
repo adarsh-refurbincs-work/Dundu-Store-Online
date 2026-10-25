@@ -232,6 +232,7 @@ export default function ComboDetailScreen() {
   const [cartLoading, setCartLoading] = useState(false);
   const [cartSuccess, setCartSuccess] = useState(false);
   const [otherCombos, setOtherCombos] = useState([]);
+  const [heroIndex, setHeroIndex] = useState(0);
 
   // Suggestions: every other live combo
   useEffect(() => {
@@ -395,22 +396,41 @@ export default function ComboDetailScreen() {
 
   if (!combo) return null;
 
-  const comboUri = getImageUri(combo.image_url);
+  const galleryUris = (combo.images?.length ? combo.images : (combo.image_url ? [combo.image_url] : [])).map(getImageUri).filter(Boolean);
+  const comboUri = galleryUris[0] || null;
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
       {header}
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Hero image */}
+        {/* Hero gallery — swipe through all combo images */}
         <View style={styles.heroWrap}>
-          {comboUri
-            ? <Image source={{ uri: comboUri }} style={styles.heroImage} resizeMode="cover" />
-            : <View style={styles.heroFallback}><Text style={{ fontSize: 80 }}>🎀</Text></View>
-          }
+          {galleryUris.length > 0 ? (
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(e) => setHeroIndex(Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH))}
+            >
+              {galleryUris.map((uri, i) => (
+                <Image key={uri + i} source={{ uri }} style={[styles.heroImage, { width: SCREEN_WIDTH }]} resizeMode="cover" />
+              ))}
+            </ScrollView>
+          ) : (
+            <View style={styles.heroFallback}><Text style={{ fontSize: 80 }}>🎀</Text></View>
+          )}
           <View style={styles.comboBadge}>
             <Text style={styles.comboBadgeText}>COMBO DEAL</Text>
           </View>
+          {galleryUris.length > 1 && (
+            <>
+              <View style={styles.heroDots}>
+                {galleryUris.map((_, i) => <View key={i} style={[styles.heroDot, i === heroIndex && styles.heroDotActive]} />)}
+              </View>
+              <View style={styles.heroCounter}><Text style={styles.heroCounterText}>{heroIndex + 1}/{galleryUris.length}</Text></View>
+            </>
+          )}
         </View>
 
         {/* Header info */}
@@ -569,6 +589,11 @@ const styles = StyleSheet.create({
   // Hero
   heroWrap: { height: 280, width: '100%', position: 'relative' },
   heroImage: { width: '100%', height: '100%' },
+  heroDots: { position: 'absolute', bottom: 12, left: 0, right: 0, flexDirection: 'row', justifyContent: 'center', gap: 6 },
+  heroDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.5)' },
+  heroDotActive: { width: 18, backgroundColor: '#fff' },
+  heroCounter: { position: 'absolute', bottom: 10, right: 12, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
+  heroCounterText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   heroFallback: { width: '100%', height: '100%', backgroundColor: '#fce4f4', alignItems: 'center', justifyContent: 'center' },
   comboBadge: {
     position: 'absolute', top: 14, right: 14,

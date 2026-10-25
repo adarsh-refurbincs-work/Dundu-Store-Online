@@ -27,6 +27,7 @@ export default function ComboDetail() {
 
   // selection[slotId] = { product_id, variant_id }
   const [selection, setSelection] = useState({});
+  const [activeImg, setActiveImg] = useState(0);
   const [qty, setQty] = useState(1);
 
   const slots = combo?.slots || [];
@@ -64,6 +65,7 @@ export default function ComboDetail() {
   if (isLoading) return <Spinner />;
   if (isError || !combo) return <EmptyState icon={Gift} title="Combo not found" action="See all combos" to="/combos" />;
 
+  const gallery = combo.images?.length ? combo.images : (combo.image_url ? [combo.image_url] : []);
   const total = Number(combo.offer_price || combo.price);
   const regular = slots.reduce((sum, s) => {
     const sel = selection[s.id];
@@ -76,9 +78,21 @@ export default function ComboDetail() {
       <PageHeader title={combo.name} subtitle={combo.description} crumbs={[{ label: 'Combos', to: '/combos' }, { label: combo.name }]} />
       <div className="grid lg:grid-cols-[1fr_380px] gap-8">
         <div className="space-y-6">
-          {combo.image_url && (
-            <div className="rounded-3xl overflow-hidden aspect-[16/8] bg-elevated">
-              <img src={imageUrl(combo.image_url)} alt={combo.name} className="w-full h-full object-cover" />
+          {gallery.length > 0 && (
+            <div className="space-y-3">
+              <div className="rounded-3xl overflow-hidden aspect-[16/9] bg-elevated">
+                <img key={gallery[activeImg] || gallery[0]} src={imageUrl(gallery[activeImg] || gallery[0])} alt={combo.name} className="w-full h-full object-cover animate-fade-in" />
+              </div>
+              {gallery.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto scrollbar-none">
+                  {gallery.map((u, i) => (
+                    <button key={u + i} type="button" onClick={() => setActiveImg(i)} aria-label={`Image ${i + 1}`}
+                      className={`shrink-0 w-20 h-16 rounded-xl overflow-hidden border-2 transition-all ${i === activeImg ? 'border-primary ring-2 ring-primary/30' : 'border-line hover:border-line-strong'}`}>
+                      <img src={imageUrl(u)} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {slots.map((slot, idx) => {

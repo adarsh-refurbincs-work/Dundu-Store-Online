@@ -194,10 +194,23 @@ function ComboModal({ editing, duplicateOf, allProducts, onClose, onSaved }) {
       products: (s.products || []).map((p) => ({ id: p.id, name: p.name, image: p.image, price: p.price, offer_price: p.offer_price, stock: p.stock })),
     }))
   );
-  const [imageFile, setImageFile] = useState(null);
-  const [preview, setPreview] = useState(source?.image_url || '');
-  const [removeImage, setRemoveImage] = useState(false);
+  // Gallery: [{ url }] for saved images, [{ file, preview }] for new ones. First = cover.
+  const [gallery, setGallery] = useState(() => {
+    const urls = source?.images?.length ? source.images : (source?.image_url ? [source.image_url] : []);
+    return urls.map((url) => ({ url, preview: url }));
+  });
   const [cropper, setCropper] = useState({ isOpen: false, src: null });
+  const [cropQueue, setCropQueue] = useState([]); // remaining picked files waiting for the cropper
+  const moveImage = (i, dir) => setGallery((g) => { const j = i + dir; if (j < 0 || j >= g.length) return g; const n = [...g]; [n[i], n[j]] = [n[j], n[i]]; return n; });
+  const removeImageAt = (i) => setGallery((g) => g.filter((_, k) => k !== i));
+  const openNextCrop = (queue) => {
+    const [next, ...rest] = queue;
+    setCropQueue(rest);
+    if (!next) { setCropper({ isOpen: false, src: null }); return; }
+    const reader = new FileReader();
+    reader.onload = () => setCropper({ isOpen: true, src: reader.result });
+    reader.readAsDataURL(next);
+  };
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const set = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
@@ -207,12 +220,10 @@ function ComboModal({ editing, duplicateOf, allProducts, onClose, onSaved }) {
   const pct = savingsPct(regularTotal, bundle);
 
   const onPickImage = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCropper({ isOpen: true, src: reader.result });
-    reader.readAsDataURL(file);
+    const files = Array.from(e.target.files || []).filter((f) => f.type.startsWith('image/'));
     e.target.value = '';
+    if (!files.length) return;
+    openNextCrop(files); // each picked file goes through the 4:3 cropper in turn
   };
 
   const validate = () => {
@@ -241,8 +252,11 @@ function ComboModal({ editing, duplicateOf, allProducts, onClose, onSaved }) {
       fd.append('stock', form.stock === '' ? 100 : form.stock);
       fd.append('sort_order', form.sort_order || 0);
       fd.append('slots', JSON.stringify(slots.map((s) => ({ id: s.id, slot_label: s.slot_label.trim(), requires_selection: s.requires_selection, products: s.products.map((p) => p.id) }))));
-      if (imageFile) fd.append('image', imageFile);
-      else if (removeImage) fd.append('image_url', '');
+      // Gallery: exact order; saved images by url, new files by their index in `images`
+      let newIdx = 0;
+      const order = gallery.map((g) => (g.file ? { new: newIdx++ } : { url: g.url }));
+      gallery.forEach((g) => { if (g.file) fd.append('images', g.file); });
+      fd.append('images_order', JSON.stringify(order));
       if (isEdit) await comboApi.update(editing.id, fd);
       else await comboApi.create(fd);
       toast.success(isEdit ? 'Combo updated' : 'Combo created');
@@ -278,20 +292,34 @@ function ComboModal({ editing, duplicateOf, allProducts, onClose, onSaved }) {
 
         <aside className="space-y-4">
           <div className="rounded-xl border border-gray-200 p-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Cover image</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-bold uppercase tracking-wide text-gray-500">Images</p>
+              {gallery.length > 0 && <span className="text-[10px] text-gray-400">{gallery.length} photo{gallery.length === 1 ? '' : 's'} · first is the cover</span>}
+            </div>
             <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-50 border border-dashed border-gray-300 flex items-center justify-center">
-              {preview ? <img src={preview} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="h-8 w-8 text-gray-300" />}
+              {gallery[0] ? <img src={gallery[0].preview} alt="" className="w-full h-full object-cover" /> : <ImagePlus className="h-8 w-8 text-gray-300" />}
+              {gallery[0] && <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/70 text-white">Cover</span>}
             </div>
-            <div className="flex gap-2 mt-2">
-              <label className="flex-1">
-                <span className="block text-center text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-50 cursor-pointer">{preview ? 'Replace' : 'Upload'}</span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onPickImage} className="hidden" />
-              </label>
-              {preview && (
-                <button type="button" onClick={() => { setPreview(''); setImageFile(null); setRemoveImage(true); }} className="text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 text-red-600 hover:bg-red-50">Remove</button>
-              )}
-            </div>
-            <p className="text-[10px] text-gray-400 mt-1.5">JPEG / PNG / WebP, cropped to 4:3, max 5 MB. Without a cover, the store shows the products' photos.</p>
+            {gallery.length > 0 && (
+              <div className="grid grid-cols-4 gap-1.5 mt-2">
+                {gallery.map((g, i) => (
+                  <div key={g.url || g.preview} className={`relative group aspect-square rounded-lg overflow-hidden border ${i === 0 ? 'border-violet-500 ring-2 ring-violet-500/20' : 'border-gray-200'}`}>
+                    <img src={g.preview} alt="" className="w-full h-full object-cover" />
+                    {g.file && <span className="absolute top-0.5 left-0.5 text-[8px] font-bold px-1 rounded bg-emerald-600 text-white">NEW</span>}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      <button type="button" title="Move left" onClick={() => moveImage(i, -1)} disabled={i === 0} className="text-white text-[11px] font-bold px-1 disabled:opacity-30">‹</button>
+                      <button type="button" title="Remove" onClick={() => removeImageAt(i)} className="text-rose-300 text-[11px] font-bold px-1">✕</button>
+                      <button type="button" title="Move right" onClick={() => moveImage(i, 1)} disabled={i === gallery.length - 1} className="text-white text-[11px] font-bold px-1 disabled:opacity-30">›</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <label className="block mt-2">
+              <span className="block text-center text-xs font-medium px-3 py-1.5 rounded-lg border border-gray-300 hover:bg-gray-50 cursor-pointer">+ Add images</span>
+              <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={onPickImage} className="hidden" />
+            </label>
+            <p className="text-[10px] text-gray-400 mt-1.5">Pick several at once — each is cropped to 4:3 in turn. Drag order with ‹ ›; the first image is the cover shown on cards.</p>
           </div>
 
           <div className="rounded-xl border border-violet-200 bg-violet-50/60 p-4">
@@ -331,8 +359,9 @@ function ComboModal({ editing, duplicateOf, allProducts, onClose, onSaved }) {
         price={bundle}
         originalPrice={regularTotal > bundle ? regularTotal : null}
         fileNamePrefix="combo"
-        onClose={() => setCropper({ isOpen: false, src: null })}
-        onCropComplete={(file, url) => { setImageFile(file); setPreview(url); setRemoveImage(false); setCropper({ isOpen: false, src: null }); }}
+        onClose={() => { setCropper({ isOpen: false, src: null }); setCropQueue([]); }}
+        onSkipCrop={() => { setCropper({ isOpen: false, src: null }); openNextCrop(cropQueue); }}
+        onCropComplete={(file, url) => { setGallery((g) => [...g, { file, preview: url }]); openNextCrop(cropQueue); }}
       />
     </Modal>
   );

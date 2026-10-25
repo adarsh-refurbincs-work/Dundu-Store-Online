@@ -1,6 +1,18 @@
 const db = require('../../../config/db');
 const { ok, notFound } = require('../../../utils/response');
 
+// Ordered gallery urls per combo (falls back to the cover for combos created before galleries)
+const attachImages = async (combos) => {
+  if (!combos.length) return;
+  const { rows } = await db.query(
+    'SELECT combo_id, url FROM combo_images WHERE combo_id = ANY($1::uuid[]) ORDER BY sort_order, created_at',
+    [combos.map((c) => c.id)]
+  );
+  const map = {};
+  rows.forEach((r) => { (map[r.combo_id] ||= []).push(r.url); });
+  combos.forEach((c) => { c.images = map[c.id] || (c.image_url ? [c.image_url] : []); });
+};
+
 /**
  * List all active combos with slots and product previews (for the list screen)
  */
@@ -32,6 +44,7 @@ const list = async (_req, res) => {
     );
     combo.slots = slots;
   }
+  await attachImages(combos);
 
   ok(res, { combos });
 };
@@ -46,6 +59,7 @@ const getOne = async (req, res) => {
   );
   if (!combos.length) return notFound(res, 'Combo not found');
   const combo = combos[0];
+  await attachImages([combo]);
 
   const { rows: slots } = await db.query(
     'SELECT * FROM combo_slots WHERE combo_id=$1 ORDER BY sort_order',

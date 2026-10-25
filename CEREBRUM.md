@@ -215,6 +215,13 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo image gallery (multiple images)
+- **DB**: migration `1782500000000_combo-images.js` → `combo_images (id, combo_id FK cascade, url, sort_order)`; existing `combos.image_url` backfilled as the first image. `combos.image_url` remains the **cover = first gallery image** (cards/lists keep using it).
+- **Backend admin** (`combo.controller.js`): create/update routes use `upload.any()`; files `image` (legacy cover) + `images[]`. `resolveGallery` honours `images_order` (JSON list of `{url}` kept / `{new: i}` uploaded-file index → exact order), else `existing_images` + appended uploads, else legacy (uploads replace; `image_url=''` clears). `writeGallery` rewrites `combo_images` and syncs the cover. `images[]` returned on admin list/getOne and customer list/getOne (`attachImages`).
+- **Admin** `ComboModal`: "Images" block — multi-select picker, each file runs through the 4:3 cropper in turn (`cropQueue`, skip supported), thumbnails with ‹ › reorder + remove, first = cover badge, NEW tag on unsaved files.
+- **Web** `ComboDetail`: main image + thumbnail strip (`activeImg`). **Mobile** `ComboDetailScreen`: paged hero `ScrollView` with dots + `n/N` counter.
+- Verified via API: create with 3 images, customer detail/list `images.length=3`, reorder+drop+insert-new keeps exact order and cover, legacy clear → 0 images. Test combo + uploads removed.
+
 ### 2026-10-25 — Combo detail ratings + black search bar in combo mode
 - API `GET /api/combos/:id`: slot products now carry `avg_rating`, `review_count`, `default_rating`.
 - Mobile `ComboDetailScreen`: rating pill + "N reviews across M items" under the price (average of the *chosen* items, same rule as `ProductCard`: reviews → default → 4.5); each product tile and the single-product preview show price (offer, MRP struck) and `x.x ★`.

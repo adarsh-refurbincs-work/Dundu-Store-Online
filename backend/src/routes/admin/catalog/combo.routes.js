@@ -13,8 +13,8 @@ router.use('/:id', (req, res, next) => (req.method === 'DELETE' ? next() : notTr
 
 router.get('/',       ah(combo.list));
 router.get('/:id',    ah(combo.getOne));
-router.post('/',      upload.single('image'), ah(combo.create));
-router.put('/:id',    upload.single('image'), ah(combo.update));
+router.post('/',      upload.any(), ah(combo.create)); // files: image (cover) + images[] (gallery)
+router.put('/:id',    upload.any(), ah(combo.update));
 router.patch('/:id/toggle', ah(combo.toggle));
 router.delete('/:id', ah(combo.remove));
 

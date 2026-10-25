@@ -5,6 +5,53 @@ const { getFileUrl } = require('../../../utils/upload');
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
+// Gallery (ordered urls) for one or many combos
+const fetchComboImages = async (client, comboIds) => {
+  if (!comboIds.length) return {};
+  const { rows } = await client.query(
+    'SELECT combo_id, url FROM combo_images WHERE combo_id = ANY($1::uuid[]) ORDER BY sort_order, created_at', [comboIds]
+  );
+  const map = {};
+  rows.forEach((r) => { (map[r.combo_id] ||= []).push(r.url); });
+  return map;
+};
+
+// Uploaded files for a combo: legacy single `image` first, then `images[]`, in request order.
+const uploadedComboFiles = (req) => {
+  const files = req.files || (req.file ? [req.file] : []);
+  return [...files.filter((f) => f.fieldname === 'image'), ...files.filter((f) => f.fieldname === 'images')];
+};
+
+/**
+ * Resolve the final ordered gallery for a combo.
+ *  - `images_order`: JSON list of { url } (kept existing) | { new: <index into uploaded files> } — exact order.
+ *  - else `existing_images`: JSON list of kept urls, new uploads appended.
+ *  - else legacy: uploads replace/extend; `image_url === ''` with no uploads clears everything.
+ */
+const resolveGallery = (req, currentUrls) => {
+  const newUrls = uploadedComboFiles(req).map(getFileUrl);
+  const parse = (v) => { try { const x = typeof v === 'string' ? JSON.parse(v) : v; return Array.isArray(x) ? x : null; } catch { return null; } };
+  const order = parse(req.body.images_order);
+  if (order) {
+    return order.map((t) => (t && typeof t === 'object' && t.new !== undefined) ? newUrls[Number(t.new)] : (t?.url || (typeof t === 'string' ? t : null)))
+      .filter((u) => typeof u === 'string' && u);
+  }
+  const existing = parse(req.body.existing_images);
+  if (existing) return [...existing.filter((u) => typeof u === 'string' && u), ...newUrls];
+  if (newUrls.length) return [...newUrls];
+  if (req.body.image_url === '') return [];
+  return currentUrls;
+};
+
+const writeGallery = async (client, comboId, urls) => {
+  await client.query('DELETE FROM combo_images WHERE combo_id=$1', [comboId]);
+  for (let i = 0; i < urls.length; i++) {
+    await client.query('INSERT INTO combo_images (combo_id, url, sort_order) VALUES ($1,$2,$3)', [comboId, urls[i], i]);
+  }
+  // Cover = first gallery image
+  await client.query('UPDATE combos SET image_url=$1 WHERE id=$2', [urls[0] || null, comboId]);
+};
+
 /**
  * Fetch full combo detail: combo row + slots + slot products with images
  */
@@ -35,6 +82,7 @@ async function fetchComboDetail(id) {
   }
 
   combo.slots = slots;
+  combo.images = (await fetchComboImages(db, [id]))[id] || (combo.image_url ? [combo.image_url] : []);
   return combo;
 }
 
@@ -63,6 +111,8 @@ const list = async (_req, res) => {
     // What the customer would pay buying the first option of every slot separately.
     combo.regular_total = slots.reduce((sum, s) => sum + (Number(s.products[0]?.offer_price) > 0 ? Number(s.products[0].offer_price) : Number(s.products[0]?.price) || 0), 0);
   }
+  const galleries = await fetchComboImages(db, combos.map((c) => c.id));
+  combos.forEach((c) => { c.images = galleries[c.id] || (c.image_url ? [c.image_url] : []); });
   ok(res, { combos });
 };
 
@@ -172,15 +222,16 @@ const create = async (req, res) => {
   try {
     const { errors, values, slots } = await validateComboInput(client, req.body);
     if (errors.length) return badRequest(res, errors[0]); // finally releases the client
-    const image_url = req.file ? getFileUrl(req.file) : null;
+    const gallery = resolveGallery(req, []);
 
     await client.query('BEGIN');
     const { rows } = await client.query(
       `INSERT INTO combos (name, description, price, offer_price, image_url, stock, sort_order)
        VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-      [values.name, values.description ?? null, values.price, values.offer_price ?? null, image_url, values.stock ?? 100, values.sort_order ?? 0]
+      [values.name, values.description ?? null, values.price, values.offer_price ?? null, gallery[0] || null, values.stock ?? 100, values.sort_order ?? 0]
     );
     const combo = rows[0];
+    await writeGallery(client, combo.id, gallery);
     await syncSlots(client, combo.id, slots || []);
     await client.query('COMMIT');
     const full = await fetchComboDetail(combo.id);
@@ -202,7 +253,8 @@ const update = async (req, res) => {
   try {
     const { errors, values, slots } = await validateComboInput(client, { ...req.body, price: req.body.price ?? cur.price }, { partial: true });
     if (errors.length) return badRequest(res, errors[0]); // finally releases the client
-    const image_url = req.file ? getFileUrl(req.file) : (req.body.image_url === '' ? null : (req.body.image_url || cur.image_url));
+    const currentUrls = (await fetchComboImages(db, [req.params.id]))[req.params.id] || (cur.image_url ? [cur.image_url] : []);
+    const gallery = resolveGallery(req, currentUrls);
 
     await client.query('BEGIN');
     await client.query(
@@ -213,12 +265,13 @@ const update = async (req, res) => {
         values.description !== undefined ? values.description : cur.description,
         values.price ?? cur.price,
         req.body.offer_price !== undefined ? values.offer_price : cur.offer_price,
-        image_url,
+        gallery[0] || null,
         values.stock !== undefined ? values.stock : cur.stock,
         values.sort_order !== undefined ? values.sort_order : cur.sort_order,
         req.params.id,
       ]
     );
+    await writeGallery(client, req.params.id, gallery);
     if (Array.isArray(slots)) await syncSlots(client, req.params.id, slots);
     await client.query('COMMIT');
     const full = await fetchComboDetail(req.params.id);
