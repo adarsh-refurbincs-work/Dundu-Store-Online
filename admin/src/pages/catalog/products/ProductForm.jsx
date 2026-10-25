@@ -274,6 +274,35 @@ function Barcode({ value, barWidth = 2.5, height = 70 }) {
 // used to live here (TAG_THEMES, getColorValue, ProductTagPreview) were removed.
 
 
+// Thumbnail for an image already saved in the DB (edit mode): set-primary / delete actions.
+function SavedImageTile({ img, onSetPrimary, onDelete, showColor = false }) {
+  return (
+    <div
+      className={`relative group w-20 h-20 rounded-xl overflow-hidden border shrink-0 transition-all ${
+        img.is_primary ? 'border-indigo-600 ring-2 ring-indigo-500/20' : 'border-slate-200'
+      }`}
+    >
+      <img src={img.url} alt="" className="w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-slate-900/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
+        {!img.is_primary && (
+          <button type="button" onClick={() => onSetPrimary(img.id)} className="text-[10px] text-amber-300 font-bold">
+            Set Primary
+          </button>
+        )}
+        <button type="button" onClick={() => onDelete(img.id)} className="text-[10px] text-rose-400 font-bold">
+          Delete
+        </button>
+      </div>
+      {img.is_primary && (
+        <span className="absolute top-1 left-1 text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">Primary</span>
+      )}
+      {showColor && img.color && (
+        <span className="absolute bottom-1 left-1 right-1 text-[8px] bg-black/70 text-white text-center truncate rounded px-1">{img.color}</span>
+      )}
+    </div>
+  );
+}
+
 export default function ProductForm({ product, onCancel, onSaved }) {
   const isEdit = !!product;
   const qc = useQueryClient();
@@ -489,7 +518,19 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
   };
 
   // ── Color Variants ────────────────────────────────────────────────────────
+  // A colour variant is "complete" when it has a colour and at least one filled size.
+  const isVariantComplete = (cv) => !!cv.color && cv.sizes.some((s) => s.size);
+  const incompleteVariant = colorVariants.find((cv) => !isVariantComplete(cv));
+  const canAddColorVariant = !incompleteVariant;
   const addColorVariant = () => {
+    if (!canAddColorVariant) {
+      toast.error(
+        !incompleteVariant.color
+          ? 'Pick a colour for the current variant before adding another'
+          : `Add at least one size for ${incompleteVariant.color} before adding another colour`
+      );
+      return;
+    }
     const defaultSizes = isWomensCategory
       ? WOMEN_SIZES.map((sz, si) => ({ size: sz, stock: 0, sku: buildSku(form.product_code, '', si) }))
       : [{ size: '', stock: 0, sku: '' }];
@@ -513,6 +554,9 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
   const updateSize = (ci, si, key, val) => setColorVariants((cv) => cv.map((c, i) => i === ci ? { ...c, sizes: c.sizes.map((s, j) => j === si ? { ...s, [key]: val } : s) } : c));
 
   const variantColors = [...new Set(colorVariants.map((cv) => cv.color).filter(Boolean))];
+  const variantColorsLower = variantColors.map((c) => c.toLowerCase());
+  // Saved images whose colour doesn't match any current colour variant (or has no colour)
+  const unassignedSavedImages = existingImages.filter((img) => !img.color || !variantColorsLower.includes(img.color.toLowerCase()));
 
   // ── Images & Cropper ──────────────────────────────────────────────────────
   const [activeColorTab, setActiveColorTab] = useState(null); // null = All
@@ -1148,7 +1192,11 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
             <button
               type="button"
               onClick={addColorVariant}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-sm"
+              aria-disabled={!canAddColorVariant}
+              title={canAddColorVariant ? 'Add another colour variant' : 'Finish the current colour variant (colour + at least one size) first'}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-xs font-bold transition-colors shadow-sm ${
+                canAddColorVariant ? 'bg-slate-900 hover:bg-slate-800' : 'bg-slate-400 cursor-not-allowed'
+              }`}
             >
               <Plus className="h-3.5 w-3.5" /> Add Color
             </button>
@@ -1159,6 +1207,9 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
             {colorVariants.map((cv, ci) => {
               const colorHex = COLORS.find((c) => c.name === cv.color)?.hex;
               const variantImgs = images.map((img, idx) => ({ ...img, idx })).filter((img) => img.color === cv.color);
+              const savedVariantImgs = cv.color
+                ? existingImages.filter((img) => (img.color || '').toLowerCase() === cv.color.toLowerCase())
+                : [];
 
               return (
                 <div key={ci} className="p-5 sm:p-6 space-y-4 bg-slate-50/30">
@@ -1249,13 +1300,21 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
                         <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                           Photos for {cv.color}
                         </span>
+                        {savedVariantImgs.length > 0 && (
+                          <span className="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full border border-slate-200">
+                            {savedVariantImgs.length} saved
+                          </span>
+                        )}
                         {variantImgs.length > 0 && (
                           <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
-                            {variantImgs.length} uploaded
+                            {variantImgs.length} new
                           </span>
                         )}
                       </div>
                       <div className="flex gap-2.5 flex-wrap">
+                        {savedVariantImgs.map((img) => (
+                          <SavedImageTile key={img.id} img={img} onSetPrimary={setPrimaryImage} onDelete={deleteExistingImage} />
+                        ))}
                         {variantImgs.map(({ idx, preview }) => (
                           <div
                             key={idx}
@@ -1317,44 +1376,14 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
             })}
           </div>
 
-          {/* Saved Images for edit mode */}
-          {isEdit && existingImages.length > 0 && (
+          {/* Saved images that don't belong to any colour variant above (general / orphaned) */}
+          {isEdit && unassignedSavedImages.length > 0 && (
             <div className="p-5 sm:p-6 border-t border-slate-100 bg-slate-50/50 space-y-3">
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Saved Product Photos</p>
+              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">General Product Photos</p>
+              <p className="text-[11px] text-slate-500 -mt-1">Not linked to any colour variant above. Shown for every colour on the storefront.</p>
               <div className="flex gap-2.5 flex-wrap">
-                {existingImages.map((img) => (
-                  <div
-                    key={img.id}
-                    className={`relative group w-20 h-20 rounded-xl overflow-hidden border shrink-0 transition-all ${
-                      img.is_primary ? 'border-indigo-600 ring-2 ring-indigo-500/20' : 'border-slate-200'
-                    }`}
-                  >
-                    <img src={img.url} alt="" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-slate-900/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1 p-1">
-                      {!img.is_primary && (
-                        <button
-                          type="button"
-                          onClick={() => setPrimaryImage(img.id)}
-                          className="text-[10px] text-amber-300 font-bold"
-                        >
-                          Set Primary
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => deleteExistingImage(img.id)}
-                        className="text-[10px] text-rose-400 font-bold"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                    {img.is_primary && (
-                      <span className="absolute top-1 left-1 text-[9px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-bold">Primary</span>
-                    )}
-                    {img.color && (
-                      <span className="absolute bottom-1 left-1 right-1 text-[8px] bg-black/70 text-white text-center truncate rounded px-1">{img.color}</span>
-                    )}
-                  </div>
+                {unassignedSavedImages.map((img) => (
+                  <SavedImageTile key={img.id} img={img} onSetPrimary={setPrimaryImage} onDelete={deleteExistingImage} showColor />
                 ))}
               </div>
               <p className="text-[11px] text-slate-400">Hover photo to change primary status or delete from catalog.</p>

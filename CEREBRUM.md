@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Admin product form: one colour variant at a time
+- `ProductForm.jsx`: "Add Color" refuses (toast + greyed button) while any existing colour variant is incomplete — no colour picked, or no size filled. Prevents stacks of blank colour cards.
+
+### 2026-10-25 — Admin product edit: saved photos grouped per colour variant
+- `admin/src/pages/catalog/products/ProductForm.jsx`: in edit mode, already-saved `product_images` are now rendered inside the matching colour variant card ("Photos for <colour>", with a "N saved" badge) instead of one flat "Saved Product Photos" list below all variants — that flat list made every colour's photos look like they belonged to a single variant. Only images with no colour / a colour matching no current variant fall through to a "General Product Photos" block. New `SavedImageTile` component shares the set-primary/delete thumbnail. Storage (`product_images.color`) and storefront per-colour filtering were already correct.
+
 ### 2026-10-20 — Repo moved to new GitHub remote
 - Removed the old `.git` (remote `adarsh-techy/Dundu_Store`, 41 commits) and re-initialised. Full project pushed to https://github.com/adarsh-refurbincs-work/Dundu-Store-Online as 5 commits (root config/docs, backend, web, admin, mobile) because a single ~9 MB push kept failing with HTTP 408.
 - Only `.env.example` and `deploy/*.env` templates are tracked; real `.env` files stay ignored.
