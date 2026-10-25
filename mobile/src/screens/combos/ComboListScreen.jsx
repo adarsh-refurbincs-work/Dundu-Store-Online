@@ -50,7 +50,7 @@ export function ComboCard({ combo, onPress }) {
           </View>
         )}
         <View style={styles.comboBadge}>
-          <Text style={styles.comboBadgeText}>COMBO</Text>
+          <Text style={styles.comboBadgeText}>Combo Deal</Text>
         </View>
       </View>
 
@@ -272,11 +272,11 @@ const styles = StyleSheet.create({
 
   comboBadge: {
     position: 'absolute', top: 10, right: 10,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 8, paddingVertical: 4,
-    borderRadius: 10,
+    backgroundColor: '#7c3aed',
+    paddingHorizontal: 7, paddingVertical: 3,
+    borderRadius: 8,
   },
-  comboBadgeText: { color: '#fff', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  comboBadgeText: { color: '#fde047', fontSize: 9, fontWeight: '800', letterSpacing: 0.3 },
 
   cardBody: { padding: 14 },
   cardName: { fontSize: 16, fontWeight: '800', color: '#1a1a1a', marginBottom: 8, lineHeight: 22 },

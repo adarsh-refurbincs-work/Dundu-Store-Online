@@ -445,7 +445,7 @@ export default function ComboDetailScreen() {
             <View style={styles.heroFallback}><Text style={{ fontSize: 80 }}>🎀</Text></View>
           )}
           <View style={styles.comboBadge}>
-            <Text style={styles.comboBadgeText}>COMBO DEAL</Text>
+            <Text style={styles.comboBadgeText}>Combo Deal</Text>
           </View>
           {galleryUris.length > 1 && (
             <>
@@ -658,10 +658,10 @@ const styles = StyleSheet.create({
   heroFallback: { width: '100%', height: '100%', backgroundColor: '#fce4f4', alignItems: 'center', justifyContent: 'center' },
   comboBadge: {
     position: 'absolute', top: 14, right: 14,
-    backgroundColor: COLORS.primary, paddingHorizontal: 12, paddingVertical: 5,
-    borderRadius: 12,
+    backgroundColor: '#7c3aed', paddingHorizontal: 9, paddingVertical: 4,
+    borderRadius: 9,
   },
-  comboBadgeText: { color: '#fff', fontWeight: '900', fontSize: 11, letterSpacing: 1.5 },
+  comboBadgeText: { color: '#fde047', fontWeight: '800', fontSize: 10, letterSpacing: 0.3 },
 
   // Info
   infoBlock: { padding: 16, backgroundColor: '#fff' },

@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile combo mode polish
+- Combo theme `T.surface`/`tagBg` → off-white `#fdf8f3` so Newest / Price sort chips and the filter button look like other categories (was dark `#111720`).
+- `ComboFilterSheet`: `statusBarTranslucent`, `comboSheet` style (`alignSelf:center`, `maxWidth 420`, bottom padding) so it sits centred on every device.
+- Combo badge (card + detail hero): violet `#7c3aed` background, yellow `#fde047` text, smaller, label "Combo Deal".
+
 ### 2026-10-25 — Mobile combo cards: rating + green price, no "View Combo" button; combo detail reviews
 - API `GET /api/combos` (list): slot products carry `avg_rating`, `default_rating`, `review_count`.
 - `ComboCard`: "View Combo →" button removed (whole card is tappable); price text green `#15803d`; rating `x.x ★ (n)` right-aligned on the price row (average over each slot's first product, same rule as `ProductCard`).

@@ -164,10 +164,10 @@ function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] 
   const activeCount = [local.offer, local.price, local.items, local.slot].filter(Boolean).length;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={onClose} />
       <View style={styles.sheetCenter} pointerEvents="box-none">
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, styles.comboSheet]}>
           <View style={styles.sheetHeader}>
             <Text style={styles.sheetTitle}>Combo Filters</Text>
             <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
@@ -411,11 +411,11 @@ export default function ProductsScreen() {
     primary:     comboThemeColor,
     bg:          comboThemeBgColor || '#1a0a12',
     topBg:       '#000', // search bar stays black like other categories; only the content area is themed
-    surface:     '#111720',
-    border:      comboThemeColor + '40',
-    tagBg:       comboThemeColor + '26',
-    inputBg:     '#151d28',
-    inputBorder: comboThemeColor + '40',
+    surface:     '#fdf8f3', // off-white sort/filter chips, same as the default category look
+    border:      comboThemeColor + '55',
+    tagBg:       '#fdf8f3',
+    inputBg:     '#1a1a1a',
+    inputBorder: '#2e2e2e',
     stripBorder: comboThemeColor,
   } : hasCustomTheme ? {
     primary:     activeCat.theme_color,
@@ -944,6 +944,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  comboSheet: { alignSelf: 'center', maxWidth: 420, paddingBottom: 16 },
   sheet: {
     width: '100%',
     backgroundColor: '#FFF8FB',
