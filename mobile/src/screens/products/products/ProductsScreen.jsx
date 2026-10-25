@@ -170,9 +170,14 @@ function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] 
         <View style={[styles.sheet, styles.comboSheet]}>
           <View style={[styles.sheetHeader, styles.comboSheetHeader]}>
             <Text style={[styles.sheetTitle, styles.comboSheetTitle]}>Combo Filters</Text>
-            <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
-              <Text style={styles.sheetReset}>Reset all</Text>
-            </TouchableOpacity>
+            <View style={styles.sheetHeaderActions}>
+              <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
+                <Text style={styles.sheetReset}>Reset all</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onClose} style={styles.sheetCloseBtn} accessibilityLabel="Close filters">
+                <Text style={styles.sheetCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
@@ -233,7 +238,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
   ].filter(Boolean).length;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <TouchableOpacity
         style={styles.sheetBackdrop}
         activeOpacity={1}
@@ -241,23 +246,28 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
       />
 
       <View style={styles.sheetCenter} pointerEvents="box-none">
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, styles.comboSheet]}>
 
-          <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>Filters</Text>
-            <TouchableOpacity onPress={() => setLocal({ sub_category: '', material: '', color: '', type: '', age_group: '', offer: false })}>
-              <Text style={styles.sheetReset}>Reset all</Text>
-            </TouchableOpacity>
+          <View style={[styles.sheetHeader, styles.comboSheetHeader]}>
+            <Text style={[styles.sheetTitle, styles.comboSheetTitle]}>Filters</Text>
+            <View style={styles.sheetHeaderActions}>
+              <TouchableOpacity onPress={() => setLocal({ sub_category: '', material: '', color: '', type: '', age_group: '', offer: false })}>
+                <Text style={styles.sheetReset}>Reset all</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={onClose} style={styles.sheetCloseBtn} accessibilityLabel="Close filters">
+                <Text style={styles.sheetCloseText}>✕</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
 
             {subCats.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Style / Sub Category</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Style / Sub Category</Text>
                 <View style={styles.chipRow}>
                   {subCats.map((s) => (
-                    <Chip
+                    <Chip compact
                       key={s}
                       label={s}
                       active={local.sub_category === s}
@@ -270,7 +280,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {types.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Type</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Type</Text>
                 <SelectDropdown
                   label="Type"
                   options={types}
@@ -282,7 +292,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {materials.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Material</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Material</Text>
                 <SelectDropdown
                   label="Material"
                   options={materials}
@@ -294,10 +304,10 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {colors.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Color</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Color</Text>
                 <View style={styles.chipRow}>
                   {colors.map((c) => (
-                    <Chip key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
+                    <Chip compact key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
                   ))}
                 </View>
               </>
@@ -305,7 +315,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {ageGroups.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Age Group</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Age Group</Text>
                 <SelectDropdown
                   label="Age Group"
                   options={ageGroups}
@@ -317,8 +327,8 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
           </ScrollView>
 
-          <TouchableOpacity style={styles.applyBtn} onPress={() => { onApply(local); onClose(); }}>
-            <Text style={styles.applyBtnText}>
+          <TouchableOpacity style={[styles.applyBtn, styles.comboApplyBtn]} onPress={() => { onApply(local); onClose(); }}>
+            <Text style={[styles.applyBtnText, styles.comboApplyBtnText]}>
               Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}
             </Text>
           </TouchableOpacity>
@@ -962,6 +972,9 @@ const styles = StyleSheet.create({
   },
   comboSheet: { alignSelf: 'center', width: '86%', maxWidth: 340, maxHeight: SCREEN_HEIGHT * 0.62, paddingHorizontal: 14, paddingBottom: 12, borderRadius: 16 },
   comboSheetHeader: { paddingVertical: 8 },
+  sheetHeaderActions: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  sheetCloseBtn: { width: 26, height: 26, borderRadius: 13, backgroundColor: '#f3e3ec', alignItems: 'center', justifyContent: 'center' },
+  sheetCloseText: { fontSize: 13, fontWeight: '800', color: '#7a2a52', lineHeight: 15 },
   comboSheetTitle: { fontSize: 14 },
   comboSheetSection: { fontSize: 10, marginTop: 8, marginBottom: 6 },
   comboApplyBtn: { paddingVertical: 10, marginTop: 8, borderRadius: 12 },
@@ -994,7 +1007,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   sheetTitle: { fontSize: 17, fontWeight: '800', color: '#111' },
-  sheetReset: { fontSize: 13, color: COLORS.primary, fontWeight: '600' },
+  sheetReset: { fontSize: 11, color: COLORS.primary, fontWeight: '600' },
   sheetSection: {
     fontSize: 11,
     fontWeight: '700',
@@ -1040,14 +1053,14 @@ const styles = StyleSheet.create({
     borderColor: '#f0c8dc',
     borderRadius: 12,
     paddingHorizontal: 14,
-    paddingVertical: 13,
+    paddingVertical: 8,
   },
   dropdownTriggerActive: {
     borderColor: COLORS.primary,
     backgroundColor: '#ffe0f0',
   },
   dropdownValue: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#111',
     fontWeight: '600',
     flex: 1,
@@ -1083,7 +1096,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 13,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#f8e0ec',
   },
@@ -1091,7 +1104,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffe0f0',
   },
   dropdownItemText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#111',
     fontWeight: '500',
   },
