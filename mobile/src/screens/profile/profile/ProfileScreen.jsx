@@ -476,7 +476,7 @@ export default function ProfileScreen() {
                 <View style={styles.lcProgressHeader}>
                   <View style={styles.lcMilestoneLeft}>
                     <View style={styles.lcMilestoneIcon}>
-                      <Ionicons name="trophy-outline" size={16} color="#B38B29" />
+                      <Ionicons name="trophy" size={18} color="#FBBF24" />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.lcProgressTitle}>Next Reward Milestone</Text>
@@ -488,39 +488,50 @@ export default function ProfileScreen() {
                   </View>
                 </View>
 
-                {/* Big counter */}
+                {/* Big Counter + Progress Pill */}
                 <View style={styles.lcCounterRow}>
-                  <Text style={styles.lcCounterBig}>
-                    {pointsAfterRedeem}<Text style={styles.lcCounterSmall}> / 200 pts</Text>
-                  </Text>
-                  <Text style={styles.lcCounterPct}>{progress}%</Text>
+                  <View style={styles.lcCounterLeft}>
+                    <Text style={styles.lcCounterBig}>
+                      {pointsAfterRedeem}
+                      <Text style={styles.lcCounterSmall}> / 200 pts</Text>
+                    </Text>
+                  </View>
+                  <View style={styles.lcPercentBadge}>
+                    <Text style={styles.lcPercentText}>{progress}% Complete</Text>
+                  </View>
                 </View>
 
-                {/* Track with sheen + knob */}
+                {/* Track with sheen */}
                 <View style={styles.lcProgressBarTrack}>
-                  <View style={[styles.lcProgressBarFill, { width: `${Math.max(progress, 2)}%` }]}>
+                  <View style={[styles.lcProgressBarFill, { width: `${Math.max(progress, 3)}%` }]}>
                     <View style={styles.lcProgressBarSheen} />
                   </View>
-                  {progress > 0 && progress < 100 && (
-                    <View style={[styles.lcProgressKnob, { left: `${progress}%` }]} />
-                  )}
                 </View>
 
                 {/* Milestone ticks */}
                 <View style={styles.lcTicksRow}>
-                  <View style={styles.lcTick}><View style={[styles.lcTickDot, styles.lcTickDotOn]} /><Text style={styles.lcTickText}>0</Text></View>
-                  <View style={[styles.lcTick, { alignItems: 'center' }]}><View style={[styles.lcTickDot, progress >= 50 && styles.lcTickDotOn]} /><Text style={styles.lcTickText}>100</Text></View>
-                  <View style={[styles.lcTick, { alignItems: 'flex-end' }]}><View style={[styles.lcTickDot, progress >= 100 && styles.lcTickDotOn]} /><Text style={[styles.lcTickText, styles.lcTickTextGold]}>200 · ₹200 off</Text></View>
+                  <View style={styles.lcTick}>
+                    <View style={[styles.lcTickDot, styles.lcTickDotOn]} />
+                    <Text style={styles.lcTickText}>0 pts</Text>
+                  </View>
+                  <View style={[styles.lcTick, { alignItems: 'center' }]}>
+                    <View style={[styles.lcTickDot, progress >= 50 && styles.lcTickDotOn]} />
+                    <Text style={[styles.lcTickText, progress >= 50 && styles.lcTickTextGold]}>100 pts</Text>
+                  </View>
+                  <View style={[styles.lcTick, { alignItems: 'flex-end' }]}>
+                    <View style={[styles.lcTickDot, progress >= 100 ? styles.lcTickDotSuccess : styles.lcTickDotOn]} />
+                    <Text style={[styles.lcTickText, styles.lcTickTextReward]}>200 · ₹200 off</Text>
+                  </View>
                 </View>
 
                 {/* How to earn */}
                 <View style={styles.lcPerkRow}>
                   <View style={styles.lcPerkChip}>
-                    <Ionicons name="bag-check-outline" size={12} color="#374151" />
-                    <Text style={styles.lcPerkText}>20 pts per ₹500</Text>
+                    <Ionicons name="bag-check" size={13} color="#818CF8" />
+                    <Text style={styles.lcPerkText}>20 pts per ₹500 spent</Text>
                   </View>
                   <View style={styles.lcPerkChip}>
-                    <Ionicons name="storefront-outline" size={12} color="#374151" />
+                    <Ionicons name="storefront" size={13} color="#818CF8" />
                     <Text style={styles.lcPerkText}>In-store & Online</Text>
                   </View>
                 </View>
@@ -1296,76 +1307,128 @@ const styles = StyleSheet.create({
 
   /* Redeemable Celebration Banner */
   lcRedeemBanner: {
-    marginTop: 12,
-    borderRadius: 16,
-    padding: 14,
+    marginTop: 14,
+    borderRadius: 18,
+    padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: '#06281e',
     borderWidth: 1.2,
-    borderColor: '#A7F3D0',
-    shadowColor: '#065F46',
-    shadowOffset: { width: 0, height: 4 },
+    borderColor: 'rgba(52, 211, 153, 0.45)',
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 4,
   },
   lcRedeemIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: 'rgba(245, 208, 97, 0.15)',
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(52, 211, 153, 0.18)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 208, 97, 0.3)',
+    borderColor: 'rgba(52, 211, 153, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  lcRedeemTitle: { fontSize: 13.5, fontWeight: '800', color: '#047857', letterSpacing: 0.2 },
-  lcRedeemSub: { fontSize: 11, color: '#059669', marginTop: 2 },
+  lcRedeemTitle: { fontSize: 14, fontWeight: '800', color: '#34D399', letterSpacing: 0.2 },
+  lcRedeemSub: { fontSize: 11, color: '#A7F3D0', marginTop: 2, fontWeight: '500' },
 
-  /* Modern Dark Progress Container */
+  /* Luxury Obsidian Milestone Container */
   lcProgressCard: {
-    marginTop: 12,
-    borderRadius: 18,
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#EEE6D6',
-    shadowColor: '#B38B29',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.10,
-    shadowRadius: 12,
-    elevation: 3,
+    marginTop: 14,
+    borderRadius: 22,
+    padding: 18,
+    backgroundColor: '#0c1026',
+    borderWidth: 1.2,
+    borderColor: 'rgba(129, 140, 248, 0.28)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 16,
+    elevation: 6,
   },
-  lcProgressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 10, marginBottom: 14 },
-  lcMilestoneLeft: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
-  lcMilestoneIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#FBF3DC', borderWidth: 1, borderColor: '#EAD28C', alignItems: 'center', justifyContent: 'center' },
-  lcProgressTitle: { fontSize: 14, fontWeight: '800', color: '#111827', letterSpacing: 0.2 },
-  lcProgressSub: { fontSize: 11.5, color: '#6B7280', marginTop: 1 },
-  lcNeededBadge: { backgroundColor: '#111827', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
-  lcNeededText: { fontSize: 10.5, fontWeight: '800', color: '#F5D061', letterSpacing: 0.3 },
+  lcProgressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
+  lcMilestoneLeft: { flexDirection: 'row', alignItems: 'center', gap: 12, flex: 1 },
+  lcMilestoneIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: 'rgba(251, 191, 36, 0.14)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(251, 191, 36, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+  },
+  lcProgressTitle: { fontSize: 15, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.2 },
+  lcProgressSub: { fontSize: 12, color: '#94A3B8', marginTop: 2, fontWeight: '500' },
+  lcNeededBadge: {
+    backgroundColor: 'rgba(251, 191, 36, 0.14)',
+    paddingHorizontal: 11,
+    paddingVertical: 5.5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(251, 191, 36, 0.35)',
+  },
+  lcNeededText: { fontSize: 11, fontWeight: '800', color: '#FCD34D', letterSpacing: 0.3 },
 
-  lcCounterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 },
-  lcCounterBig: { fontSize: 24, fontWeight: '900', color: '#111827', letterSpacing: -0.3 },
-  lcCounterSmall: { fontSize: 12, fontWeight: '600', color: '#6B7280', letterSpacing: 0 },
-  lcCounterPct: { fontSize: 13, fontWeight: '800', color: '#9A7420' },
+  lcCounterRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 14, marginBottom: 10 },
+  lcCounterLeft: { flexDirection: 'row', alignItems: 'baseline' },
+  lcCounterBig: { fontSize: 28, fontWeight: '900', color: '#FFFFFF', letterSpacing: -0.5 },
+  lcCounterSmall: { fontSize: 13, fontWeight: '700', color: '#818CF8', letterSpacing: 0.2 },
+  lcPercentBadge: {
+    backgroundColor: 'rgba(99, 102, 241, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4.5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(129, 140, 248, 0.38)',
+  },
+  lcPercentText: { fontSize: 11.5, fontWeight: '800', color: '#C7D2FE', letterSpacing: 0.3 },
 
-  lcProgressBarTrack: { height: 10, borderRadius: 999, backgroundColor: '#F1ECE3', overflow: 'visible', marginBottom: 8, position: 'relative' },
-  lcProgressBarFill: { height: '100%', borderRadius: 999, backgroundColor: '#D4AF37', overflow: 'hidden' },
-  lcProgressBarSheen: { position: 'absolute', top: 1, left: 4, right: 4, height: 3, borderRadius: 999, backgroundColor: 'rgba(255,255,255,0.45)' },
-  lcProgressKnob: { position: 'absolute', top: -3, marginLeft: -8, width: 16, height: 16, borderRadius: 8, backgroundColor: '#FFFFFF', borderWidth: 3, borderColor: '#D4AF37', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.15, shadowRadius: 2, elevation: 2 },
+  lcProgressBarTrack: { height: 10, borderRadius: 6, backgroundColor: 'rgba(255, 255, 255, 0.08)', overflow: 'hidden', marginBottom: 10 },
+  lcProgressBarFill: {
+    height: '100%',
+    borderRadius: 6,
+    backgroundColor: '#F59E0B',
+    position: 'relative',
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  lcProgressBarSheen: { position: 'absolute', top: 1, left: 2, right: 2, height: 3, borderRadius: 3, backgroundColor: 'rgba(255, 255, 255, 0.45)' },
 
-  lcTicksRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
-  lcTick: { alignItems: 'flex-start', gap: 3 },
-  lcTickDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#E5DFD2' },
-  lcTickDotOn: { backgroundColor: '#D4AF37' },
-  lcTickText: { fontSize: 10.5, fontWeight: '600', color: '#9CA3AF' },
-  lcTickTextGold: { color: '#9A7420', fontWeight: '800' },
+  lcTicksRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  lcTick: { alignItems: 'flex-start', gap: 4 },
+  lcTickDot: { width: 7, height: 7, borderRadius: 3.5, backgroundColor: 'rgba(255, 255, 255, 0.2)' },
+  lcTickDotOn: { backgroundColor: '#F59E0B', shadowColor: '#F59E0B', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4 },
+  lcTickDotSuccess: { backgroundColor: '#34D399', shadowColor: '#34D399', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.8, shadowRadius: 4 },
+  lcTickText: { fontSize: 10.5, fontWeight: '600', color: '#64748B' },
+  lcTickTextGold: { color: '#FCD34D', fontWeight: '700' },
+  lcTickTextReward: { color: '#34D399', fontWeight: '800', fontSize: 11 },
 
-  lcPerkRow: { flexDirection: 'row', gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0EAE0' },
-  lcPerkChip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#F7F5F0', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  lcPerkText: { fontSize: 11, fontWeight: '600', color: '#374151' },
+  lcPerkRow: { flexDirection: 'row', gap: 8, paddingTop: 14, borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.08)' },
+  lcPerkChip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingVertical: 7,
+    paddingHorizontal: 8,
+  },
+  lcPerkText: { fontSize: 11, fontWeight: '700', color: '#CBD5E1' },
 
   // ── Guest styles ──────────────────────────
   guestScroll: {
