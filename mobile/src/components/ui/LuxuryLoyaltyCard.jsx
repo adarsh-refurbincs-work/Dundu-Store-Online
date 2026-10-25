@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Svg, {
   Defs,
   LinearGradient,
@@ -128,6 +128,10 @@ export default function LuxuryLoyaltyCard({
     ? new Date(card.created_at).getFullYear()
     : new Date().getFullYear();
 
+  // Explicit size (not aspectRatio) so content never collapses on Android / iOS
+  const { width: winW } = useWindowDimensions();
+  const cardHeight = Math.round(Math.max(280, winW - 32) / 1.586); // ISO ID-1 bank-card ratio
+
   // Cardholder name
   const rawName = card?.name || profileName || 'ADARSH SHARMA';
   const displayName = rawName.trim().slice(0, 24).toUpperCase();
@@ -138,45 +142,47 @@ export default function LuxuryLoyaltyCard({
   const lastFour = digits.length >= 4 ? digits.slice(-4) : '3210';
 
   const CardContent = (
-    <View style={[styles.cardContainer, style]}>
-      {/* ── Background SVG with exact Indigo Gradient & Subtle Border ── */}
-      <Svg style={StyleSheet.absoluteFillObject} viewBox="0 0 360 226" preserveAspectRatio="none">
-        <Defs>
-          <LinearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#151b3b" />
-            <Stop offset="45%" stopColor="#10142e" />
-            <Stop offset="100%" stopColor="#0c0f24" />
-          </LinearGradient>
-          <RadialGradient id="ambientGlow" cx="18%" cy="16%" r="65%">
-            <Stop offset="0%" stopColor="#3c4c8f" stopOpacity="0.4" />
-            <Stop offset="100%" stopColor="#151b3b" stopOpacity="0" />
-          </RadialGradient>
-          <LinearGradient id="borderGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#818cf8" stopOpacity="0.5" />
-            <Stop offset="50%" stopColor="#4f46e5" stopOpacity="0.25" />
-            <Stop offset="100%" stopColor="#6366f1" stopOpacity="0.4" />
-          </LinearGradient>
-        </Defs>
+    <View style={[styles.cardContainer, { height: cardHeight }, style]}>
+      {/* ── Background layer (SVG) — kept in its own non-interactive wrapper with zIndex 0 BELOW content ── */}
+      <View style={styles.bgLayer} pointerEvents="none">
+        <Svg width="100%" height="100%" viewBox="0 0 360 226" preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#151b3b" />
+              <Stop offset="45%" stopColor="#10142e" />
+              <Stop offset="100%" stopColor="#0c0f24" />
+            </LinearGradient>
+            <RadialGradient id="ambientGlow" cx="18%" cy="16%" r="65%">
+              <Stop offset="0%" stopColor="#3c4c8f" stopOpacity="0.4" />
+              <Stop offset="100%" stopColor="#151b3b" stopOpacity="0" />
+            </RadialGradient>
+            <LinearGradient id="borderGrad" x1="0" y1="0" x2="1" y2="1">
+              <Stop offset="0%" stopColor="#818cf8" stopOpacity="0.5" />
+              <Stop offset="50%" stopColor="#4f46e5" stopOpacity="0.25" />
+              <Stop offset="100%" stopColor="#6366f1" stopOpacity="0.4" />
+            </LinearGradient>
+          </Defs>
 
-        {/* Base dark navy/indigo fill */}
-        <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#bgGrad)" />
-        {/* Soft diffused ambient glow */}
-        <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#ambientGlow)" />
-        {/* Rounded border stroke */}
-        <Rect
-          x="1"
-          y="1"
-          width="358"
-          height="224"
-          rx="25"
-          fill="none"
-          stroke="url(#borderGrad)"
-          strokeWidth="1.5"
-        />
-      </Svg>
+          {/* Base dark navy/indigo fill */}
+          <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#bgGrad)" />
+          {/* Soft diffused ambient glow */}
+          <Rect x="0" y="0" width="360" height="226" rx="26" fill="url(#ambientGlow)" />
+          {/* Rounded border stroke */}
+          <Rect
+            x="1"
+            y="1"
+            width="358"
+            height="224"
+            rx="25"
+            fill="none"
+            stroke="url(#borderGrad)"
+            strokeWidth="1.5"
+          />
+        </Svg>
+      </View>
 
-      {/* ── CARD FOREGROUND CONTENT ── */}
-      <View style={styles.cardInner}>
+      {/* ── CARD FOREGROUND CONTENT (always above background with zIndex 2) ── */}
+      <View style={[styles.cardInner, { height: cardHeight }]}>
         {/* Row 1: Brand & Subtitle + App Member Pill & Contactless */}
         <View style={styles.rowTop}>
           <View style={styles.brandGroup}>
@@ -255,7 +261,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 26,
     overflow: 'hidden',
-    minHeight: 226,
+    width: '100%',
     position: 'relative',
     backgroundColor: '#0c0f24',
     shadowColor: '#000',
@@ -264,12 +270,16 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 14,
   },
+  bgLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
+  },
   cardInner: {
+    zIndex: 2,
     paddingHorizontal: 22,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingTop: 18,
+    paddingBottom: 18,
     justifyContent: 'space-between',
-    minHeight: 226,
   },
 
   /* Row 1: Brand & Top Right */
@@ -349,8 +359,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 14,
-    marginBottom: 8,
+    marginTop: 10,
+    marginBottom: 6,
   },
   chipWrapper: {
     shadowColor: '#000',
@@ -408,8 +418,8 @@ const styles = StyleSheet.create({
 
   /* Row 3: Card Number */
   rowNumber: {
-    marginTop: 10,
-    marginBottom: 14,
+    marginTop: 8,
+    marginBottom: 10,
   },
   cardNumberText: {
     fontSize: 20,
