@@ -56,6 +56,7 @@ export const cartApi = {
 // Orders
 export const orderApi = {
   place: (data) => client.post('/orders', data),
+  quote: (data) => client.post('/orders/quote', data),
   verifyPayment: (data) => client.post('/orders/verify-payment', data),
   list: () => client.get('/orders'),
   getOne: (id) => client.get(`/orders/${id}`),

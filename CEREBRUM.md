@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Storefront: checkout amount from a server quote, product-page crash fix, route error boundary
+- **Checkout button/summary**: the web client stacked coupon + loyalty and ignored referral and the birthday eligibility rules, so its shipping-threshold check and total could differ from the order the server created (e.g. button without ₹50 shipping). New `POST /api/orders/quote` = `placeOrder` with `req.quote` → runs the full pricing inside the transaction, then **ROLLBACK** (coupon counters, loyalty deduction, locks all undone) and returns `{ subtotal, discount, discount_type, loyalty_discount, shipping, free_shipping_reward, total, wallet_amount, payable }`. `Checkout.jsx` debounces a quote on address / coupon / payment method / loyalty / wallet / cart changes and renders `*Shown` values from it (local maths is only the instant fallback). Verified: quote writes nothing; with threshold raised, button read "Proceed to pay ₹1,049" for a ₹999 item (+₹50 shipping).
+- **Blank product pages (root cause)**: the "See all reviews" `useState` had been placed *after* the `isLoading` / `!product` early returns → "Rendered more hooks than during the previous render" once data arrived (intermittent: only on uncached first load). Hook moved above the returns. Rule: in `ProductDetail.jsx` every hook must sit above line ~93.
+- **Error boundary**: `components/ui/ErrorBoundary.jsx` wraps `<Routes>` (`RouteBoundary`, resets on pathname change); logs `[route-error] <path>` + component stack and shows Reload / Browse products instead of a blank screen.
+- **Profile addresses**: re-verified end-to-end (save → appears instantly without reload → persisted on server); no further change needed beyond the cache merge from earlier today.
+
 ### 2026-10-25 — Mobile profile loyalty section: light-theme fix
 - The blocks around the blue loyalty card were styled for a dark page (title `#ddd`, progress box `#1a1a1a`/`#2e2e2e`, hint `#555`, redeem banner `#052e16`) but the profile page is white → near-invisible title and black boxes. `ProfileScreen`: title `COLORS.text`, progress card white with `COLORS.border`, text `COLORS.text/textSecondary`, track `#e5e7eb`; redeem banner light green (`#ecfdf5`/`#a7f3d0`, text `#047857`/`#059669`, icon `#047857`). Same light-green banner applied in `LoyaltyCardScreen`.
 

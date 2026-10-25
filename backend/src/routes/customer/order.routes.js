@@ -6,6 +6,7 @@ const ah = require('../../utils/asyncHandler');
 router.use(authenticate);
 
 router.get('/return-restrictions', ah(ctrl.getReturnRestrictions));
+router.post('/quote', ah(ctrl.quoteOrder)); // dry-run pricing for the checkout summary
 router.post('/', ah(ctrl.placeOrder));
 router.post('/verify-payment', ah(ctrl.verifyPayment));
 router.get('/', ah(ctrl.listOrders));

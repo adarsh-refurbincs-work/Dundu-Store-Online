@@ -577,6 +577,21 @@ const placeOrder = async (req, res) => {
     }
     const payableAmount = round2(Math.max(0, total - walletAmount));
 
+    // Quote mode (POST /orders/quote): everything above ran the real pricing rules inside
+    // the transaction; roll it all back (coupon counters, loyalty deduction, locks) and
+    // return the breakdown so the checkout button can show the exact amount.
+    if (req.quote) {
+      await client.query('ROLLBACK');
+      return ok(res, {
+        quote: {
+          subtotal: round2(subtotal), discount: round2(discount), discount_type: discountType,
+          loyalty_discount: round2(loyaltyDiscount), loyalty_points_redeemed: loyaltyPointsRedeemed,
+          shipping: round2(shipping), free_shipping_reward: !!freeShipReward,
+          total, wallet_amount: walletAmount, payable: payableAmount, item_count: cartItems.length,
+        },
+      });
+    }
+
     const { rows: orderRows } = await client.query(
       `INSERT INTO orders (order_number, user_id, address_id, coupon_id, subtotal, discount, loyalty_discount, total,
                            payment_method, wallet_amount, discount_type, delivery_charge, loyalty_points_redeemed)
@@ -1016,7 +1031,11 @@ const retryPayment = async (req, res) => {
   ok(res, { order: { ...order, razorpay_order_id: razorpayOrder.id }, razorpay: razorpayOrder });
 };
 
+// Same validation + pricing as placeOrder, but nothing is written (see `req.quote`).
+const quoteOrder = (req, res) => { req.quote = true; return placeOrder(req, res); };
+
 module.exports = {
+  quoteOrder,
   placeOrder, verifyPayment, retryPayment, listOrders, getOrder, cancelOrder, returnRequest, getReturnRestrictions,
   reverseOrderSideEffects, earnLoyaltyPoints,
 };

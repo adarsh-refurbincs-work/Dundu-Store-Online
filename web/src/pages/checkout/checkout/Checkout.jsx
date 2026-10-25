@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { orderApi, userApi, couponApi, loyaltyApi, settingsApi, spinWheelApi, walletApi } from '../../../api';
@@ -167,6 +167,39 @@ export default function Checkout() {
   const walletAmount = useWallet ? Math.round(Math.max(0, Math.min(walletBalance, grandTotal, walletAllowed)) * 100) / 100 : 0;
   const payableTotal = Math.max(0, Math.round((grandTotal - walletAmount) * 100) / 100);
 
+  // ── Server quote ───────────────────────────────────────────────────────────
+  // The API picks ONE best discount (coupon / referral / birthday / loyalty), applies the
+  // birthday eligibility rules and the free-shipping reward, and computes shipping on the
+  // amount after discounts. The local numbers above are only an instant estimate; once the
+  // quote arrives it is the source of truth for the summary and the "Proceed to pay" button.
+  const [serverQuote, setServerQuote] = useState(null);
+  const quotePayload = useMemo(() => ({
+    address_id: selectedAddress,
+    coupon_code: appliedCoupon ? coupon : undefined,
+    payment_method: paymentMethod,
+    use_loyalty_points: useLoyaltyPoints,
+    use_wallet: useWallet,
+    ...(buyNow ? { buy_now_item: { product_id: buyNow.product_id, variant_id: buyNow.variant_id, quantity: buyNow.quantity || 1 } } : {}),
+  }), [selectedAddress, appliedCoupon, coupon, paymentMethod, useLoyaltyPoints, useWallet, buyNow]);
+  useEffect(() => {
+    if (!selectedAddress || !(subtotal > 0)) return; // nothing to quote yet (q below falls back to the estimate)
+    let cancelled = false;
+    const t = setTimeout(() => {
+      orderApi.quote(quotePayload)
+        .then((res) => { if (!cancelled) setServerQuote(res?.data?.quote || null); })
+        .catch(() => { if (!cancelled) setServerQuote(null); });
+    }, 350);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [quotePayload, selectedAddress, subtotal, items.length]);
+
+  const q = selectedAddress && subtotal > 0 ? serverQuote : null;
+  const discountShown = q ? Number(q.discount) : discount;
+  const loyaltyDiscountShown = q ? Number(q.loyalty_discount) : loyaltyDiscount;
+  const shippingShown = q ? Number(q.shipping) : shipping;
+  const grandTotalShown = q ? Number(q.total) : grandTotal;
+  const walletAmountShown = q ? Number(q.wallet_amount) : walletAmount;
+  const payableShown = q ? Number(q.payable) : payableTotal;
+
   // Auto-apply a won spin/scratch coupon against the real subtotal (once per code).
   const autoTriedRef = useRef('');
   useEffect(() => {
@@ -326,7 +359,7 @@ export default function Checkout() {
                 <div>
                   <p className="font-bold text-white text-sm">Happy Birthday! 🎉</p>
                   <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.88)' }}>
-                    Your special {birthdayDiscountPct}% birthday discount is automatically applied to this order!
+                    Your special {birthdayDiscountPct}% birthday discountShown is automatically applied to this order!
                   </p>
                 </div>
               </div>
@@ -416,7 +449,7 @@ export default function Checkout() {
                   </div>
                   {loyaltyCard.points >= loyaltyRule.points ? (
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <span className="text-xs" style={{ color: '#aaa' }}>Use {loyaltyRule.points} pts (−₹{loyaltyRule.discount})</span>
+                      <span className="text-xs" style={{ color: '#aaa' }}>Use {loyaltyRule.points} pts (−₹{loyaltyRule.discountShown})</span>
                       <div
                         onClick={() => setUseLoyaltyPoints((v) => !v)}
                         className="relative w-9 h-5 rounded-full transition-colors cursor-pointer"
@@ -431,7 +464,7 @@ export default function Checkout() {
                   )}
                 </div>
                 {useLoyaltyPoints && discountType !== 'loyalty' && (
-                  <p className="text-xs" style={{ color: '#fbbf24' }}>Your {discountIsBirthday ? 'birthday' : 'coupon'} discount is larger, so points will not be used on this order.</p>
+                  <p className="text-xs" style={{ color: '#fbbf24' }}>Your {discountIsBirthday ? 'birthday' : 'coupon'} discountShown is larger, so points will not be used on this order.</p>
                 )}
                 {pointsToEarn > 0 && (
                   <p className="text-xs" style={{ color: '#888' }}>
@@ -445,34 +478,34 @@ export default function Checkout() {
               <div className="flex justify-between" style={{ color: '#888' }}>
                 <span>Subtotal</span><span>{formatPrice(subtotal)}</span>
               </div>
-              {discount > 0 && (
+              {discountShown > 0 && (
                 <div className="flex justify-between" style={{ color: '#4ade80' }}>
                   <span>
                     {discountIsBirthday
                       ? `🎂 Birthday Discount (${birthdayDiscountPct}%)`
                       : `Discount (${appliedCoupon?.code})`}
                   </span>
-                  <span>−{formatPrice(discount)}</span>
+                  <span>−{formatPrice(discountShown)}</span>
                 </div>
               )}
-              {loyaltyDiscount > 0 && (
+              {loyaltyDiscountShown > 0 && (
                 <div className="flex justify-between" style={{ color: '#4ade80' }}>
-                  <span>Loyalty Points ({loyaltyRule.points} pts)</span><span>−{formatPrice(loyaltyDiscount)}</span>
+                  <span>Loyalty Points ({loyaltyRule.points} pts)</span><span>−{formatPrice(loyaltyDiscountShown)}</span>
                 </div>
               )}
-              <div className="flex justify-between" style={shipping === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
+              <div className="flex justify-between" style={shippingShown === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
                 <span>Shipping</span>
-                <span>{shipping === 0 ? formatPrice(deliveryCharge) : formatPrice(shipping)}</span>
+                <span>{shippingShown === 0 ? formatPrice(deliveryCharge) : formatPrice(shippingShown)}</span>
               </div>
               <div className="flex justify-between font-bold text-base pt-1" style={{ borderTop: '1px solid #2e2e2e', color: '#f5f5f5' }}>
                 <span>Total</span>
                 <span className="flex items-center gap-2">
-                  {shipping === 0 && (
+                  {shippingShown === 0 && (
                     <span style={{ color: '#888', textDecoration: 'line-through red', fontWeight: 'normal', fontSize: '14px' }}>
-                      {formatPrice(grandTotal + deliveryCharge)}
+                      {formatPrice(grandTotalShown + deliveryCharge)}
                     </span>
                   )}
-                  <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotal)}</span>
+                  <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
                 </span>
               </div>
             </div>
@@ -494,16 +527,16 @@ export default function Checkout() {
                       style={{ transform: useWallet ? 'translateX(16px)' : 'none' }} />
                   </div>
                 </div>
-                {useWallet && walletAmount > 0 && (
-                  <p className="text-xs" style={{ color: '#4ade80' }}>−{formatPrice(walletAmount)} applied from your wallet</p>
+                {useWallet && walletAmountShown > 0 && (
+                  <p className="text-xs" style={{ color: '#4ade80' }}>−{formatPrice(walletAmountShown)} applied from your wallet</p>
                 )}
               </div>
             )}
 
-            {walletAmount > 0 && (
+            {walletAmountShown > 0 && (
               <div className="flex justify-between font-bold text-base" style={{ color: '#f5f5f5' }}>
                 <span>Amount Payable</span>
-                <span style={{ color: '#e91e8c' }}>{formatPrice(payableTotal)}</span>
+                <span style={{ color: '#e91e8c' }}>{formatPrice(payableShown)}</span>
               </div>
             )}
 
@@ -513,7 +546,7 @@ export default function Checkout() {
                 setShowConfirm(true);
               }}
               fullWidth size="lg">
-              {paymentMethod === 'online' && payableTotal > 0 ? `Proceed to pay ${formatPrice(payableTotal)}` : 'Place order'}
+              {paymentMethod === 'online' && payableShown > 0 ? `Proceed to pay ${formatPrice(payableShown)}` : 'Place order'}
             </Button>
           </div>
         </aside>
@@ -568,44 +601,44 @@ export default function Checkout() {
                 <div className="flex justify-between" style={{ color: '#888' }}>
                   <span>Subtotal</span><span>{formatPrice(subtotal)}</span>
                 </div>
-                {discount > 0 && (
+                {discountShown > 0 && (
                   <div className="flex justify-between" style={{ color: '#4ade80' }}>
                     <span>{discountIsBirthday ? `🎂 Birthday (${birthdayDiscountPct}%)` : 'Discount'}</span>
-                    <span>−{formatPrice(discount)}</span>
+                    <span>−{formatPrice(discountShown)}</span>
                   </div>
                 )}
-                {loyaltyDiscount > 0 && (
+                {loyaltyDiscountShown > 0 && (
                   <div className="flex justify-between" style={{ color: '#4ade80' }}>
-                    <span>Loyalty Points</span><span>−{formatPrice(loyaltyDiscount)}</span>
+                    <span>Loyalty Points</span><span>−{formatPrice(loyaltyDiscountShown)}</span>
                   </div>
                 )}
-                <div className="flex justify-between" style={shipping === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
+                <div className="flex justify-between" style={shippingShown === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? formatPrice(deliveryCharge) : formatPrice(shipping)}</span>
+                  <span>{shippingShown === 0 ? formatPrice(deliveryCharge) : formatPrice(shippingShown)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-base pt-1" style={{ borderTop: '1px solid #2a2a2a', color: '#f5f5f5' }}>
                   <span>Total</span>
                   <span className="flex items-center gap-2">
-                    {shipping === 0 && (
+                    {shippingShown === 0 && (
                       <span style={{ color: '#888', textDecoration: 'line-through red', fontWeight: 'normal', fontSize: '14px' }}>
-                        {formatPrice(grandTotal + deliveryCharge)}
+                        {formatPrice(grandTotalShown + deliveryCharge)}
                       </span>
                     )}
-                    <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotal)}</span>
+                    <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
                   </span>
                 </div>
-                {walletAmount > 0 && (
+                {walletAmountShown > 0 && (
                   <>
                     <div className="flex justify-between" style={{ color: '#4ade80' }}>
-                      <span>Paid from Wallet</span><span>−{formatPrice(walletAmount)}</span>
+                      <span>Paid from Wallet</span><span>−{formatPrice(walletAmountShown)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-base" style={{ color: '#f5f5f5' }}>
-                      <span>Amount Payable</span><span style={{ color: '#e91e8c' }}>{formatPrice(payableTotal)}</span>
+                      <span>Amount Payable</span><span style={{ color: '#e91e8c' }}>{formatPrice(payableShown)}</span>
                     </div>
                   </>
                 )}
                 <p className="text-xs text-center pt-1" style={{ color: '#555' }}>
-                  via {payableTotal === 0 ? 'Wallet' : paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
+                  via {payableShown === 0 ? 'Wallet' : paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}
                 </p>
               </div>
 
@@ -613,7 +646,7 @@ export default function Checkout() {
               <div className="flex gap-3 pt-1">
                 <Button variant="ghost" fullWidth onClick={() => setShowConfirm(false)}>Go Back</Button>
                 <Button fullWidth loading={loading} onClick={() => { setShowConfirm(false); placeOrder(); }}>
-                  {paymentMethod === 'online' && payableTotal > 0 ? 'Pay Now' : 'Confirm Order'}
+                  {paymentMethod === 'online' && payableShown > 0 ? 'Pay Now' : 'Confirm Order'}
                 </Button>
               </div>
             </div>

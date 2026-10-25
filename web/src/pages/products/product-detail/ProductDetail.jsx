@@ -61,6 +61,7 @@ export default function ProductDetail() {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [reviewImage, setReviewImage] = useState(null);
   const [reviewImagePreview, setReviewImagePreview] = useState(null);
+  const [showAllReviews, setShowAllReviews] = useState(false); // must stay above the early returns (hook order)
 
   const { data, isLoading } = useQuery({ queryKey: ['product', id], queryFn: () => productApi.getOne(id) });
   const { data: relatedData } = useQuery({ queryKey: ['related', id], queryFn: () => productApi.getRelated(id) });
@@ -94,7 +95,6 @@ export default function ProductDetail() {
   if (!product) return <EmptyState emoji="🧵" title="Product not found" description="It may have been removed or is no longer available." action="Browse products" to="/products" />;
 
   const reviews = reviewData?.data?.reviews || [];
-  const [showAllReviews, setShowAllReviews] = useState(false);
   const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3);
   const related = relatedData?.data?.products || [];
   const canReview = canReviewData?.data?.can_review ?? false;

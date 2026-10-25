@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 
 import Layout from './components/layout/Layout';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import WelcomePopup from './components/layout/WelcomePopup';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import useAuthStore from './store/auth.store';
@@ -38,6 +39,12 @@ function KeyedProductDetail() {
   return <ProductDetail key={id} />;
 }
 
+// Wraps the routed page so a crash in one page never blanks the whole app.
+function RouteBoundary({ children }) {
+  const { pathname } = useLocation();
+  return <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>;
+}
+
 function ScrollToTop() {
   const { pathname, search } = useLocation();
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [pathname, search]);
@@ -58,6 +65,7 @@ function AppRoutes() {
   return (
     <Layout>
       <WelcomePopup />
+      <RouteBoundary>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
@@ -84,6 +92,7 @@ function AppRoutes() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </RouteBoundary>
     </Layout>
   );
 }
