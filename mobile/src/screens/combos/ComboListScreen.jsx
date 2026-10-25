@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   slotPillText: { fontSize: 11, fontWeight: '700', color: '#C2167A', maxWidth: 90 },
 
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
-  offerPrice: { fontSize: 22, fontWeight: '900', color: '#15803d' },
+  offerPrice: { fontSize: 22, fontWeight: '900', color: COLORS.primary },
   ratingWrap: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'baseline', gap: 4 },
   ratingText: { fontSize: 13, fontWeight: '800', color: '#F6A800' },
   ratingCount: { fontSize: 11, color: '#999', fontWeight: '600' },

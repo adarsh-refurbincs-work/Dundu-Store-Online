@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo card price back to brand pink
+- `ComboCard.offerPrice` colour `#15803d` → `COLORS.primary`, matching product cards.
+
 ### 2026-10-25 — Mobile "blank loyalty card" root cause: stale Expo env
 - The Dundu Expo dev server (port **8083**) had been started before `mobile/.env` was corrected; Expo inlines `EXPO_PUBLIC_*` **at startup**, so the app kept calling `http://192.168.31.243:5000/api` (this Mac is now `.244`; nothing answers on `.243`) → every API call failed → card/profile data empty. Fixed by restarting Expo (`npx expo start --port 8083 -c`); verified the served bundle now injects `.244`.
 - Debug recipe: `curl -s "http://localhost:<metro-port>/index.bundle?platform=android&dev=true" | grep -o '"EXPO_PUBLIC_API_URL[^}]*'` shows the address the app really uses. Port 8081 on this Mac belongs to another project (`WORK/Looser/mobile`); Dundu Metro is on 8083.
