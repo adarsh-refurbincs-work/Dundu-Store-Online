@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Web: Combos circle in header category strip
+- `components/layout/Header.jsx`: the strip now starts with a Combos circle (Gift icon, highlighted on `/combos`) like the mobile strip. Before, the only header entry was in the desktop-only nav (`hidden lg:flex`), so on phones/narrow windows Combos was unreachable from the header. Note: both local DBs (`demodundustore`, `dundustore`) currently have **0 combos** — the Home "Combo offers" section and `/combos` are empty until combos are created in Admin → Combos.
+
 ### 2026-10-25 — Mobile combo mode: sorting + filters
 - `ProductsScreen.jsx` combo mode now has the same sort row (Newest / Price ↑ / Price ↓ on effective price), a filter button with badge and active-filter tag row, and a `ComboFilterSheet` (On offer, price band, items-in-combo count, "Includes" by slot label). All client-side over the loaded combo list (`visibleCombos`); `comboEffectivePrice` exported.
 

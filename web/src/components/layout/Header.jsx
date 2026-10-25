@@ -27,6 +27,7 @@ export default function Header() {
   const params = new URLSearchParams(location.search);
   const activeCategory = params.get('category') || '';
   const isOfferPage = params.get('offer') === 'true';
+  const isComboPage = location.pathname.startsWith('/combos');
   const count = totalItems();
 
   const { data: catData } = useQuery({
@@ -178,6 +179,13 @@ export default function Header() {
         <div className="border-t border-line/70 bg-bg">
           <div className="container-x">
             <div className="flex gap-4 md:gap-6 overflow-x-auto py-2.5 md:py-3 scrollbar-none">
+              {/* Combos — first circle, same as the mobile app strip */}
+              <Link to="/combos" className="flex flex-col items-center gap-1.5 shrink-0 group">
+                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center bg-primary/15 border-2 transition-transform group-hover:scale-105 ${isComboPage ? 'border-primary ring-2 ring-primary/30' : 'border-primary/50'}`}>
+                  <Gift className="h-5 w-5 text-primary-soft" />
+                </div>
+                <span className={`text-[11px] font-semibold ${isComboPage ? 'text-primary-soft font-bold' : 'text-ink-2'}`}>Combos</span>
+              </Link>
               <Link to="/products?offer=true" className="flex flex-col items-center gap-1.5 shrink-0 group">
                 <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center transition-transform group-hover:scale-105 ${isOfferPage ? 'ring-2 ring-offset-2 ring-offset-bg ring-primary' : ''}`}
                   style={{ background: 'linear-gradient(135deg, #e91e8c, #ff7a3d)', boxShadow: '0 6px 18px -6px rgba(233,30,140,.7)' }}>
