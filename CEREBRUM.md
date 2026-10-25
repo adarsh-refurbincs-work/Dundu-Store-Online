@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo screen: fixed 'Shop' navigation
+- `ComboListScreen` is in the root stack, `Shop` is a tab inside `MainTabs` → `navigate('Shop')` was unhandled. Category / Offers / search now use `navigate('MainTabs', { screen: 'Shop', params })`.
+
 ### 2026-10-25 — Mobile Combo screen matches category pages
 - `ComboListScreen.jsx`: replaced the back-arrow title header with the same chrome as Home/Shop — `AppHeader logo showCart showWishlist`, the search bar (submits to `Shop { search }`), and `CategoryStrip` (categories load via `categoryApi.list`; tapping one navigates to `Shop { category, category_name }`, Offers → `Shop { offer: true }`). Festival nav colours honoured.
 - `CategoryStrip.jsx`: new `isComboActive` prop highlights the Combo circle/label like an active category.

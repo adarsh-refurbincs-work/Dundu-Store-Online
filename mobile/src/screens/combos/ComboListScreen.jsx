@@ -98,9 +98,12 @@ export default function ComboListScreen() {
   const festNavBg   = useSettingsStore((s) => s.festivalNavbarColor);
   const festNavText = useSettingsStore((s) => s.festivalNavbarTextColor);
 
+  // ComboList sits in the root stack; Shop is a tab inside MainTabs, so target it as a nested screen.
+  const goToShop = (params) => navigation.navigate('MainTabs', { screen: 'Shop', params });
+
   const handleSearch = () => {
     const q = searchText.trim();
-    if (q) { navigation.navigate('Shop', { search: q }); setSearchText(''); }
+    if (q) { goToShop({ search: q }); setSearchText(''); }
   };
 
   const fetchCombos = async () => {
@@ -150,8 +153,8 @@ export default function ComboListScreen() {
         isOfferActive={false}
         isComboActive
         onPressCombo={() => {}}
-        onPressOffers={() => navigation.navigate('Shop', { offer: true })}
-        onPressCategory={(cat) => navigation.navigate('Shop', { category: cat.slug, category_name: cat.name })}
+        onPressOffers={() => goToShop({ offer: true })}
+        onPressCategory={(cat) => goToShop({ category: cat.slug, category_name: cat.name })}
       />
 
       {loading ? (
