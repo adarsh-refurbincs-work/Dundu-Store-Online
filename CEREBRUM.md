@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo filter sheet compacted
+- `ComboFilterSheet`: 86% width / max 340px / max 62% height, 14px side padding; smaller title (14), section labels (10), compact chips (`Chip compact` → 10/5 padding, 11px text), slimmer Apply button. Product filter sheet unchanged.
+
 ### 2026-10-25 — Mobile Shop sort bar compacted
 - `sortRow` padding 12/8→10/5, gap 6; chips 14/6→10/4, radius 16, border 1, text 12→11; filter button 12/6→9/4; result count 10px; Hot Offer chip without the 🔥 emoji.
 

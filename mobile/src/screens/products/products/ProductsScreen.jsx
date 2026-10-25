@@ -77,14 +77,14 @@ function FilterIcon({ color = '#fff', size = 15 }) {
 }
 
 /* ── Filter bottom sheet ──────────────────────────────────────────────────── */
-function Chip({ label, active, onPress }) {
+function Chip({ label, active, onPress, compact = false }) {
   return (
     <TouchableOpacity
-      style={[styles.fchip, active && styles.fchipActive]}
+      style={[styles.fchip, compact && styles.fchipCompact, active && styles.fchipActive]}
       onPress={onPress}
       activeOpacity={0.75}
     >
-      <Text style={[styles.fchipText, active && styles.fchipTextActive]}>{label}</Text>
+      <Text style={[styles.fchipText, compact && styles.fchipTextCompact, active && styles.fchipTextActive]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -168,47 +168,47 @@ function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] 
       <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={onClose} />
       <View style={styles.sheetCenter} pointerEvents="box-none">
         <View style={[styles.sheet, styles.comboSheet]}>
-          <View style={styles.sheetHeader}>
-            <Text style={styles.sheetTitle}>Combo Filters</Text>
+          <View style={[styles.sheetHeader, styles.comboSheetHeader]}>
+            <Text style={[styles.sheetTitle, styles.comboSheetTitle]}>Combo Filters</Text>
             <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
               <Text style={styles.sheetReset}>Reset all</Text>
             </TouchableOpacity>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
-            <Text style={styles.sheetSection}>Deals</Text>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
+            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Deals</Text>
             <View style={styles.chipRow}>
-              <Chip label="🏷️ On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
+              <Chip compact label="🏷️ On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
             </View>
 
-            <Text style={styles.sheetSection}>Price</Text>
+            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Price</Text>
             <View style={styles.chipRow}>
               {COMBO_PRICE_OPTS.map((o) => (
-                <Chip key={o.value} label={o.label} active={local.price === o.value} onPress={() => toggle('price', o.value)} />
+                <Chip compact key={o.value} label={o.label} active={local.price === o.value} onPress={() => toggle('price', o.value)} />
               ))}
             </View>
 
-            <Text style={styles.sheetSection}>Items in combo</Text>
+            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Items in combo</Text>
             <View style={styles.chipRow}>
               {COMBO_ITEMS_OPTS.map((o) => (
-                <Chip key={o.value} label={o.label} active={local.items === o.value} onPress={() => toggle('items', o.value)} />
+                <Chip compact key={o.value} label={o.label} active={local.items === o.value} onPress={() => toggle('items', o.value)} />
               ))}
             </View>
 
             {slotLabels.length > 0 && (
               <>
-                <Text style={styles.sheetSection}>Includes</Text>
+                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Includes</Text>
                 <View style={styles.chipRow}>
                   {slotLabels.map((l) => (
-                    <Chip key={l} label={l} active={local.slot === l} onPress={() => toggle('slot', l)} />
+                    <Chip compact key={l} label={l} active={local.slot === l} onPress={() => toggle('slot', l)} />
                   ))}
                 </View>
               </>
             )}
           </ScrollView>
 
-          <TouchableOpacity style={styles.applyBtn} onPress={() => { onApply(local); onClose(); }}>
-            <Text style={styles.applyBtnText}>Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}</Text>
+          <TouchableOpacity style={[styles.applyBtn, styles.comboApplyBtn]} onPress={() => { onApply(local); onClose(); }}>
+            <Text style={[styles.applyBtnText, styles.comboApplyBtnText]}>Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -960,7 +960,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
-  comboSheet: { alignSelf: 'center', maxWidth: 420, paddingBottom: 16 },
+  comboSheet: { alignSelf: 'center', width: '86%', maxWidth: 340, maxHeight: SCREEN_HEIGHT * 0.62, paddingHorizontal: 14, paddingBottom: 12, borderRadius: 16 },
+  comboSheetHeader: { paddingVertical: 8 },
+  comboSheetTitle: { fontSize: 14 },
+  comboSheetSection: { fontSize: 10, marginTop: 8, marginBottom: 6 },
+  comboApplyBtn: { paddingVertical: 10, marginTop: 8, borderRadius: 12 },
+  comboApplyBtnText: { fontSize: 13 },
+  fchipCompact: { paddingHorizontal: 10, paddingVertical: 5 },
+  fchipTextCompact: { fontSize: 11 },
   sheet: {
     width: '100%',
     backgroundColor: '#FFF8FB',
