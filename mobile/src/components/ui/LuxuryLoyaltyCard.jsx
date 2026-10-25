@@ -118,10 +118,10 @@ export default function LuxuryLoyaltyCard({
         <Defs>
           {/* Deep Matte Carbon Obsidian Gradient */}
           <LinearGradient id="obsidianGrad" x1="0" y1="0" x2="1" y2="1">
-            <Stop offset="0%" stopColor="#1a1d28" />
-            <Stop offset="30%" stopColor="#0f1118" />
-            <Stop offset="70%" stopColor="#141722" />
-            <Stop offset="100%" stopColor="#07080b" />
+            <Stop offset="0%" stopColor="#0b0f1a" />
+            <Stop offset="35%" stopColor="#05070d" />
+            <Stop offset="70%" stopColor="#0b1f3f" />
+            <Stop offset="100%" stopColor="#030508" />
           </LinearGradient>
 
           {/* Champagne Gold Ambient Warmth */}
@@ -132,8 +132,9 @@ export default function LuxuryLoyaltyCard({
           </RadialGradient>
 
           {/* Deep Steel-Navy Depth Glow */}
-          <RadialGradient id="steelGlowBL" cx="12%" cy="88%" r="60%">
-            <Stop offset="0%" stopColor="#2e3852" stopOpacity="0.25" />
+          <RadialGradient id="steelGlowBL" cx="12%" cy="88%" r="65%">
+            <Stop offset="0%" stopColor="#1d4ed8" stopOpacity="0.45" />
+            <Stop offset="55%" stopColor="#1e3a8a" stopOpacity="0.18" />
             <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </RadialGradient>
 
@@ -268,8 +269,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     aspectRatio: 1.586, // ISO/IEC 7810 ID-1 — same proportions as a bank card
     position: 'relative',
-    backgroundColor: '#0a0c10',
-    shadowColor: '#000',
+    backgroundColor: '#060912',
+    shadowColor: '#1e3a8a',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.55,
     shadowRadius: 18,

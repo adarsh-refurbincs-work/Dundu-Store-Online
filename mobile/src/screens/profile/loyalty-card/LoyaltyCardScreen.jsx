@@ -81,13 +81,14 @@ function BarcodeGraphic({ code = '8820491823' }) {
 
 export default function LoyaltyCardScreen() {
   const [card, setCard] = useState(null);
+  const [needsPhone, setNeedsPhone] = useState(false);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loyaltyApi
       .myCard()
-      .then((res) => setCard(res?.card || res?.data?.card || null))
+      .then((res) => { setCard(res?.card || res?.data?.card || null); setNeedsPhone(!!(res?.needs_phone ?? res?.data?.needs_phone)); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -112,10 +113,11 @@ export default function LoyaltyCardScreen() {
           <View style={styles.emptyIconCircle}>
             <Ionicons name="card-outline" size={48} color="#F5D061" />
           </View>
-          <Text style={styles.emptyTitle}>No Loyalty Card Yet</Text>
+          <Text style={styles.emptyTitle}>{needsPhone ? 'Add Your Phone Number' : 'No Loyalty Card Yet'}</Text>
           <Text style={styles.emptySub}>
-            Your Dundu Privilege Black Card is created automatically with your first purchase
-            online or in our retail store!
+            {needsPhone
+              ? 'Your Privilege Card is linked to your mobile number so the billing counter can find it. Add your phone number in Edit Profile to activate the card.'
+              : 'Your Dundu Privilege Card could not be loaded right now. Pull down to retry.'}
           </Text>
         </View>
       </SafeAreaView>

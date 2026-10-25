@@ -215,6 +215,10 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Loyalty card issued on first view; black/blue/gold palette
+- `GET /api/loyalty/my-card` now **creates** the member's card (phone, profile name, 0 pts) if none exists — previously a card only appeared after a points-earning order, so Profile hid the section and the Loyalty page showed "No Loyalty Card Yet" with no name/points. Users without a phone get `{ card: null, needs_phone: true }`; the Loyalty page explains to add a phone in Edit Profile.
+- `LuxuryLoyaltyCard`: gradient black → deep navy (`#0b1f3f`) with a blue glow bottom-left, gold accents kept.
+
 ### 2026-10-25 — Loyalty card: bank-card proportions + ATM-style details
 - `components/ui/LuxuryLoyaltyCard.jsx` (shared by Profile + Loyalty page): `aspectRatio 1.586` (ID-1 bank card) instead of `minHeight`; EMV chip + contactless mark together on the left, holographic disc top-right; embossed masked 16-digit number (`••••  ••••  ••••  1234`, last 4 of member phone); footer CARDHOLDER / VALID THRU (issue +5y) / SINCE; balance block slightly smaller; tighter spacing.
 - Note: commit `082604b` ("fix(api)…") also contained the user's own loyalty UI rewrite (ProfileScreen dark loyalty section, LuxuryLoyaltyCard, LoyaltyCardScreen redesign) swept in by `git add -A` — message is narrower than its contents.
