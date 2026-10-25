@@ -178,7 +178,7 @@ function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] 
           <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
             <Text style={[styles.sheetSection, styles.comboSheetSection]}>Deals</Text>
             <View style={styles.chipRow}>
-              <Chip compact label="🏷️ On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
+              <Chip compact label="On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
             </View>
 
             <Text style={[styles.sheetSection, styles.comboSheetSection]}>Price</Text>
@@ -620,18 +620,20 @@ export default function ProductsScreen() {
       {comboMode ? (
         /* ── Combo mode: same chrome; sort row + filters + combo list in the content area ── */
         <>
-          {comboFilterCount > 0 && (
+          {(
             <View style={[styles.filterSection, { backgroundColor: T.bg, borderBottomColor: T.border }]}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeTagsRow}>
-                <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🎀 Combos</Text></View>
-                {comboFilters.offer && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🏷️ On offer</Text></View>}
-                {comboFilters.price && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>💰 {COMBO_PRICE_OPTS.find((o) => o.value === comboFilters.price)?.label}</Text></View>}
-                {comboFilters.items && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>📦 {COMBO_ITEMS_OPTS.find((o) => o.value === comboFilters.items)?.label}</Text></View>}
+                <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>Combos</Text></View>
+                {comboFilters.offer && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>On offer</Text></View>}
+                {comboFilters.price && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{COMBO_PRICE_OPTS.find((o) => o.value === comboFilters.price)?.label}</Text></View>}
+                {comboFilters.items && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{COMBO_ITEMS_OPTS.find((o) => o.value === comboFilters.items)?.label}</Text></View>}
                 {comboFilters.slot && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{comboFilters.slot}</Text></View>}
               </ScrollView>
-              <TouchableOpacity onPress={clearComboFilters} style={{ paddingHorizontal: 12 }}>
-                <Text style={[styles.clearText, { color: T.primary }]}>✕</Text>
-              </TouchableOpacity>
+              {comboFilterCount > 0 && (
+                <TouchableOpacity onPress={clearComboFilters} style={{ paddingHorizontal: 12 }}>
+                  <Text style={[styles.clearText, { color: T.primary }]}>✕</Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
@@ -651,7 +653,6 @@ export default function ProductsScreen() {
             >
               <Text style={[styles.chipText, styles.hotChipText, comboFilters.offer && styles.chipTextActive]}>Hot Offer</Text>
             </TouchableOpacity>
-            <Text style={styles.resultCount}>{visibleCombos.length} combo{visibleCombos.length !== 1 ? 's' : ''}</Text>
             <TouchableOpacity
               style={[styles.sortFilterBtn, { borderColor: T.primary, backgroundColor: T.surface }, comboFilterCount > 0 && { backgroundColor: T.tagBg }]}
               onPress={() => setShowComboFilter(true)}
@@ -713,14 +714,14 @@ export default function ProductsScreen() {
       {hasAnyFilter && (
         <View style={[styles.filterSection, { backgroundColor: T.bg, borderBottomColor: T.border }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeTagsRow}>
-            {offerOnly && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🏷️ Offers</Text></View>}
-            {activeSlug && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>📂 {categoryName}</Text></View>}
+            {offerOnly && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>Offers</Text></View>}
+            {activeSlug && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{categoryName}</Text></View>}
             {filters.sub_category && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{filters.sub_category}</Text></View>}
-            {filters.type     && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>👗 {filters.type}</Text></View>}
-            {filters.material && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🧵 {filters.material}</Text></View>}
-            {filters.color    && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🎨 {filters.color}</Text></View>}
-            {filters.age_group && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>👶 {filters.age_group}</Text></View>}
-            {filters.offer    && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>🏷️ Offers</Text></View>}
+            {filters.type     && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{filters.type}</Text></View>}
+            {filters.material && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{filters.material}</Text></View>}
+            {filters.color    && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{filters.color}</Text></View>}
+            {filters.age_group && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>{filters.age_group}</Text></View>}
+            {filters.offer    && <View style={[styles.activeTag, { backgroundColor: T.tagBg, borderColor: T.primary }]}><Text style={[styles.activeTagText, { color: T.primary }]}>Offers</Text></View>}
           </ScrollView>
           <TouchableOpacity onPress={clearAll} style={{ paddingHorizontal: 12 }}>
             <Text style={[styles.clearText, { color: T.primary }]}>✕</Text>
@@ -747,7 +748,6 @@ export default function ProductsScreen() {
           <Text style={[styles.chipText, styles.hotChipText, offerOnly && styles.chipTextActive]}>Hot Offer</Text>
         </TouchableOpacity>
 
-        <Text style={styles.resultCount}>{products.length}{hasMore ? '+' : ''} items</Text>
 
         {/* Filter button — right side of sort row */}
         <TouchableOpacity

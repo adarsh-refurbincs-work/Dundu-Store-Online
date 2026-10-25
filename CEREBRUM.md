@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile Shop: sort bar without counts, combo tag row, emoji-free tags
+- Removed "N items" / "N combos" from the sort rows. Combo mode always shows the active-tag row with a "Combos" tag above the sort bar (✕ only when filters are set), matching the category tag row. Emojis removed from all active-filter tag labels (Offers, category, type, material, colour, age, combo filters).
+
 ### 2026-10-25 — Combo filter sheet compacted
 - `ComboFilterSheet`: 86% width / max 340px / max 62% height, 14px side padding; smaller title (14), section labels (10), compact chips (`Chip compact` → 10/5 padding, 11px text), slimmer Apply button. Product filter sheet unchanged.
 
