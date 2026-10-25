@@ -45,7 +45,7 @@ export function ComboCard({ combo, onPress }) {
         {hasOffer && (
           <View style={styles.saveBadge}>
             <Text style={styles.saveBadgeText}>
-              {Math.round(((parseFloat(combo.price) - parseFloat(combo.offer_price)) / parseFloat(combo.price)) * 100)}% OFF
+⚡ {Math.round(((parseFloat(combo.price) - parseFloat(combo.offer_price)) / parseFloat(combo.price)) * 100)}% OFF
             </Text>
           </View>
         )}

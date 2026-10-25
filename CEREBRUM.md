@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo offer badge gets the ⚡ prefix like product cards
+- `ComboCard.saveBadge` and `ComboDetail.offPill` read "⚡ N% OFF" (black bg, green text kept).
+
 ### 2026-10-25 — Mobile Home: "Combo Deals" rail
 - `HomeScreen`: fetches `comboApi.list()` and shows a horizontal `ComboCard` rail (250px cards) between New Arrivals and Trending; "View all →" opens Shop in combo mode (`{ combo: true }`); hidden when there are no combos.
 

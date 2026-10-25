@@ -469,7 +469,7 @@ export default function ComboDetailScreen() {
                 <Text style={styles.mrp}>{formatPrice(combo.price)}</Text>
                 <View style={styles.offPill}>
                   <Text style={styles.offPillText}>
-                    {Math.round(((parseFloat(combo.price) - parseFloat(combo.offer_price)) / parseFloat(combo.price)) * 100)}% OFF
+⚡ {Math.round(((parseFloat(combo.price) - parseFloat(combo.offer_price)) / parseFloat(combo.price)) * 100)}% OFF
                   </Text>
                 </View>
               </>
