@@ -239,6 +239,7 @@ export default function ComboDetailScreen() {
   const [otherCombos, setOtherCombos] = useState([]);
   const [heroIndex, setHeroIndex] = useState(0);
   const [reviews, setReviews] = useState([]); // reviews of every product that can be in this combo
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   useEffect(() => {
     if (!combo) return;
@@ -560,7 +561,7 @@ export default function ComboDetailScreen() {
           <Text style={styles.reviewsHint}>What shoppers said about the items in this combo</Text>
           {reviews.length === 0 ? (
             <Text style={styles.noReviewsText}>No reviews yet for the items in this combo.</Text>
-          ) : reviews.slice(0, 6).map((r) => (
+          ) : (showAllReviews ? reviews : reviews.slice(0, 3)).map((r) => (
             <View key={r.id} style={styles.reviewCard}>
               <View style={styles.reviewTop}>
                 <Text style={styles.reviewName}>{r.user_name || r.reviewer_name || 'Customer'}</Text>
@@ -573,6 +574,11 @@ export default function ComboDetailScreen() {
               )}
             </View>
           ))}
+          {reviews.length > 3 && (
+            <TouchableOpacity style={styles.seeAllReviewsBtn} onPress={() => setShowAllReviews((v) => !v)} activeOpacity={0.8}>
+              <Text style={styles.seeAllReviewsText}>{showAllReviews ? 'Show less' : `See all ${reviews.length} reviews`}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Other combos */}
@@ -641,6 +647,8 @@ const styles = StyleSheet.create({
   reviewProduct: { fontSize: 11, color: '#999', marginBottom: 4 },
   reviewText: { fontSize: 13, color: '#555', lineHeight: 18 },
   reviewImage: { width: 80, height: 80, borderRadius: 8, marginTop: 8 },
+  seeAllReviewsBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 20, borderWidth: 1.5, borderColor: COLORS.primary, marginTop: 4 },
+  seeAllReviewsText: { color: COLORS.primary, fontSize: 13, fontWeight: '700' },
 
   /* Other combos */
   moreSection: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0d6e8' },

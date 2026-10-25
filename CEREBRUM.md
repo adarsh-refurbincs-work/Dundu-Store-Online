@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Reviews: show 3, "See all N reviews" toggle
+- Mobile `ProductDetailScreen` (was 5), mobile `ComboDetailScreen` (was 6) and web `ProductDetail` (was all) now list 3 reviews with a pill button that expands to all / "Show less" (`showAllReviews`).
+
 ### 2026-10-25 — Combo offer tag: black bg, green text
 - Mobile `ComboCard.saveBadge` and `ComboDetail.offPill` ("N% OFF") → background `#000`, text `#22c55e`.
 

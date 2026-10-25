@@ -94,6 +94,8 @@ export default function ProductDetail() {
   if (!product) return <EmptyState emoji="🧵" title="Product not found" description="It may have been removed or is no longer available." action="Browse products" to="/products" />;
 
   const reviews = reviewData?.data?.reviews || [];
+  const [showAllReviews, setShowAllReviews] = useState(false);
+  const visibleReviews = showAllReviews ? reviews : reviews.slice(0, 3);
   const related = relatedData?.data?.products || [];
   const canReview = canReviewData?.data?.can_review ?? false;
   const existingReview = canReviewData?.data?.existing_review;
@@ -449,7 +451,7 @@ export default function ProductDetail() {
 
           {reviews.length === 0 ? (
             <p className="text-sm text-muted py-6 text-center">No reviews yet — be the first to share your experience.</p>
-          ) : reviews.map((r) => (
+          ) : visibleReviews.map((r) => (
             <article key={r.id} className="card p-4 animate-fade-up">
               <div className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-primary/15 text-primary-soft font-bold text-sm flex items-center justify-center">{(r.user_name || 'U')[0].toUpperCase()}</div>
@@ -467,6 +469,12 @@ export default function ProductDetail() {
               )}
             </article>
           ))}
+          {reviews.length > 3 && (
+            <button type="button" onClick={() => setShowAllReviews((v) => !v)}
+              className="mx-auto mt-2 h-10 px-5 rounded-full border border-primary text-primary-soft text-sm font-semibold hover:bg-primary/10 transition-colors">
+              {showAllReviews ? 'Show less' : `See all ${reviews.length} reviews`}
+            </button>
+          )}
         </div>
       </section>
 

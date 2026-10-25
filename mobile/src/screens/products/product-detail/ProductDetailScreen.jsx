@@ -90,6 +90,7 @@ export default function ProductDetailScreen() {
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [showAllReviews, setShowAllReviews] = useState(false); // list shows 3 until "See all"
   const [loading, setLoading] = useState(true);
   const [cartLoading, setCartLoading] = useState(false);
   const [buyLoading, setBuyLoading] = useState(false);
@@ -588,7 +589,7 @@ export default function ProductDetailScreen() {
               <Text style={styles.noReviewsText}>No reviews yet. Be the first to review!</Text>
             )}
 
-            {reviews.slice(0, 5).map((r) => (
+            {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r) => (
               <View key={r.id} style={styles.reviewCard}>
                 <View style={styles.reviewTop}>
                   <Text style={styles.reviewName}>{r.user_name || 'Customer'}</Text>
@@ -608,6 +609,11 @@ export default function ProductDetailScreen() {
                 )}
               </View>
             ))}
+            {reviews.length > 3 && (
+              <TouchableOpacity style={styles.seeAllReviewsBtn} onPress={() => setShowAllReviews((v) => !v)} activeOpacity={0.8}>
+                <Text style={styles.seeAllReviewsText}>{showAllReviews ? 'Show less' : `See all ${reviews.length} reviews`}</Text>
+              </TouchableOpacity>
+            )}
             <View style={styles.ownerBox}>
               <Text style={styles.ownerText}>Return Policy: Returns are accepted within 48 hours of delivery. Items must be unused and in original condition. A continuous unboxing video from opening the package is mandatory for return approval.</Text>
               <Text style={styles.ownerTextMl}>റിട്ടേൺ പോളിസി: ഡെലിവറി കഴിഞ്ഞ് 48 മണിക്കൂറിനുള്ളിൽ റിട്ടേൺ സ്വീകരിക്കുന്നതാണ്. ഉൽപ്പന്നങ്ങൾ ഉപയോഗിക്കാത്തതും യഥാർത്ഥ അവസ്ഥയിലുമായിരിക്കണം. റിട്ടേൺ അംഗീകരിക്കുന്നതിനായി പാക്കേജ് തുറക്കുന്നതിന്റെ തുടർച്ചയായ അൺബോക്സിങ് വീഡിയോ നിർബന്ധമാണ്.</Text>
@@ -1159,6 +1165,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   writeReviewBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
+  seeAllReviewsBtn: { alignSelf: 'center', paddingVertical: 8, paddingHorizontal: 18, borderRadius: 20, borderWidth: 1.5, borderColor: COLORS.primary, marginTop: 4, marginBottom: 6 },
+  seeAllReviewsText: { color: COLORS.primary, fontSize: 13, fontWeight: '700' },
   noReviewsText: { fontSize: 13, color: COLORS.textSecondary, marginBottom: 8, fontStyle: 'italic' },
 
   /* Review Modal */
