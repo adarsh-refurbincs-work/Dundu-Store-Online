@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo savings line text green
+- `ComboDetailScreen.savingsText` base colour grey → green `#15803d` (amount green bold, separate total still red).
+
 ### 2026-10-25 — Combo card price back to brand pink
 - `ComboCard.offerPrice` colour `#15803d` → `COLORS.primary`, matching product cards.
 

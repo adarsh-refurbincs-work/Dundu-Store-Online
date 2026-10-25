@@ -620,7 +620,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#fff0f6' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scrollContent: { paddingBottom: 20 },
-  savingsText: { fontSize: 12, fontWeight: '600', color: '#777', marginTop: 6 },
+  savingsText: { fontSize: 12, fontWeight: '600', color: '#15803d', marginTop: 6 },
   savingsAmount: { color: '#15803d', fontWeight: '800' },
   savingsRegular: { color: '#dc2626', fontWeight: '700' },
 
