@@ -410,7 +410,7 @@ export default function ProductsScreen() {
     // Combos themed like a custom category (admin → Combos → icon & theme)
     primary:     comboThemeColor,
     bg:          comboThemeBgColor || '#1a0a12',
-    topBg:       comboThemeBgColor || '#1a0a12',
+    topBg:       '#000', // search bar stays black like other categories; only the content area is themed
     surface:     '#111720',
     border:      comboThemeColor + '40',
     tagBg:       comboThemeColor + '26',

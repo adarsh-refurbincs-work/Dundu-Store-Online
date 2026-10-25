@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Check, ShoppingBag, Gift } from 'lucide-react';
+import { Check, ShoppingBag, Gift, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { comboApi } from '../../api';
 import useCartStore from '../../store/cart.store';
@@ -103,7 +103,14 @@ export default function ComboDetail() {
                         <div className="aspect-[3/4] bg-elevated"><img src={imageUrl(p.image)} alt={p.name} className="w-full h-full object-cover" loading="lazy" /></div>
                         <div className="p-2.5">
                           <p className="text-xs font-medium text-ink line-clamp-2">{p.name}</p>
-                          <p className="text-[11px] text-muted mt-0.5">{formatPrice(p.offer_price || p.price)}</p>
+                          <div className="flex items-center justify-between gap-2 mt-0.5">
+                            <p className="text-[11px] text-muted">{formatPrice(Number(p.offer_price) > 0 ? p.offer_price : p.price)}</p>
+                            {(Number(p.avg_rating) > 0 || Number(p.default_rating) > 0) && (
+                              <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-warning">
+                                <Star className="h-3 w-3 fill-current" />{(Number(p.avg_rating) > 0 ? Number(p.avg_rating) : Number(p.default_rating)).toFixed(1)}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         {active && <span className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary text-white flex items-center justify-center"><Check className="h-3.5 w-3.5" /></span>}
                       </button>

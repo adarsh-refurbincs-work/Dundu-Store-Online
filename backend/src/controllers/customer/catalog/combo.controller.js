@@ -55,7 +55,9 @@ const getOne = async (req, res) => {
   for (const slot of slots) {
     const { rows: slotProducts } = await db.query(
       `SELECT csp.id AS slot_product_id, csp.sort_order,
-              p.id, p.name, p.price, p.offer_price, p.sku, p.description,
+              p.id, p.name, p.price, p.offer_price, p.sku, p.description, p.default_rating,
+              (SELECT COALESCE(AVG(r.rating),0) FROM reviews r WHERE r.product_id=p.id) AS avg_rating,
+              (SELECT COUNT(*) FROM reviews r WHERE r.product_id=p.id) AS review_count,
               (SELECT url FROM product_images WHERE product_id=p.id AND is_primary=true LIMIT 1) AS image,
               (SELECT json_agg(img.url ORDER BY img.sort_order) FROM product_images img WHERE img.product_id=p.id) AS images,
               COALESCE(

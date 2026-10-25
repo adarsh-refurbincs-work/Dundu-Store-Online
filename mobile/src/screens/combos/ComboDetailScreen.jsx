@@ -16,6 +16,12 @@ import { ComboCard } from './ComboListScreen';
 
 // Price a shopper would pay for a product on its own (offer 0 / "0.00" = no offer)
 const unitPrice = (p) => (Number(p?.offer_price) > 0 ? Number(p.offer_price) : Number(p?.price) || 0);
+// Same rating rule as ProductCard: real reviews → admin default → 4.5
+const ratingOf = (p) => {
+  const avg = parseFloat(p?.avg_rating), def = parseFloat(p?.default_rating);
+  return avg > 0 ? avg : def > 0 ? def : 4.5;
+};
+const reviewsOf = (p) => parseInt(p?.review_count, 10) || 0;
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -108,6 +114,9 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
                   <Text style={[styles.productChoiceName, isChosen && styles.productChoiceNameActive]} numberOfLines={2}>
                     {prod.name}
                   </Text>
+                  <Text style={styles.productChoiceMeta}>
+                    {formatPrice(unitPrice(prod))} · <Text style={styles.ratingText}>{ratingOf(prod).toFixed(1)} ★</Text>
+                  </Text>
                   {isChosen && <View style={styles.productChoiceCheck}><Text style={{ color: '#fff', fontSize: 10 }}>✓</Text></View>}
                 </TouchableOpacity>
               );
@@ -125,10 +134,16 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
           }
           <View style={{ flex: 1 }}>
             <Text style={styles.singleProductName} numberOfLines={2}>{chosenProduct.name}</Text>
-            {chosenProduct.offer_price && parseFloat(chosenProduct.offer_price) > 0
-              ? <Text style={styles.singleProductPrice}>{formatPrice(chosenProduct.offer_price)}</Text>
-              : <Text style={styles.singleProductPrice}>{formatPrice(chosenProduct.price)}</Text>
-            }
+            <View style={styles.singleProductMetaRow}>
+              <Text style={styles.singleProductPrice}>{formatPrice(unitPrice(chosenProduct))}</Text>
+              {Number(chosenProduct.offer_price) > 0 && (
+                <Text style={styles.singleProductMrp}>{formatPrice(chosenProduct.price)}</Text>
+              )}
+            </View>
+            <Text style={styles.ratingLine}>
+              <Text style={styles.ratingText}>{ratingOf(chosenProduct).toFixed(1)} ★</Text>
+              {reviewsOf(chosenProduct) > 0 ? `  ${reviewsOf(chosenProduct)} review${reviewsOf(chosenProduct) === 1 ? '' : 's'}` : ''}
+            </Text>
           </View>
         </View>
       )}
@@ -352,6 +367,10 @@ export default function ComboDetailScreen() {
     return sum + unitPrice(chosen);
   }, 0) : 0;
   const savings = regularTotal > bundlePrice ? regularTotal - bundlePrice : 0;
+  // Combo rating = average of the chosen items' ratings; review count = total across them
+  const chosenProducts = combo ? combo.slots.map((slot, i) => slot.products?.find((p) => p.id === selections[i]?.product_id) || slot.products?.[0]).filter(Boolean) : [];
+  const comboRating = chosenProducts.length ? chosenProducts.reduce((s, p) => s + ratingOf(p), 0) / chosenProducts.length : 0;
+  const comboReviews = chosenProducts.reduce((s, p) => s + reviewsOf(p), 0);
   const inStock = combo ? (combo.stock == null || Number(combo.stock) > 0) : false;
 
   // Same chrome as the product detail page: back on the left, logo on the right
@@ -413,6 +432,17 @@ export default function ComboDetailScreen() {
               <Text style={styles.offerPrice}>{formatPrice(combo.price)}</Text>
             )}
           </View>
+
+          {comboRating > 0 && (
+            <View style={styles.comboRatingRow}>
+              <View style={styles.comboRatingPill}>
+                <Text style={styles.comboRatingPillText}>{comboRating.toFixed(1)} ★</Text>
+              </View>
+              <Text style={styles.comboRatingMeta}>
+                {comboReviews > 0 ? `${comboReviews} review${comboReviews === 1 ? '' : 's'} across ${chosenProducts.length} item${chosenProducts.length === 1 ? '' : 's'}` : `Rated across ${chosenProducts.length} item${chosenProducts.length === 1 ? '' : 's'}`}
+              </Text>
+            </View>
+          )}
 
           {savings > 0 && (
             <Text style={styles.savingsText}>
@@ -507,6 +537,17 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   scrollContent: { paddingBottom: 20 },
   savingsText: { fontSize: 12, fontWeight: '700', color: '#15803d', marginTop: 6 },
+
+  /* Ratings */
+  ratingText: { color: '#F6A800', fontWeight: '800' },
+  ratingLine: { fontSize: 12, color: '#777', marginTop: 2 },
+  productChoiceMeta: { fontSize: 10, color: '#777', textAlign: 'center', marginTop: 2 },
+  singleProductMetaRow: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
+  singleProductMrp: { fontSize: 12, color: '#aaa', textDecorationLine: 'line-through' },
+  comboRatingRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  comboRatingPill: { backgroundColor: '#15803d', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  comboRatingPillText: { color: '#fff', fontSize: 12, fontWeight: '800' },
+  comboRatingMeta: { fontSize: 12, color: '#666', fontWeight: '600' },
 
   /* Total + action buttons (mirrors ProductDetailScreen) */
   actionBlock: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 4 },

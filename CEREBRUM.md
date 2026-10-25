@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Combo detail ratings + black search bar in combo mode
+- API `GET /api/combos/:id`: slot products now carry `avg_rating`, `review_count`, `default_rating`.
+- Mobile `ComboDetailScreen`: rating pill + "N reviews across M items" under the price (average of the *chosen* items, same rule as `ProductCard`: reviews → default → 4.5); each product tile and the single-product preview show price (offer, MRP struck) and `x.x ★`.
+- Web `ComboDetail`: star rating on slot product tiles.
+- Mobile Shop combo mode: `T.topBg` fixed to `#000` so the search bar stays black like other categories while only the content area takes the combo theme/background.
+
 ### 2026-10-25 — Mobile combo detail rebuilt + combo Buy Now
 - **Mobile `ComboDetailScreen`**: same header as the product page (back + logo, safe-area edges left/right/bottom); "You save ₹X vs. buying separately" computed from the *chosen* slot products (`unitPrice` = offer>0 ? offer : price — same rule as admin/web/order API); sticky bar replaced by a "Bundle total" row + **Add to Cart** (blue) / **Buy Now** (pink) like `ProductDetailScreen`; out-of-stock combos disable both; "More combos you may like" horizontal rail (`ComboCard`, `navigation.push('ComboDetail')`).
 - **Buy Now for combos**: `CheckoutScreen` sends `buy_now_item: { combo_id, combo_selections, quantity }`; backend `placeOrder` handles it via the new `expandComboRows` (shared with the cart path — slot/product/variant validation, proportional price split, combo stock lock). Unknown combo → "Combo not found"; missing slot → names the slot.
