@@ -19,6 +19,7 @@ import Orders from './pages/orders/order-list/Orders';
 import OrderDetail from './pages/orders/order-detail/OrderDetail';
 import ReturnRequest from './pages/orders/return-request/ReturnRequest';
 import Checkout from './pages/checkout/checkout/Checkout';
+import Cart from './pages/cart/Cart';
 import Profile from './pages/account/profile/Profile';
 import Wishlist from './pages/account/wishlist/Wishlist';
 import Login from './pages/auth/login/Login';
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
+        <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />

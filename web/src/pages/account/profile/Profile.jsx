@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { userApi, loyaltyApi, orderApi, referralApi, announcementApi } from '../../../api';
@@ -108,10 +108,23 @@ export default function Profile() {
   });
   const announcements = announcData?.data?.announcements || [];
 
+  const qc = useQueryClient();
   const { data: addrData, refetch: refetchAddrs } = useQuery({
     queryKey: ['addresses'], queryFn: userApi.getAddresses, enabled: !!user,
   });
   const addresses = addrData?.data?.addresses || [];
+
+  // Put a freshly created / edited address into the cached list right away so it
+  // shows the instant the form closes, then re-sync with the server in the background.
+  const mergeAddressIntoCache = (addr) => {
+    if (!addr?.id) return;
+    qc.setQueryData(['addresses'], (old) => {
+      const list = old?.data?.addresses || [];
+      const rest = list.filter((a) => a.id !== addr.id).map((a) => (addr.is_default ? { ...a, is_default: false } : a));
+      const next = addr.is_default ? [addr, ...rest] : [...rest, addr];
+      return { ...(old || { success: true }), data: { ...(old?.data || {}), addresses: next } };
+    });
+  };
 
   const copyCode = () => {
     try {
@@ -158,11 +171,13 @@ export default function Profile() {
     setAddrSaving(true);
     try {
       if (id) {
-        await userApi.updateAddress(id, form);
+        const res = await userApi.updateAddress(id, form);
+        mergeAddressIntoCache(res?.data?.address || { ...form, id });
         toast.success('Address updated');
         setEditingAddr(null);
       } else {
-        await userApi.addAddress(form);
+        const res = await userApi.addAddress(form);
+        mergeAddressIntoCache(res?.data?.address);
         toast.success('Address added');
         setAddingAddr(false);
         if (location.state?.next) {
@@ -170,7 +185,7 @@ export default function Profile() {
           return;
         }
       }
-      refetchAddrs();
+      await refetchAddrs();
     } catch { toast.error('Failed to save address'); }
     finally { setAddrSaving(false); }
   };
@@ -178,8 +193,9 @@ export default function Profile() {
   const deleteAddress = async (id) => {
     try {
       await userApi.deleteAddress(id);
+      qc.setQueryData(['addresses'], (old) => old ? { ...old, data: { ...old.data, addresses: (old.data?.addresses || []).filter((a) => a.id !== id) } } : old);
       toast.success('Address deleted');
-      refetchAddrs();
+      await refetchAddrs();
     } catch { toast.error('Failed to delete'); }
   };
 

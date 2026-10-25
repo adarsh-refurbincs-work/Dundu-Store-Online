@@ -175,7 +175,7 @@ export default function Header() {
 
       {/* ── Category strip ── */}
       {(categories.length > 0) && (
-        <div className="border-t border-line/70">
+        <div className="border-t border-line/70 bg-bg">
           <div className="container-x">
             <div className="flex gap-4 md:gap-6 overflow-x-auto py-2.5 md:py-3 scrollbar-none">
               <Link to="/products?offer=true" className="flex flex-col items-center gap-1.5 shrink-0 group">

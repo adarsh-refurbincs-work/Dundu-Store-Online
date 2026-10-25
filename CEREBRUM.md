@@ -215,6 +215,12 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Storefront: address list refresh, sticky strip overlap, /cart page
+- **Profile addresses** (`web/.../Profile.jsx`): after add/update/delete the returned row is merged into the `['addresses']` React Query cache immediately (`mergeAddressIntoCache`), then `refetch` is awaited — the new address shows the moment the form closes instead of waiting on a background refetch.
+- **Sticky header strip** (`components/layout/Header.jsx`): the category-circle strip inherited the translucent `.glass` header background, so form fields showed through it when scrolled. Strip wrapper now `bg-bg` (solid).
+- **/cart** (`pages/cart/Cart.jsx`, route in `App.jsx`): new full-page bag (items, qty +/−, remove, subtotal, Checkout CTA; empty state with Sign in when logged out). The slide-in `CartDrawer` remains the quick view from header/mobile nav.
+- Verified with Playwright (scratchpad `pw/e2e.mjs`) against Vite on :3100 + dev-OTP login: /cart logged-out & logged-in with an item, add-address appears without reload and persists, strip computed bg `rgb(11,11,13)` and on top at scroll, zero page errors. Test user/address/cart rows cleaned up afterwards.
+
 ### 2026-10-25 — Web product detail blank screen (missing `useEffect` import)
 - `web/src/pages/products/product-detail/ProductDetail.jsx` used `useEffect` but imported only `useMemo, useState` → `ReferenceError: useEffect is not defined`, blank page for every product. Import fixed. Swept every `.jsx` in `web/` and `admin/` for hooks used without import — no others.
 - Verified with headless Chromium (Playwright, scratchpad) against a Vite dev server on :3100: all 7 product detail pages render the product name with zero page errors. Note: local port 3000 is often taken by another project's Vite (`WORK/Looser/frontend`) — when the Dundu storefront "shows a login page", check `lsof -iTCP:3000`.
