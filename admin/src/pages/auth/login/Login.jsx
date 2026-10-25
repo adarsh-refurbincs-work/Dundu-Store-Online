@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../../api';
 import useAuthStore from '../../../store/auth.store';
+import { RETURN_TO_KEY } from '../../../api/client';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import loginImage from '../../../assets/loginimage.png';
@@ -9,7 +10,12 @@ import dunduLogo from '../../../assets/logo.png';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setToken, fetchMe } = useAuthStore();
+  const { setToken, fetchMe, sessionLostMessage } = useAuthStore();
+
+  // Explain a forced sign-out once (e.g. "Account not found on this server").
+  useEffect(() => {
+    if (sessionLostMessage) toast(sessionLostMessage, { icon: '🔒', duration: 6000 });
+  }, [sessionLostMessage]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +46,12 @@ export default function Login() {
       setToken(res.data.token);
       await fetchMe();
       toast.success('Welcome back!');
-      navigate('/');
+      let returnTo = '/';
+      try {
+        returnTo = sessionStorage.getItem(RETURN_TO_KEY) || '/';
+        sessionStorage.removeItem(RETURN_TO_KEY);
+      } catch { /* ignore */ }
+      navigate(returnTo.startsWith('/') && !returnTo.startsWith('/login') ? returnTo : '/');
     } catch (err) {
       toast.error(err?.message || err?.error || 'Invalid credentials');
     } finally {

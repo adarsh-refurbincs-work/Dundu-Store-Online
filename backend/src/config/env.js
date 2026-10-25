@@ -69,6 +69,9 @@ const env = {
   dbName: targetDbName,
   jwtSecret: requireSecret('JWT_SECRET', 'dundu_dev_only_jwt_secret'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  // Admin / super-admin sessions: long-lived (default 30 days) and refreshed on
+  // every authenticated request (sliding window) — see auth.middleware.js.
+  adminJwtExpiresIn: process.env.ADMIN_JWT_EXPIRES_IN || '30d',
 
   // Explicit opt-in for the fixed "123456" OTP used in local development.
   // Never honoured in production regardless of the flag.

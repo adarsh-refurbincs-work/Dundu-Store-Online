@@ -60,8 +60,13 @@ import FinancePage from './pages/reports/finance/FinancePage';
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 30_000 } } });
 
 function AppRoutes() {
-  const { fetchMe } = useAuthStore();
+  const { fetchMe, sessionLost } = useAuthStore();
   useEffect(() => { fetchMe(); }, []);
+  useEffect(() => {
+    const onLost = (e) => sessionLost(e.detail?.message);
+    window.addEventListener('dundu:session-lost', onLost);
+    return () => window.removeEventListener('dundu:session-lost', onLost);
+  }, [sessionLost]);
 
   return (
     <Routes>

@@ -8,6 +8,7 @@ import {
 import { productApi, categoryApi, brandApi, reviewApi, materialApi } from '../../../api';
 import Button from '../../../components/ui/Button';
 import ImageCropperModal from '../../../components/ui/ImageCropperModal';
+import { loadDraftMeta, saveDraftMeta, saveDraftImages, loadDraftImages, clearDraft } from '../../../utils/productDraft';
 import Input, { Select, Textarea } from '../../../components/ui/Input';
 import toast from 'react-hot-toast';
 
@@ -463,6 +464,67 @@ type: product?.type || '',
   // How many labels to print per variant, keyed by SKU. Defaults to that
   // variant's stock count (one barcode per physical unit) until overridden.
   const [printQty, setPrintQty] = useState({});
+
+  // ── Draft autosave (add mode) ─────────────────────────────────────────────
+  // Everything typed/picked on /products/new is mirrored to localStorage (text)
+  // and IndexedDB (image files) so a session drop, forced re-login or reload
+  // never loses an unsubmitted product. Cleared on successful create / discard.
+  const draftKey = 'product:new';
+  const draftEnabled = !isEdit;
+  const draftReady = useRef(false);
+  const [restoredDraft, setRestoredDraft] = useState(null); // { savedAt, imageCount }
+  const isDraftWorthSaving = () =>
+    !!(form.name || form.description || form.price || images.length || colorVariants.some((cv) => cv.color) || pendingReviews.length);
+
+  useEffect(() => {
+    if (!draftEnabled) return;
+    let cancelled = false;
+    (async () => {
+      const meta = loadDraftMeta(draftKey);
+      const files = meta ? await loadDraftImages(draftKey) : [];
+      if (cancelled) return;
+      if (meta) {
+        if (meta.form) setForm((p) => ({ ...p, ...meta.form }));
+        if (meta.flags) setFlags((p) => ({ ...p, ...meta.flags }));
+        if (meta.colorVariants?.length) setColorVariants(meta.colorVariants);
+        if (Array.isArray(meta.pendingReviews)) setPendingReviews(meta.pendingReviews);
+        if (files.length) {
+          setImages(files.map(({ file, color }) => ({ file, preview: URL.createObjectURL(file), color })));
+          setPrimaryNewIndex(Math.min(meta.primaryNewIndex || 0, files.length - 1));
+        }
+        setRestoredDraft({ savedAt: meta.savedAt, imageCount: files.length });
+      }
+      draftReady.current = true;
+    })();
+    return () => { cancelled = true; };
+  }, [draftEnabled]);
+
+  // Text state → localStorage (debounced). An empty form clears the draft instead.
+  useEffect(() => {
+    if (!draftEnabled || !draftReady.current) return;
+    const t = setTimeout(() => {
+      if (!isDraftWorthSaving()) { clearDraft(draftKey); return; }
+      saveDraftMeta(draftKey, {
+        form, flags, colorVariants, primaryNewIndex,
+        // File objects can't be serialised here; review photos are re-attached by the admin.
+        pendingReviews: pendingReviews.map(({ reviewer_name, rating, review }) => ({ reviewer_name, rating, review })),
+      });
+    }, 500);
+    return () => clearTimeout(t);
+  }, [draftEnabled, form, flags, colorVariants, primaryNewIndex, pendingReviews]);
+
+  // Picked image files → IndexedDB (debounced)
+  useEffect(() => {
+    if (!draftEnabled || !draftReady.current) return;
+    const t = setTimeout(() => { saveDraftImages(draftKey, images); }, 500);
+    return () => clearTimeout(t);
+  }, [draftEnabled, images]);
+
+  const discardDraft = async () => {
+    draftReady.current = false;
+    await clearDraft(draftKey);
+    window.location.reload();
+  };
   const getPrintQty = (v) => {
     const q = printQty[v.sku];
     return q !== undefined ? q : Number(v.stock) || 0;
@@ -706,6 +768,8 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
       } else {
         await productApi.create(fd);
         toast.success('Product created');
+        draftReady.current = false;
+        await clearDraft(draftKey);
       }
       onSaved();
     } catch (err) {
@@ -890,6 +954,19 @@ const catPatterns    = parseJson(selectedCat?.patterns).filter(p => p.is_active)
 
   return (
     <div className="w-full space-y-6 pb-20">
+      {restoredDraft && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs font-semibold text-amber-900">
+            Restored your unsaved draft from {new Date(restoredDraft.savedAt).toLocaleString()}
+            {restoredDraft.imageCount ? ` (${restoredDraft.imageCount} photo${restoredDraft.imageCount === 1 ? '' : 's'})` : ''}.
+            It keeps saving automatically while you work.
+          </p>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => setRestoredDraft(null)} className="text-xs font-bold text-amber-800 hover:underline">Keep</button>
+            <button type="button" onClick={discardDraft} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-rose-600 hover:bg-rose-50">Discard draft</button>
+          </div>
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* ── Sticky Action Header ────────────────────────────────────────── */}
         <div className="sticky top-3 z-30 bg-white/95 backdrop-blur-md rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center justify-between gap-4">

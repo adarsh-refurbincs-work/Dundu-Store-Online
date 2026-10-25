@@ -215,6 +215,13 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Admin sessions: 30-day sliding tokens, no hard logouts, product draft autosave
+Reported: admin panel logged out every few minutes, especially during image uploads. The JWT was already 7 days, so expiry was not the cause; the admin client treated *any* 401 (and any `/auth/me` failure, even a network blip while nodemon restarts) as "log out + full page reload", wiping the form. The TopBar polls 2 admin endpoints every 6 s, so one bad response per ~8 requests/min was enough.
+- **Backend**: `ADMIN_JWT_EXPIRES_IN` (default `30d`) for admin/super_admin tokens — `utils/jwt.js` `sign()` picks the lifetime by role; customers stay on `JWT_EXPIRES_IN` (7d). Sliding session: `authenticate` sets `X-Refreshed-Token` with a new token once less than half the lifetime remains. 401s now carry `X-Auth-Reason` (`TOKEN_EXPIRED` / `TOKEN_INVALID` / `ACCOUNT_NOT_FOUND` / `ACCOUNT_BLOCKED`) with a human message — `ACCOUNT_NOT_FOUND` is what you get when `DB_NAME` is switched under a logged-in admin. CORS exposes both headers.
+- **Admin client** (`api/client.js`, `store/auth.store.js`, `App.jsx`, `Login.jsx`): stores the refreshed token; on 401 logs the reason to console, remembers the current path (`sessionStorage dundu_admin_return_to`), clears the token and fires a `dundu:session-lost` event → store flips to logged out → `<Layout>` routes to /login *without* reloading. `fetchMe` only signs out on 401/403 (not on network errors / 5xx). Login toasts the reason and navigates back to the remembered page.
+- **Product form draft autosave** (`utils/productDraft.js`, `ProductForm.jsx`, add mode only): fields/flags/variants/pending reviews → localStorage (`dundu_product_draft:product:new`), picked image files → IndexedDB (`dundu_admin_drafts`), debounced 500 ms. On return a banner offers Keep / Discard; cleared on successful create or when the form is emptied. Review photo files are not persisted (re-attach).
+- Test recipe: mint tokens with `jsonwebtoken` + `JWT_SECRET` and curl `/api/auth/me` — half-used token ⇒ `X-Refreshed-Token`; unknown id ⇒ `X-Auth-Reason: ACCOUNT_NOT_FOUND`; expired ⇒ `TOKEN_EXPIRED`.
+
 ### 2026-10-25 — Mobile: search icon removed
 - `HomeScreen.jsx` / `ProductsScreen.jsx`: dropped the 🔍 emoji before the search input (and its `searchIcon` style). The search input itself is unchanged.
 

@@ -1,14 +1,19 @@
 import { create } from 'zustand';
 import { authApi } from '../api';
+import { TOKEN_KEY, getToken, clearToken } from '../api/client';
+
+const isAdminRole = (role) => ['admin', 'super_admin'].includes(role);
 
 const useAuthStore = create((set, get) => ({
   user: null,
-  token: localStorage.getItem('dundu_admin_token') || localStorage.getItem('velora_admin_token'),
+  token: getToken(),
   isLoading: true,
+  // Set when the API rejected the token (shown once on the login page).
+  sessionLostMessage: null,
 
   setToken: (token) => {
-    localStorage.setItem('dundu_admin_token', token);
-    set({ token });
+    localStorage.setItem(TOKEN_KEY, token);
+    set({ token, sessionLostMessage: null });
   },
 
   fetchMe: async () => {
@@ -16,23 +21,35 @@ const useAuthStore = create((set, get) => ({
     try {
       const res = await authApi.me();
       const user = res.data.user;
-      if (!['admin', 'super_admin'].includes(user.role)) {
-        localStorage.removeItem('dundu_admin_token');
-        localStorage.removeItem('velora_admin_token');
-        set({ token: null, user: null, isLoading: false });
+      if (!isAdminRole(user.role)) {
+        clearToken();
+        set({ token: null, user: null, isLoading: false, sessionLostMessage: 'Administrator privileges required' });
         return;
       }
       set({ user, isLoading: false });
-    } catch {
-      localStorage.removeItem('dundu_admin_token');
-      localStorage.removeItem('velora_admin_token');
-      set({ token: null, user: null, isLoading: false });
+    } catch (err) {
+      // Only an explicit rejection of the token ends the session. Network hiccups,
+      // a restarting API or a 5xx must NOT log the admin out — keep the token and
+      // the current user (if any) and let the next request retry.
+      const status = err?.status || err?.response?.status;
+      if (status === 401 || status === 403) {
+        clearToken();
+        set({ token: null, user: null, isLoading: false, sessionLostMessage: err?.message || 'Session expired' });
+      } else {
+        set({ isLoading: false });
+      }
     }
   },
 
+  // Called when any API call comes back 401 (see api/client.js interceptor).
+  sessionLost: (message) => {
+    clearToken();
+    set({ token: null, user: null, isLoading: false, sessionLostMessage: message || 'Your session ended, please sign in again' });
+  },
+
   logout: () => {
-    localStorage.removeItem('velora_admin_token');
-    set({ user: null, token: null });
+    clearToken();
+    set({ user: null, token: null, sessionLostMessage: null });
   },
 
   isSuperAdmin: () => get().user?.role === 'super_admin',
