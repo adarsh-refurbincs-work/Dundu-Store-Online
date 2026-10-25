@@ -16,11 +16,57 @@ const requireSecret = (name, devFallback) => {
   return devFallback;
 };
 
+// Resolve Database URL from DB_NAME or individual components or DATABASE_URL
+const resolveDatabaseUrl = () => {
+  const dbName = process.env.DB_NAME?.trim();
+  const dbUser = process.env.DB_USER?.trim() || 'postgres';
+  const dbPassword = process.env.DB_PASSWORD !== undefined ? process.env.DB_PASSWORD : '1234';
+  const dbHost = process.env.DB_HOST?.trim() || 'localhost';
+  const dbPort = process.env.DB_PORT?.trim() || '5432';
+
+  let rawUrl = process.env.DATABASE_URL?.trim();
+
+  if (rawUrl) {
+    if (dbName) {
+      try {
+        const parsed = new URL(rawUrl);
+        parsed.pathname = `/${dbName.replace(/^\//, '')}`;
+        const finalUrl = parsed.toString();
+        process.env.DATABASE_URL = finalUrl;
+        return finalUrl;
+      } catch {
+        const replaced = rawUrl.replace(/\/[^/?#]+(\?.*)?$/, `/${dbName}$1`);
+        process.env.DATABASE_URL = replaced;
+        return replaced;
+      }
+    }
+    return rawUrl;
+  }
+
+  // Construct from individual DB_* components
+  const targetDbName = dbName || 'dundustore';
+  const constructed = `postgresql://${encodeURIComponent(dbUser)}:${encodeURIComponent(dbPassword)}@${dbHost}:${dbPort}/${targetDbName}`;
+  process.env.DATABASE_URL = constructed;
+  return constructed;
+};
+
+const resolvedDatabaseUrl = resolveDatabaseUrl();
+const targetDbName = (() => {
+  try {
+    return new URL(resolvedDatabaseUrl).pathname.replace(/^\//, '');
+  } catch {
+    return process.env.DB_NAME || 'dundustore';
+  }
+})();
+
+console.log(`[database] Active Database: "${targetDbName}"`);
+
 const env = {
   port: parseInt(process.env.PORT || '5000', 10),
   nodeEnv,
   isProduction,
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:1234@localhost:5432/dundu',
+  databaseUrl: resolvedDatabaseUrl,
+  dbName: targetDbName,
   jwtSecret: requireSecret('JWT_SECRET', 'dundu_dev_only_jwt_secret'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 

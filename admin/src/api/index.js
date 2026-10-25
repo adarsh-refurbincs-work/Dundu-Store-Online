@@ -4,6 +4,7 @@ export const authApi = {
   login: (data) => client.post('/auth/login', data),
   me: () => client.get('/auth/me'),
   adminRegister: (data) => client.post('/auth/admin-register', data),
+  setupStatus: () => client.get('/auth/setup-status'),
 };
 
 export const dashboardApi = {

@@ -69,12 +69,41 @@ process.on('unhandledRejection', (reason) => {
   console.error('Unhandled promise rejection:', reason);
 });
 
+// Ensure target database exists in PostgreSQL (creates it if missing in non-production)
+async function ensureDatabaseExists(databaseUrl) {
+  try {
+    const { Client } = require('pg');
+    const parsed = new URL(databaseUrl);
+    const dbName = parsed.pathname.replace(/^\//, '');
+    if (!dbName || dbName === 'postgres') return;
+
+    const maintenanceUrl = new URL(databaseUrl);
+    maintenanceUrl.pathname = '/postgres';
+
+    const client = new Client({ connectionString: maintenanceUrl.toString() });
+    await client.connect();
+    const check = await client.query('SELECT 1 FROM pg_database WHERE datname = $1', [dbName]);
+    if (check.rows.length === 0) {
+      if (/^[a-zA-Z0-9_]+$/.test(dbName)) {
+        await client.query(`CREATE DATABASE "${dbName}"`);
+        console.log(`✓ Database "${dbName}" did not exist and was created automatically`);
+      }
+    }
+    await client.end();
+  } catch (err) {
+    // Non-fatal: if maintenance DB is inaccessible, let the connection pool try directly
+  }
+}
+
 // Bootstrap Database & Start Server
 async function startServer() {
   try {
+    // 0. Ensure target database exists
+    await ensureDatabaseExists(env.databaseUrl);
+
     // 1. Verify DB connection
     await db.query('SELECT 1');
-    console.log('✓ Database connected');
+    console.log(`✓ Database connected (${env.dbName})`);
 
     // 2. Apply versioned migrations (same as `npm run migrate`). Safe to run on every
     //    boot: already-applied files are skipped. Set RUN_MIGRATIONS_ON_START=false to opt out.

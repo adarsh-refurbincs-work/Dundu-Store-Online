@@ -7,6 +7,7 @@
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const db = require('../src/config/db');
+const { seedAllCategories } = require('../src/database/seedCategories');
 
 (async () => {
   console.log('Clearing all data...');
@@ -41,15 +42,19 @@ const db = require('../src/config/db');
   console.log('All tables cleared.');
 
   // Re-create the super admin so the panel is immediately usable.
-  const hash = await bcrypt.hash('123456', 10);
+  const hash = await bcrypt.hash('12345678', 10);
   await db.query(
     `INSERT INTO users (name, email, password_hash, role)
      VALUES ('Super Admin', 'superadmin@gmail.com', $1, 'super_admin')`,
     [hash]
   );
 
-  console.log('Super admin ready:  superadmin@gmail.com  /  123456');
-  console.log('Start the backend once to auto-seed product_materials.');
+  console.log('Super admin ready:  superadmin@gmail.com  /  12345678');
+
+  // Re-seed Women, Maternity, Kids, Gen Z categories with Sub-Categories, Types, Materials, and Patterns
+  await seedAllCategories(db);
+  console.log('Categories (Women, Maternity, Kids, Gen Z) seeded with Sub-Categories, Types, Materials, and Patterns.');
+
   process.exit(0);
 })().catch((err) => {
   console.error('Failed:', err.message);

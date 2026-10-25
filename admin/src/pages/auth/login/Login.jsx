@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../../api';
 import useAuthStore from '../../../store/auth.store';
@@ -15,6 +15,17 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [setupComplete, setSetupComplete] = useState(true);
+
+  useEffect(() => {
+    authApi.setupStatus()
+      .then((res) => {
+        if (res?.data && typeof res.data.setupComplete === 'boolean') {
+          setSetupComplete(res.data.setupComplete);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -182,15 +193,21 @@ export default function Login() {
 
             {/* Register Option */}
             <div className="pt-2 text-center">
-              <p className="text-xs text-slate-500">
-                Initial system setup?{' '}
-                <Link
-                  to="/register"
-                  className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors"
-                >
-                  Register Super Admin
-                </Link>
-              </p>
+              {!setupComplete ? (
+                <p className="text-xs text-slate-500">
+                  Initial system setup?{' '}
+                  <Link
+                    to="/register"
+                    className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors"
+                  >
+                    Register Super Admin
+                  </Link>
+                </p>
+              ) : (
+                <p className="text-xs text-slate-400">
+                  Need an admin account? Ask your Super Admin to add you.
+                </p>
+              )}
             </div>
           </form>
 

@@ -31,6 +31,7 @@ router.get('/google/callback',
   ctrl.googleCallback
 );
 
+router.get('/setup-status', ctrl.setupStatus);
 router.post('/admin-register', signupLimiter, adminRegisterRules, handleValidation, ctrl.adminRegister);
 
 router.get('/me', authenticate, ctrl.me);

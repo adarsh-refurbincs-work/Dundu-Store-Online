@@ -1,0 +1,13 @@
+{
+  "watch": [
+    "src/",
+    "index.js",
+    ".env",
+    "scripts/"
+  ],
+  "ext": "js,mjs,cjs,json,env",
+  "ignore": [
+    "uploads/*",
+    "node_modules/*"
+  ]
+}

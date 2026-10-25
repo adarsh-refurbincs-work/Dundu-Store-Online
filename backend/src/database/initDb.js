@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { seedAllCategories } = require('./seedCategories');
 
 /**
  * Ensures required database tables, alter statements, and initial dynamic settings
@@ -156,6 +157,25 @@ async function initDb() {
     await db.query("UPDATE products SET default_rating=4.5 WHERE default_rating IS NULL").catch(() => {});
 
     console.log('✓ Database runtime migrations verified');
+
+    // 6. Ensure default categories (Women, Maternity, Kids, Gen Z) and materials are seeded
+    await seedAllCategories(db);
+    console.log('✓ Categories (Women, Maternity, Kids, Gen Z) metadata verified and seeded');
+
+    // 7. Ensure default Super Admin exists if database is new
+    const { rows: existingAdmins } = await db.query(
+      "SELECT id FROM users WHERE role IN ('admin', 'super_admin') LIMIT 1"
+    );
+    if (existingAdmins.length === 0) {
+      const bcrypt = require('bcryptjs');
+      const hash = await bcrypt.hash('12345678', 10);
+      await db.query(
+        `INSERT INTO users (name, email, password_hash, role)
+         VALUES ('Super Admin', 'superadmin@gmail.com', $1, 'super_admin')`,
+        [hash]
+      );
+      console.log('✓ Default Super Admin created: superadmin@gmail.com / 12345678');
+    }
   } catch (err) {
     console.warn('⚠️ Runtime migration notice:', err.message);
   }

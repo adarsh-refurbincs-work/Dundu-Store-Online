@@ -8,7 +8,9 @@
     "dev": "nodemon index.js",
     "migrate": "node-pg-migrate up",
     "migrate:down": "node-pg-migrate down",
-    "migrate:create": "node-pg-migrate create"
+    "migrate:create": "node-pg-migrate create",
+    "seed:women": "node scripts/seed-women.js",
+    "seed:categories": "node scripts/seed-categories.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
