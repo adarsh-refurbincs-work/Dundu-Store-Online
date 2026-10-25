@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-25 — Mobile combo cards: rating + green price, no "View Combo" button; combo detail reviews
+- API `GET /api/combos` (list): slot products carry `avg_rating`, `default_rating`, `review_count`.
+- `ComboCard`: "View Combo →" button removed (whole card is tappable); price text green `#15803d`; rating `x.x ★ (n)` right-aligned on the price row (average over each slot's first product, same rule as `ProductCard`).
+- `ComboDetailScreen`: "Reviews" section before "More combos" — merges `productApi.getReviews` for every product that can appear in the combo (deduped), newest first, each tagged "on <product>"; header shows the combo rating.
+
 ### 2026-10-25 — Combo image gallery (multiple images)
 - **DB**: migration `1782500000000_combo-images.js` → `combo_images (id, combo_id FK cascade, url, sort_order)`; existing `combos.image_url` backfilled as the first image. `combos.image_url` remains the **cover = first gallery image** (cards/lists keep using it).
 - **Backend admin** (`combo.controller.js`): create/update routes use `upload.any()`; files `image` (legacy cover) + `images[]`. `resolveGallery` honours `images_order` (JSON list of `{url}` kept / `{new: i}` uploaded-file index → exact order), else `existing_images` + appended uploads, else legacy (uploads replace; `image_url=''` clears). `writeGallery` rewrites `combo_images` and syncs the cover. `images[]` returned on admin list/getOne and customer list/getOne (`attachImages`).

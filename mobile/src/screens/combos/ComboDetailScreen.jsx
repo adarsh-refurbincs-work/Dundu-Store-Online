@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { comboApi, cartApi } from '../../api/index';
+import { comboApi, cartApi, productApi } from '../../api/index';
 import { COLORS, UPLOADS_URL } from '../../config';
 import { formatPrice } from '../../utils/format';
 import AppHeader from '../../components/ui/AppHeader';
@@ -22,6 +22,11 @@ const ratingOf = (p) => {
   return avg > 0 ? avg : def > 0 ? def : 4.5;
 };
 const reviewsOf = (p) => parseInt(p?.review_count, 10) || 0;
+
+function StarRow({ rating }) {
+  const r = Math.round(parseFloat(rating) || 0);
+  return <Text style={styles.stars}>{'★'.repeat(r)}{'☆'.repeat(Math.max(0, 5 - r))}</Text>;
+}
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -233,6 +238,25 @@ export default function ComboDetailScreen() {
   const [cartSuccess, setCartSuccess] = useState(false);
   const [otherCombos, setOtherCombos] = useState([]);
   const [heroIndex, setHeroIndex] = useState(0);
+  const [reviews, setReviews] = useState([]); // reviews of every product that can be in this combo
+
+  useEffect(() => {
+    if (!combo) return;
+    const products = (combo.slots || []).flatMap((s) => s.products || []);
+    const seen = new Set();
+    const unique = products.filter((p) => p?.id && !seen.has(p.id) && seen.add(p.id));
+    let cancelled = false;
+    Promise.all(unique.map((p) =>
+      productApi.getReviews(p.id)
+        .then((res) => (res?.reviews || res?.data?.reviews || []).map((r) => ({ ...r, product_name: p.name })))
+        .catch(() => [])
+    )).then((lists) => {
+      if (cancelled) return;
+      const all = lists.flat().sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      setReviews(all);
+    });
+    return () => { cancelled = true; };
+  }, [combo]);
 
   // Suggestions: every other live combo
   useEffect(() => {
@@ -527,6 +551,30 @@ export default function ComboDetailScreen() {
           </View>
         </View>
 
+        {/* Reviews — from the products inside this combo */}
+        <View style={styles.reviewsSection}>
+          <Text style={styles.reviewsTitle}>
+            Reviews{reviews.length > 0 ? ` (${reviews.length})` : ''}
+            {comboRating > 0 && <Text style={{ color: '#F6A800' }}>{`  ★ ${comboRating.toFixed(1)}`}</Text>}
+          </Text>
+          <Text style={styles.reviewsHint}>What shoppers said about the items in this combo</Text>
+          {reviews.length === 0 ? (
+            <Text style={styles.noReviewsText}>No reviews yet for the items in this combo.</Text>
+          ) : reviews.slice(0, 6).map((r) => (
+            <View key={r.id} style={styles.reviewCard}>
+              <View style={styles.reviewTop}>
+                <Text style={styles.reviewName}>{r.user_name || r.reviewer_name || 'Customer'}</Text>
+                <StarRow rating={r.rating} />
+              </View>
+              {r.product_name && <Text style={styles.reviewProduct} numberOfLines={1}>on {r.product_name}</Text>}
+              {(r.review || r.comment) ? <Text style={styles.reviewText}>{r.review || r.comment}</Text> : null}
+              {r.image_url && (
+                <Image source={{ uri: getImageUri(r.image_url) }} style={styles.reviewImage} resizeMode="cover" />
+              )}
+            </View>
+          ))}
+        </View>
+
         {/* Other combos */}
         {otherCombos.length > 0 && (
           <View style={styles.moreSection}>
@@ -580,6 +628,19 @@ const styles = StyleSheet.create({
   buyBtn: { flex: 1, backgroundColor: COLORS.primary, borderRadius: 14, paddingVertical: 16, alignItems: 'center' },
   buyBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   actionBtnDisabled: { backgroundColor: COLORS.textSecondary },
+
+  /* Reviews */
+  reviewsSection: { marginTop: 16, paddingTop: 16, paddingHorizontal: 16, borderTopWidth: 1, borderTopColor: '#f0d6e8' },
+  reviewsTitle: { fontSize: 16, fontWeight: '800', color: '#1a1a1a' },
+  reviewsHint: { fontSize: 12, color: '#888', marginBottom: 10, marginTop: 2 },
+  noReviewsText: { fontSize: 13, color: '#777', fontStyle: 'italic' },
+  reviewCard: { backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: '#f0d6e8' },
+  reviewTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
+  reviewName: { fontSize: 13, fontWeight: '700', color: '#2563eb' },
+  stars: { color: '#F59E0B', fontSize: 13, letterSpacing: 1 },
+  reviewProduct: { fontSize: 11, color: '#999', marginBottom: 4 },
+  reviewText: { fontSize: 13, color: '#555', lineHeight: 18 },
+  reviewImage: { width: 80, height: 80, borderRadius: 8, marginTop: 8 },
 
   /* Other combos */
   moreSection: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0d6e8' },

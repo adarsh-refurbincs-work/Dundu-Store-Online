@@ -18,10 +18,17 @@ function getImageUri(src) {
   return UPLOADS_URL + (src.startsWith('/') ? src : '/' + src);
 }
 
+// Same rating rule as ProductCard: reviews → admin default → 4.5
+const ratingOf = (p) => { const a = parseFloat(p?.avg_rating), d = parseFloat(p?.default_rating); return a > 0 ? a : d > 0 ? d : 4.5; };
+
 export function ComboCard({ combo, onPress }) {
   const uri = getImageUri(combo.image_url);
   const hasOffer = combo.offer_price && parseFloat(combo.offer_price) > 0;
   const slotCount = combo.slots?.length || 0;
+  // Card rating = average over each slot's first product; reviews = total across them
+  const firstProducts = (combo.slots || []).map((s) => (s.products || [])[0]).filter((p) => p && p.id);
+  const rating = firstProducts.length ? firstProducts.reduce((s, p) => s + ratingOf(p), 0) / firstProducts.length : 0;
+  const reviewCount = firstProducts.reduce((s, p) => s + (parseInt(p.review_count, 10) || 0), 0);
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
@@ -65,7 +72,7 @@ export function ComboCard({ combo, onPress }) {
           )}
         </View>
 
-        {/* Price */}
+        {/* Price + rating */}
         <View style={styles.priceRow}>
           {hasOffer ? (
             <>
@@ -75,11 +82,13 @@ export function ComboCard({ combo, onPress }) {
           ) : (
             <Text style={styles.offerPrice}>{formatPrice(combo.price)}</Text>
           )}
+          {rating > 0 && (
+            <View style={styles.ratingWrap}>
+              <Text style={styles.ratingText}>{rating.toFixed(1)} ★</Text>
+              {reviewCount > 0 && <Text style={styles.ratingCount}>({reviewCount})</Text>}
+            </View>
+          )}
         </View>
-
-        <TouchableOpacity style={styles.buyBtn} onPress={onPress} activeOpacity={0.8}>
-          <Text style={styles.buyBtnText}>View Combo →</Text>
-        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -280,8 +289,11 @@ const styles = StyleSheet.create({
   slotPillMore: { backgroundColor: '#f5f5f5', borderColor: '#ddd' },
   slotPillText: { fontSize: 11, fontWeight: '700', color: '#C2167A', maxWidth: 90 },
 
-  priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  offerPrice: { fontSize: 22, fontWeight: '900', color: COLORS.primary },
+  priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
+  offerPrice: { fontSize: 22, fontWeight: '900', color: '#15803d' },
+  ratingWrap: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'baseline', gap: 4 },
+  ratingText: { fontSize: 13, fontWeight: '800', color: '#F6A800' },
+  ratingCount: { fontSize: 11, color: '#999', fontWeight: '600' },
   mrpPrice: { fontSize: 15, color: '#aaa', textDecorationLine: 'line-through', fontWeight: '500' },
 
   buyBtn: {

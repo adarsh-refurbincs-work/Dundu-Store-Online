@@ -31,6 +31,9 @@ const list = async (_req, res) => {
                   'name', p.name,
                   'price', p.price,
                   'offer_price', p.offer_price,
+                  'default_rating', p.default_rating,
+                  'avg_rating', (SELECT COALESCE(AVG(r.rating),0) FROM reviews r WHERE r.product_id=p.id),
+                  'review_count', (SELECT COUNT(*) FROM reviews r WHERE r.product_id=p.id),
                   'image', (SELECT url FROM product_images WHERE product_id=p.id AND is_primary=true LIMIT 1)
                 ) ORDER BY csp.sort_order
               ) AS products
