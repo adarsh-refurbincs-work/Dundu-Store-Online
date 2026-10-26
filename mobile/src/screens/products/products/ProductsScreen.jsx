@@ -11,6 +11,8 @@ import {
   Modal,
   ScrollView,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -157,6 +159,39 @@ export const comboEffectivePrice = (c) => {
   return offer > 0 ? offer : (parseFloat(c.price) || 0);
 };
 
+/* ── Full-screen filter panel that slides in from the right ───────────────── */
+function SlidePanel({ visible, onClose, title, onReset, children }) {
+  const [shown, setShown] = useState(visible);
+  const x = useRef(new Animated.Value(SCREEN_WIDTH)).current;
+  useEffect(() => {
+    if (visible) {
+      setShown(true);
+      Animated.timing(x, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+    } else if (shown) {
+      Animated.timing(x, { toValue: SCREEN_WIDTH, duration: 220, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(() => setShown(false));
+    }
+  }, [visible]);
+  if (!shown) return null;
+  return (
+    <Modal visible transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
+      <Animated.View style={[styles.panel, { transform: [{ translateX: x }] }]}>
+        <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
+          <View style={styles.panelHeader}>
+            <TouchableOpacity onPress={onClose} style={styles.panelClose} accessibilityLabel="Close filters" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={styles.panelCloseText}>✕</Text>
+            </TouchableOpacity>
+            <Text style={styles.panelTitle}>{title}</Text>
+            <TouchableOpacity onPress={onReset} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={styles.panelReset}>Reset all</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.panelBody}>{children}</View>
+        </SafeAreaView>
+      </Animated.View>
+    </Modal>
+  );
+}
+
 function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] }) {
   const [local, setLocal] = useState(filters);
   const toggle = (k, v) => setLocal((p) => ({ ...p, [k]: p[k] === v ? '' : v }));
@@ -164,60 +199,43 @@ function ComboFilterSheet({ visible, onClose, filters, onApply, slotLabels = [] 
   const activeCount = [local.offer, local.price, local.items, local.slot].filter(Boolean).length;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <TouchableOpacity style={styles.sheetBackdrop} activeOpacity={1} onPress={onClose} />
-      <View style={styles.sheetCenter} pointerEvents="box-none">
-        <View style={[styles.sheet, styles.comboSheet]}>
-          <View style={[styles.sheetHeader, styles.comboSheetHeader]}>
-            <Text style={[styles.sheetTitle, styles.comboSheetTitle]}>Combo Filters</Text>
-            <View style={styles.sheetHeaderActions}>
-              <TouchableOpacity onPress={() => setLocal(COMBO_DEFAULT_FILTERS)}>
-                <Text style={styles.sheetReset}>Reset all</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onClose} style={styles.sheetCloseBtn} accessibilityLabel="Close filters">
-                <Text style={styles.sheetCloseText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
-            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Deals</Text>
+    <SlidePanel visible={visible} onClose={onClose} title="Combo Filters" onReset={() => setLocal(COMBO_DEFAULT_FILTERS)}>
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+            <Text style={styles.sheetSection}>Deals</Text>
             <View style={styles.chipRow}>
-              <Chip compact label="On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
+              <Chip label="On offer" active={local.offer} onPress={() => setLocal((p) => ({ ...p, offer: !p.offer }))} />
             </View>
 
-            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Price</Text>
+            <Text style={styles.sheetSection}>Price</Text>
             <View style={styles.chipRow}>
               {COMBO_PRICE_OPTS.map((o) => (
-                <Chip compact key={o.value} label={o.label} active={local.price === o.value} onPress={() => toggle('price', o.value)} />
+                <Chip key={o.value} label={o.label} active={local.price === o.value} onPress={() => toggle('price', o.value)} />
               ))}
             </View>
 
-            <Text style={[styles.sheetSection, styles.comboSheetSection]}>Items in combo</Text>
+            <Text style={styles.sheetSection}>Items in combo</Text>
             <View style={styles.chipRow}>
               {COMBO_ITEMS_OPTS.map((o) => (
-                <Chip compact key={o.value} label={o.label} active={local.items === o.value} onPress={() => toggle('items', o.value)} />
+                <Chip key={o.value} label={o.label} active={local.items === o.value} onPress={() => toggle('items', o.value)} />
               ))}
             </View>
 
             {slotLabels.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Includes</Text>
+                <Text style={styles.sheetSection}>Includes</Text>
                 <View style={styles.chipRow}>
                   {slotLabels.map((l) => (
-                    <Chip compact key={l} label={l} active={local.slot === l} onPress={() => toggle('slot', l)} />
+                    <Chip key={l} label={l} active={local.slot === l} onPress={() => toggle('slot', l)} />
                   ))}
                 </View>
               </>
             )}
           </ScrollView>
 
-          <TouchableOpacity style={[styles.applyBtn, styles.comboApplyBtn]} onPress={() => { onApply(local); onClose(); }}>
-            <Text style={[styles.applyBtnText, styles.comboApplyBtnText]}>Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}</Text>
+          <TouchableOpacity style={styles.applyBtn} onPress={() => { onApply(local); onClose(); }}>
+            <Text style={styles.applyBtnText}>Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}</Text>
           </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+    </SlidePanel>
   );
 }
 
@@ -238,33 +256,12 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
   ].filter(Boolean).length;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <TouchableOpacity
-        style={styles.sheetBackdrop}
-        activeOpacity={1}
-        onPress={onClose}
-      />
-
-      <View style={styles.sheetCenter} pointerEvents="box-none">
-        <View style={[styles.sheet, styles.comboSheet]}>
-
-          <View style={[styles.sheetHeader, styles.comboSheetHeader]}>
-            <Text style={[styles.sheetTitle, styles.comboSheetTitle]}>Filters</Text>
-            <View style={styles.sheetHeaderActions}>
-              <TouchableOpacity onPress={() => setLocal({ sub_category: '', material: '', color: '', type: '', age_group: '', offer: false })}>
-                <Text style={styles.sheetReset}>Reset all</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={onClose} style={styles.sheetCloseBtn} accessibilityLabel="Close filters">
-                <Text style={styles.sheetCloseText}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 10 }}>
+    <SlidePanel visible={visible} onClose={onClose} title="Filters" onReset={() => setLocal({ sub_category: '', material: '', color: '', type: '', age_group: '', offer: false })}>
+          <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
 
             {subCats.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Style / Sub Category</Text>
+                <Text style={styles.sheetSection}>Style / Sub Category</Text>
                 <View style={styles.chipRow}>
                   {subCats.map((s) => (
                     <Chip compact
@@ -280,7 +277,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {types.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Type</Text>
+                <Text style={styles.sheetSection}>Type</Text>
                 <SelectDropdown
                   label="Type"
                   options={types}
@@ -292,7 +289,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {materials.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Material</Text>
+                <Text style={styles.sheetSection}>Material</Text>
                 <SelectDropdown
                   label="Material"
                   options={materials}
@@ -304,10 +301,10 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {colors.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Color</Text>
+                <Text style={styles.sheetSection}>Color</Text>
                 <View style={styles.chipRow}>
                   {colors.map((c) => (
-                    <Chip compact key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
+                    <Chip key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
                   ))}
                 </View>
               </>
@@ -315,7 +312,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
             {ageGroups.length > 0 && (
               <>
-                <Text style={[styles.sheetSection, styles.comboSheetSection]}>Age Group</Text>
+                <Text style={styles.sheetSection}>Age Group</Text>
                 <SelectDropdown
                   label="Age Group"
                   options={ageGroups}
@@ -327,14 +324,12 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
 
           </ScrollView>
 
-          <TouchableOpacity style={[styles.applyBtn, styles.comboApplyBtn]} onPress={() => { onApply(local); onClose(); }}>
-            <Text style={[styles.applyBtnText, styles.comboApplyBtnText]}>
+          <TouchableOpacity style={styles.applyBtn} onPress={() => { onApply(local); onClose(); }}>
+            <Text style={styles.applyBtnText}>
               Apply{activeCount > 0 ? ` (${activeCount} active)` : ' Filters'}
             </Text>
           </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+    </SlidePanel>
   );
 }
 
@@ -960,6 +955,18 @@ const styles = StyleSheet.create({
   loadMoreBox: { paddingVertical: 16, alignItems: 'center' },
 
   /* ── Filter sheet ── */
+  /* Full-screen slide-in panel */
+  panel: { ...StyleSheet.absoluteFillObject, backgroundColor: '#FFF8FB' },
+  panelHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 12,
+    borderBottomWidth: 1, borderBottomColor: '#f0c8dc', backgroundColor: '#fff',
+  },
+  panelClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#f3e3ec', alignItems: 'center', justifyContent: 'center' },
+  panelCloseText: { fontSize: 15, fontWeight: '800', color: '#7a2a52', lineHeight: 17 },
+  panelTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: '800', color: '#111' },
+  panelReset: { fontSize: 12.5, fontWeight: '700', color: COLORS.primary },
+  panelBody: { flex: 1, paddingHorizontal: 18, paddingTop: 6 },
   sheetBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.65)',
@@ -1036,9 +1043,10 @@ const styles = StyleSheet.create({
   applyBtn: {
     backgroundColor: COLORS.primary,
     borderRadius: 14,
-    paddingVertical: 14,
+    paddingVertical: 15,
     alignItems: 'center',
-    marginTop: 14,
+    marginTop: 10,
+    marginBottom: 6,
     marginBottom: 18,
   },
   applyBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },

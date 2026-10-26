@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Filters: full-screen panel sliding in from the right
+- `ProductsScreen`: new `SlidePanel` (Modal + `Animated` translateX, 260 ms ease-out in / 220 ms in-cubic out, `SafeAreaView`) with header ✕ · title · Reset all, scrollable body and the Apply button pinned at the bottom. Both `FilterSheet` and `ComboFilterSheet` use it; chips back to regular size. Old centred-sheet styles kept but unused.
+
 ### 2026-10-26 — Filter sheets truly centred
 - `ProductsScreen` `sheetCenter`: absoluteFill → `flex:1` centred container (backdrop stays absolute), so product and combo filter modals open in the middle of the screen on all devices.
 
