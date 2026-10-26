@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Combo size chips in apparel order
+- Mobile `ComboDetailScreen` `sizeOptions` sorted XS → S → M → L → XL → XXL… (unknown/numeric after); web `ComboDetail` variant chips sorted the same way.
+
 ### 2026-10-26 — Combo detail: zoom product images in "Customize Your Combo"
 - `SlotSection` gets `onZoom` (= `setLightbox`): single-product preview image opens the `LightboxViewer` on tap; multi-choice tiles select on tap, zoom via the ⤢ badge or long-press.
 

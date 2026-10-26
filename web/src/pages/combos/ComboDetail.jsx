@@ -99,7 +99,9 @@ export default function ComboDetail() {
             const sel = selection[slot.id];
             const products = slot.products || [];
             const chosen = products.find((p) => p.id === sel?.product_id) || (products.length === 1 ? products[0] : null);
-            const variants = (chosen?.variants || []);
+            const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'XXXL', '4XL', '5XL', 'FREE SIZE'];
+            const rank = (sz) => { const i = SIZE_ORDER.indexOf(String(sz || '').toUpperCase()); return i === -1 ? 100 : i; };
+            const variants = [...(chosen?.variants || [])].sort((a, b) => (rank(a.size) - rank(b.size)) || String(a.size || '').localeCompare(String(b.size || '')) || String(a.color || '').localeCompare(String(b.color || '')));
             return (
               <section key={slot.id} className="card p-5 animate-fade-up">
                 <div className="flex items-center gap-3 mb-4">

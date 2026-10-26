@@ -24,6 +24,17 @@ const ratingOf = (p) => {
 };
 const reviewsOf = (p) => parseInt(p?.review_count, 10) || 0;
 
+// Natural apparel size order (API returns sizes alphabetically: L, M, S, XL, XS)
+const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'XXXL', '4XL', '5XL', 'FREE SIZE', 'FREE'];
+const sizeRank = (sz) => { const i = SIZE_ORDER.indexOf(String(sz || '').trim().toUpperCase()); return i === -1 ? 100 : i; };
+const bySize = (a, b) => {
+  const ra = sizeRank(a), rb = sizeRank(b);
+  if (ra !== rb) return ra - rb;
+  const na = parseFloat(a), nb = parseFloat(b);
+  if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb; // numeric sizes (28, 30, 32…)
+  return String(a).localeCompare(String(b));
+};
+
 function StarRow({ rating }) {
   const r = Math.round(parseFloat(rating) || 0);
   return <Text style={styles.stars}>{'★'.repeat(r)}{'☆'.repeat(Math.max(0, 5 - r))}</Text>;
@@ -49,7 +60,7 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange, onZoom }) 
   // One chip per size. Before a colour is picked a product with Black S + Red S would
   // otherwise list "S" twice; dedupe by size and remember which variant backs each chip.
   const sizePool = variants.filter((v) => v.size && (!chosenColor || v.color === chosenColor));
-  const sizeOptions = [...new Set(sizePool.map((v) => v.size))].map((size) => {
+  const sizeOptions = [...new Set(sizePool.map((v) => v.size))].sort(bySize).map((size) => {
     const inStock = sizePool.find((v) => v.size === size && v.stock > 0);
     return { size, variant: inStock || sizePool.find((v) => v.size === size), inStock: !!inStock };
   });
