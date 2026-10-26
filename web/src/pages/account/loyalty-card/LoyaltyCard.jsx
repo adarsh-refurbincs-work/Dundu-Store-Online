@@ -183,27 +183,13 @@ export default function LoyaltyCard() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black tracking-wide"
-                  style={{
-                    background: '#e6006e',
-                    border: '1px solid #ff66b2',
-                    color: '#ffffff',
-                    boxShadow: '0 0 12px rgba(255, 0, 128, 0.75)',
-                  }}
-                >
-                  <span className="text-white text-[11px]">★</span>
-                  <span className="text-white text-[10px] tracking-wider">SHOP MEMBER</span>
-                </div>
-                <div className="flex items-center" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 20, 147, 0.6))' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="5" cy="12" r="1.6" fill="#ffffff" />
-                    <path d="M9.5 7.5 C12.2 9.8 12.2 14.2 9.5 16.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
-                    <path d="M14 4.5 C18 8.5 18 15.5 14 19.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
-                    <path d="M18.5 2 C23.5 7 23.5 17 18.5 22" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" opacity="0.85" />
-                  </svg>
-                </div>
+              <div className="flex items-center" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 20, 147, 0.6))' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <circle cx="5" cy="12" r="1.6" fill="#ffffff" />
+                  <path d="M9.5 7.5 C12.2 9.8 12.2 14.2 9.5 16.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+                  <path d="M14 4.5 C18 8.5 18 15.5 14 19.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+                  <path d="M18.5 2 C23.5 7 23.5 17 18.5 22" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" opacity="0.85" />
+                </svg>
               </div>
             </div>
 

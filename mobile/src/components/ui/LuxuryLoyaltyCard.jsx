@@ -133,10 +133,6 @@ export default function LuxuryLoyaltyCard({
         </View>
 
         <View style={styles.topRightGroup}>
-          <View style={styles.memberPill}>
-            <Text style={styles.memberPillStar}>★</Text>
-            <Text style={styles.memberPillText}>SHOP MEMBER</Text>
-          </View>
           <View style={styles.contactlessWrap}>
             <ContactlessWaves />
           </View>
@@ -312,33 +308,6 @@ const styles = StyleSheet.create({
   topRightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  memberPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e6006e',
-    paddingHorizontal: 11,
-    paddingVertical: 5,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#ff66b2',
-    gap: 5,
-    shadowColor: '#ff007f',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.75,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  memberPillStar: {
-    fontSize: 10.5,
-    color: '#FFFFFF',
-  },
-  memberPillText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: 1,
   },
   contactlessWrap: {
     paddingLeft: 2,
