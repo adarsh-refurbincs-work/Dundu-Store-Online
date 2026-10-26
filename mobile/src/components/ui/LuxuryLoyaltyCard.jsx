@@ -55,7 +55,7 @@ export default function LuxuryLoyaltyCard({
       {/* Decorative ambient subtle glow */}
       <View style={styles.ambientGlow} pointerEvents="none" />
 
-      {/* Row 1: Brand + Shop Member Pill & Contactless */}
+      {/* Row 1: Brand + Contactless */}
       <View style={styles.rowTop}>
         <View style={styles.brandGroup}>
           <View style={styles.sparkleBadge}>
