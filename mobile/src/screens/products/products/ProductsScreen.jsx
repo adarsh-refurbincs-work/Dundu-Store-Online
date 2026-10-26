@@ -700,10 +700,10 @@ export default function ProductsScreen() {
               </TouchableOpacity>
             ))}
             <TouchableOpacity
-              style={[styles.chip, styles.hotChip, comboFilters.offer && styles.hotChipActive]}
+              style={[styles.chip, { backgroundColor: T.surface, borderColor: T.border }, comboFilters.offer && { backgroundColor: T.primary, borderColor: T.primary }]}
               onPress={() => setComboFilters((f) => ({ ...f, offer: !f.offer }))}
             >
-              <Text style={[styles.chipText, styles.hotChipText, comboFilters.offer && styles.chipTextActive]}>Hot Offer</Text>
+              <Text style={[styles.chipText, comboFilters.offer && styles.chipTextActive]}>Hot Offer</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.sortFilterBtn, { borderColor: T.primary, backgroundColor: T.surface }, comboFilterCount > 0 && { backgroundColor: T.tagBg }]}
@@ -794,10 +794,10 @@ export default function ProductsScreen() {
         ))}
         {/* Hot Offer — quick toggle for offer products only */}
         <TouchableOpacity
-          style={[styles.chip, styles.hotChip, offerOnly && styles.hotChipActive]}
+          style={[styles.chip, { backgroundColor: T.surface, borderColor: T.border }, offerOnly && { backgroundColor: T.primary, borderColor: T.primary }]}
           onPress={() => { setOfferOnly((p) => !p); setNewArrivalOnly(false); }}
         >
-          <Text style={[styles.chipText, styles.hotChipText, offerOnly && styles.chipTextActive]}>Hot Offer</Text>
+          <Text style={[styles.chipText, offerOnly && styles.chipTextActive]}>Hot Offer</Text>
         </TouchableOpacity>
 
 

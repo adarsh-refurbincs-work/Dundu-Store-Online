@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Hot Offer chip styled like the sort chips
+- Orange `hotChip*` overrides dropped; Hot Offer uses `T.surface`/`T.border` and `T.primary` when active, same as Newest / Price.
+
 ### 2026-10-26 — Combo size chips in apparel order
 - Mobile `ComboDetailScreen` `sizeOptions` sorted XS → S → M → L → XL → XXL… (unknown/numeric after); web `ComboDetail` variant chips sorted the same way.
 
