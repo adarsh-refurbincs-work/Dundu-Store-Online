@@ -147,7 +147,7 @@ export default function ComboListScreen() {
             festEnabled && { backgroundColor: 'rgba(255,255,255,0.18)', borderColor: 'rgba(255,255,255,0.25)', color: festNavText },
           ]}
           placeholder="Search products, brands..."
-          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : '#666'}
+          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : '#9CA3AF'}
           value={searchText}
           onChangeText={setSearchText}
           onSubmitEditing={handleSearch}
@@ -215,22 +215,22 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: '#FFF0F7',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
+    borderBottomColor: '#FCE7F3',
   },
   searchInput: {
     flex: 1,
-    height: 38,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    fontSize: 13,
-    color: '#f5f5f5',
+    height: 40,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    fontSize: 13.5,
+    color: '#1F2937',
     borderWidth: 1,
-    borderColor: '#2e2e2e',
+    borderColor: '#F9A8D4',
   },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
 
