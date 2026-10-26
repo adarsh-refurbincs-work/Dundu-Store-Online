@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Combo detail: colour circles + product-page size chips
+- `ComboDetailScreen` slot pickers: colour names → 34px colour dots (`COLOR_HEX` map, light colours get a grey ring, ✓ on the selected one), size chips restyled to the `ProductDetailScreen` look (16/9 padding, radius 8). Label still shows the chosen colour name.
+
 ### 2026-10-26 — Hot Offer chip styled like the sort chips
 - Orange `hotChip*` overrides dropped; Hot Offer uses `T.surface`/`T.border` and `T.primary` when active, same as Newest / Price.
 

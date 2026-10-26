@@ -24,6 +24,19 @@ const ratingOf = (p) => {
 };
 const reviewsOf = (p) => parseInt(p?.review_count, 10) || 0;
 
+// Colour name → swatch hex (unknown names: try the name as a CSS colour, else grey)
+const COLOR_HEX = {
+  white: '#FFFFFF', black: '#111111', red: '#E53935', pink: '#F06292', rose: '#E91E63', orange: '#FB8C00',
+  yellow: '#FDD835', green: '#43A047', mint: '#98E6C3', teal: '#00897B', blue: '#1E88E5', 'sky blue': '#4FC3F7',
+  navy: '#1A237E', purple: '#8E24AA', lavender: '#B39DDB', maroon: '#800000', brown: '#6D4C41', beige: '#E8D8C3',
+  cream: '#FFF4DC', grey: '#9E9E9E', gray: '#9E9E9E', charcoal: '#36454F', gold: '#D4AF37', silver: '#C0C0C0',
+  mustard: '#E1AD01', coral: '#FF7F50', peach: '#FFCBA4', indigo: '#3F51B5', olive: '#808000', rust: '#B7410E',
+  ivory: '#FFFFF0', emerald: '#2E8B57', wine: '#722F37', magenta: '#D81B60', turquoise: '#40E0D0', khaki: '#C3B091',
+};
+const CSS_NAMES = new Set(['aqua','azure','bisque','crimson','cyan','fuchsia','lime','linen','orchid','plum','salmon','sienna','tan','tomato','violet','wheat']);
+const swatchFor = (name) => { const k = String(name || '').trim().toLowerCase(); return COLOR_HEX[k] || (CSS_NAMES.has(k) ? k : '#BDBDBD'); };
+const isLightHex = (hex) => { if (!/^#/.test(hex)) return false; const n = parseInt(hex.slice(1), 16); return (((n >> 16) & 255) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 200; };
+
 // Natural apparel size order (API returns sizes alphabetically: L, M, S, XL, XS)
 const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'XXXL', '4XL', '5XL', 'FREE SIZE', 'FREE'];
 const sizeRank = (sz) => { const i = SIZE_ORDER.indexOf(String(sz || '').trim().toUpperCase()); return i === -1 ? 100 : i; };
@@ -188,17 +201,20 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange, onZoom }) 
                 Color: <Text style={styles.variantValue}>{chosenColor || 'Select'}</Text>
               </Text>
               <View style={styles.optionRow}>
-                {colors.map((color) => (
-                  <TouchableOpacity
-                    key={color}
-                    onPress={() => selectColor(color)}
-                    style={[styles.colorChip, chosenColor === color && styles.colorChipActive]}
-                  >
-                    <Text style={[styles.colorChipText, chosenColor === color && styles.colorChipTextActive]}>
-                      {color}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {colors.map((color) => {
+                  const active = chosenColor === color;
+                  const hex = swatchFor(color);
+                  return (
+                    <TouchableOpacity
+                      key={color}
+                      onPress={() => selectColor(color)}
+                      accessibilityLabel={color}
+                      style={[styles.colorDot, { backgroundColor: hex }, isLightHex(hex) && styles.colorDotLight, active && styles.colorDotActive]}
+                    >
+                      {active && <Text style={[styles.colorCheck, isLightHex(hex) && { color: '#111', textShadowColor: 'transparent' }]}>✓</Text>}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
           )}
@@ -779,25 +795,31 @@ const styles = StyleSheet.create({
   variantBlock: {},
   variantLabel: { fontSize: 13, fontWeight: '700', color: '#555', marginBottom: 6 },
   variantValue: { color: COLORS.primary },
-  optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  optionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignItems: 'center' },
 
-  colorChip: {
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
-    borderWidth: 1.5, borderColor: '#e0e0e0', backgroundColor: '#fafafa',
+  /* Colour circles — same as ProductDetailScreen */
+  colorDot: {
+    width: 34, height: 34, borderRadius: 17,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: COLORS.border,
   },
-  colorChipActive: { borderColor: COLORS.primary, backgroundColor: '#fff0f6' },
-  colorChipText: { fontSize: 13, fontWeight: '600', color: '#555' },
-  colorChipTextActive: { color: COLORS.primary, fontWeight: '800' },
+  colorDotLight: { borderColor: '#cfcfcf' },
+  colorDotActive: { borderColor: COLORS.primary, borderWidth: 3 },
+  colorCheck: {
+    color: COLORS.white, fontSize: 15, fontWeight: '800',
+    textShadowColor: '#000', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 3,
+  },
 
+  /* Size chips — same as ProductDetailScreen */
   sizeChip: {
-    width: 48, height: 38, borderRadius: 10, borderWidth: 1.5,
-    borderColor: '#e0e0e0', backgroundColor: '#fafafa',
+    paddingHorizontal: 16, paddingVertical: 9,
+    borderRadius: 8, borderWidth: 1.5, borderColor: COLORS.border, backgroundColor: '#fff',
     alignItems: 'center', justifyContent: 'center',
   },
-  sizeChipActive: { borderColor: COLORS.primary, backgroundColor: COLORS.primary },
+  sizeChipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   sizeChipOOS: { opacity: 0.35 },
-  sizeChipText: { fontSize: 13, fontWeight: '700', color: '#555' },
-  sizeChipTextActive: { color: '#fff' },
+  sizeChipText: { fontSize: 13, fontWeight: '600', color: COLORS.text },
+  sizeChipTextActive: { color: COLORS.white },
 
   noVariantNote: { backgroundColor: '#dcfce7', borderRadius: 10, padding: 8 },
   noVariantNoteText: { fontSize: 12, fontWeight: '700', color: '#16a34a', textAlign: 'center' },
