@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -40,7 +41,8 @@ export default function ProfileScreen() {
   const resetCart = useCartStore((state) => state.resetCart);
   const showPrompt = useLoginPromptStore((s) => s.show);
 
-  const [profile, setProfile] = useState(user || null);
+  const [profileData, setProfile] = useState(user || null);
+  const profile = profileData || user || null;
   const [loading, setLoading] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -52,7 +54,11 @@ export default function ProfileScreen() {
   const [pickerMonth, setPickerMonth] = useState(0);
   const [pickerDay, setPickerDay] = useState(1);
   const [editLoading, setEditLoading] = useState(false);
-  const [loyaltyCard, setLoyaltyCard] = useState(null);
+  // Start with a card built from the cached user so the section paints instantly;
+  // the real card (points, member-since) replaces it as soon as the API answers.
+  const [loyaltyCard, setLoyaltyCard] = useState(() =>
+    user ? { name: user.name, phone: user.phone, points: 0, total_spent: 0, created_at: user.created_at } : null
+  );
   const [addresses, setAddresses] = useState([]);
   const [addrLoading, setAddrLoading] = useState(false);
   const [showAddrForm, setShowAddrForm] = useState(false);
@@ -62,29 +68,35 @@ export default function ProfileScreen() {
   const [showAddressModal, setShowAddressModal] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) fetchProfile();
+    if (!isAuthenticated) return;
+    // Last known card from storage paints before the network answers.
+    AsyncStorage.getItem('dundu_loyalty_card')
+      .then((raw) => { if (raw) setLoyaltyCard((cur) => (cur && cur.id ? cur : JSON.parse(raw))); })
+      .catch(() => {});
+    fetchProfile();
   }, [isAuthenticated]);
 
   async function fetchProfile() {
-    setLoading(true);
-    try {
-      const res = await userApi.getProfile();
-      const p = res.user || res;
+    // Only block the header with a spinner when we have nothing cached to show.
+    if (!profile) setLoading(true);
+    const [profileRes, cardRes] = await Promise.allSettled([userApi.getProfile(), loyaltyApi.myCard()]);
+    let p = profile;
+    if (profileRes.status === 'fulfilled') {
+      p = profileRes.value?.user || profileRes.value;
       setProfile(p);
       updateUser(p);
-      // Fetch loyalty card
-      try {
-        const lRes = await loyaltyApi.myCard();
-        const c = lRes?.card || lRes?.data?.card || null;
-        const needsPhone = !!(lRes?.needs_phone ?? lRes?.data?.needs_phone);
-        // Show the card with the profile name and 0 pts rather than hiding the whole section
-        setLoyaltyCard(c || (needsPhone ? null : { name: p?.name, phone: p?.phone, points: 0, total_spent: 0, created_at: p?.created_at }));
-      } catch (_) {}
-    } catch (err) {
-      // silent — user data from auth store is fallback
-    } finally {
-      setLoading(false);
     }
+    if (cardRes.status === 'fulfilled') {
+      const lRes = cardRes.value;
+      const c = lRes?.card || lRes?.data?.card || null;
+      const needsPhone = !!(lRes?.needs_phone ?? lRes?.data?.needs_phone);
+      // Show the card with the profile name and 0 pts rather than hiding the whole section
+      const next = c || (needsPhone ? null : { name: p?.name, phone: p?.phone, points: 0, total_spent: 0, created_at: p?.created_at });
+      setLoyaltyCard(next);
+      if (next) AsyncStorage.setItem('dundu_loyalty_card', JSON.stringify(next)).catch(() => {});
+      else AsyncStorage.removeItem('dundu_loyalty_card').catch(() => {});
+    }
+    setLoading(false);
   }
 
   function openEdit() {

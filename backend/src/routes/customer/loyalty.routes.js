@@ -15,29 +15,21 @@ router.get('/check', ah(async (req, res) => {
 }));
 
 router.get('/my-card', authenticate, ah(async (req, res) => {
-  const { rows: userRows } = await db.query('SELECT phone, name FROM users WHERE id=$1', [req.user.id]);
-  const phone = (userRows[0]?.phone || '').replace(/\D/g, '');
-  // Cards are keyed by phone (the billing counter looks them up by number).
+  // req.user is already loaded by the auth middleware; cards are keyed by phone
+  // (the billing counter looks them up by number).
+  const phone = (req.user.phone || '').replace(/\D/g, '');
   if (!phone) return ok(res, { card: null, needs_phone: true });
 
-  // Issue the card the first time the member opens it, instead of waiting for a
-  // points-earning order — so name / balance / member-since are always populated.
-  await db.query(
-    `INSERT INTO loyalty_cards (phone, name, points, total_spent)
-     VALUES ($1, $2, 0, 0) ON CONFLICT (phone) DO NOTHING`,
-    [phone, userRows[0]?.name || null]
-  );
+  // One round trip: issue the card on first open (so name / balance / member-since
+  // are always populated), back-fill a missing name, and return the row.
   const { rows } = await db.query(
-    'SELECT id, phone, name, points, total_spent, created_at, updated_at FROM loyalty_cards WHERE phone=$1',
-    [phone]
+    `INSERT INTO loyalty_cards (phone, name, points, total_spent)
+     VALUES ($1, $2, 0, 0)
+     ON CONFLICT (phone) DO UPDATE SET name = COALESCE(loyalty_cards.name, EXCLUDED.name)
+     RETURNING id, phone, name, points, total_spent, created_at, updated_at`,
+    [phone, req.user.name || null]
   );
-  const card = rows[0] || null;
-  // Keep the printed name in step with the profile name when the card was created nameless.
-  if (card && !card.name && userRows[0]?.name) {
-    await db.query('UPDATE loyalty_cards SET name=$1 WHERE id=$2', [userRows[0].name, card.id]);
-    card.name = userRows[0].name;
-  }
-  ok(res, { card, needs_phone: false });
+  ok(res, { card: rows[0] || null, needs_phone: false });
 }));
 
 module.exports = router;

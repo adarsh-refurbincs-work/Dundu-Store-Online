@@ -3,6 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../config';
 
 let logoutCallback = null;
+// In-memory token so every request doesn't pay for two AsyncStorage reads.
+let cachedToken;
+export function setAuthToken(token) { cachedToken = token || null; }
 
 export function setLogoutCallback(fn) {
   logoutCallback = fn;
@@ -19,9 +22,11 @@ const client = axios.create({
 client.interceptors.request.use(
   async (config) => {
     try {
-      const token = (await AsyncStorage.getItem('dundu_token')) || (await AsyncStorage.getItem('velora_token'));
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (cachedToken === undefined) {
+        cachedToken = (await AsyncStorage.getItem('dundu_token')) || (await AsyncStorage.getItem('velora_token')) || null;
+      }
+      if (cachedToken) {
+        config.headers.Authorization = `Bearer ${cachedToken}`;
       }
     } catch (error) {
       // ignore storage errors
@@ -53,6 +58,7 @@ client.interceptors.response.use(
       } catch (e) {
         // ignore
       }
+      cachedToken = null;
       if (logoutCallback) {
         logoutCallback();
       }
