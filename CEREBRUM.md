@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Colour filter swatches
+- `ProductsScreen`: `COLOR_HEX` name→hex map + `ColorChip` (16px swatch dot + name; light swatches get a ring; unknown names grey; Multicolor pink/green ring). Used for the Color section in the filter drawer.
+
 ### 2026-10-26 — Filter drawer: full height, half width, right-anchored
 - `SlidePanel`: now a right drawer (`width = max(260, 50% screen)`, rounded left corners, shadow) over a dimmed backdrop that closes on tap; slide + fade animated in parallel.
 

@@ -34,6 +34,19 @@ const SORT_OPTIONS = [
   { label: 'Price ↓', value: 'price_desc' },
 ];
 
+// Swatch colours for the filter (name → hex). Unknown names fall back to a neutral grey.
+const COLOR_HEX = {
+  white: '#FFFFFF', black: '#111111', red: '#E53935', pink: '#F06292', rose: '#E91E63', orange: '#FB8C00',
+  yellow: '#FDD835', green: '#43A047', mint: '#98E6C3', teal: '#00897B', blue: '#1E88E5', 'sky blue': '#4FC3F7',
+  navy: '#1A237E', purple: '#8E24AA', lavender: '#B39DDB', maroon: '#800000', brown: '#6D4C41', beige: '#E8D8C3',
+  cream: '#FFF4DC', grey: '#9E9E9E', gray: '#9E9E9E', charcoal: '#36454F', gold: '#D4AF37', silver: '#C0C0C0',
+  mustard: '#E1AD01', coral: '#FF7F50', peach: '#FFCBA4', indigo: '#3F51B5', olive: '#808000', rust: '#B7410E',
+  ivory: '#FFFFF0', emerald: '#2E8B57', wine: '#722F37', magenta: '#D81B60', turquoise: '#40E0D0', khaki: '#C3B091',
+  multicolor: 'linear', multi: 'linear',
+};
+const hexFor = (name) => COLOR_HEX[String(name || '').trim().toLowerCase()] || '#BDBDBD';
+const isLight = (hex) => { if (!/^#/.test(hex)) return false; const n = parseInt(hex.slice(1), 16); const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 200; };
+
 const ALL_COLORS = [
   'White', 'Black', 'Red', 'Pink', 'Rose', 'Orange', 'Yellow',
   'Green', 'Mint', 'Teal', 'Blue', 'Sky Blue', 'Navy', 'Purple',
@@ -79,6 +92,18 @@ function FilterIcon({ color = '#fff', size = 15 }) {
 }
 
 /* ── Filter bottom sheet ──────────────────────────────────────────────────── */
+// Colour chip: swatch dot + name, so shoppers can pick by sight
+function ColorChip({ label, active, onPress }) {
+  const hex = hexFor(label);
+  const multi = hex === 'linear';
+  return (
+    <TouchableOpacity style={[styles.fchip, styles.colorChip, active && styles.fchipActive]} onPress={onPress} activeOpacity={0.75}>
+      <View style={[styles.swatch, multi ? styles.swatchMulti : { backgroundColor: hex }, (isLight(hex) || active) && styles.swatchRing]} />
+      <Text style={[styles.fchipText, active && styles.fchipTextActive]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 function Chip({ label, active, onPress, compact = false }) {
   return (
     <TouchableOpacity
@@ -317,7 +342,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
                 <Text style={styles.sheetSection}>Color</Text>
                 <View style={styles.chipRow}>
                   {colors.map((c) => (
-                    <Chip key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
+                    <ColorChip key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
                   ))}
                 </View>
               </>
@@ -1058,6 +1083,10 @@ const styles = StyleSheet.create({
   },
   fchipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   fchipText: { fontSize: 12, color: '#222', fontWeight: '500' },
+  colorChip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingLeft: 8 },
+  swatch: { width: 16, height: 16, borderRadius: 8 },
+  swatchRing: { borderWidth: 1, borderColor: 'rgba(0,0,0,0.25)' },
+  swatchMulti: { backgroundColor: '#E91E8C', borderWidth: 2, borderColor: '#43A047' },
   fchipTextActive: { color: '#fff', fontWeight: '700' },
 
   applyBtn: {
