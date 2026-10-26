@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — One typeface everywhere: Manrope
+- **Mobile**: `expo-font` + `@expo-google-fonts/manrope` (400–800). `App.js` loads them (`useFonts`) and calls `applyGlobalFont()` from `src/theme/typography.js`, which patches `Text.render`/`TextInput.render` to set `fontFamily` = Manrope face chosen from the style's `fontWeight` (and strips `fontWeight`, since Android won't pick bold files for custom fonts). Styles with an explicit non-Manrope `fontFamily` (e.g. monospace member ID) are left alone. No per-screen changes needed.
+- **Web**: `--font-sans` → Manrope (Google Fonts link updated); Playfair Display kept for `.font-display` headings. **Admin**: Manrope link added, body `font-family` → Manrope.
+- After pulling: `cd mobile && npm install` then restart Expo with `-c` (new packages).
+
 ### 2026-10-26 — Web signup/login "silent failure" on the live https site
 - Cause is server-side: the https nginx host proxies `/api` to a non-Dundu/outdated backend (`/api/auth/signup` → 404, foreign login error text), while the Dundu stack on `:8082` is correct. The `'139.59.65.141 undefined undefined 139.59.65.141'` console line is **not** emitted by any Dundu web code (no `console.log` in `web/src`); it comes from that other bundle/app. Fix = nginx `proxy_pass` for `/api/` + `/uploads/` → Dundu backend (`deploy/DIGITALOCEAN.md`).
 - Web hardening: `api/client.js` rejects any response that is not the Dundu envelope `{ success, … }` with a visible "Unexpected response from the server… wrong API" error (+ `[api] unexpected response shape` console error); `Login.jsx`/`Signup.jsx` throw if no `token` is returned, so a wrong backend can never "succeed" silently again.

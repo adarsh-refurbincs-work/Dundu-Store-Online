@@ -39,7 +39,8 @@
         {
           "cameraPermission": "Delivery staff use the camera to scan hub pickup QR codes."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "scheme": "dundu",
     "extra": {
