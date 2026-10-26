@@ -169,19 +169,8 @@ export default function LoyaltyCard() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-extrabold tracking-wide"
-                  style={{
-                    background: 'rgba(99, 102, 241, 0.22)',
-                    border: '1px solid rgba(129, 140, 248, 0.4)',
-                    color: '#c7d2fe',
-                  }}
-                >
-                  <span>★</span>
-                  <span>SHOP MEMBER</span>
-                </div>
-                <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
+              <div className="flex items-center">
+                <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
                   <circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
                   <path d="M9 6.5 C11.8 8.8 11.8 13.2 9 15.5" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
                   <path d="M13 3.8 C17 7.5 17 14.5 13 18.2" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />

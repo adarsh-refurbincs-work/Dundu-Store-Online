@@ -68,12 +68,8 @@ export default function LuxuryLoyaltyCard({
         </View>
 
         <View style={styles.topRightGroup}>
-          <View style={styles.memberPill}>
-            <Text style={styles.memberPillStar}>★</Text>
-            <Text style={styles.memberPillText}>SHOP MEMBER</Text>
-          </View>
           <View style={styles.contactlessWrap}>
-            <Ionicons name="wifi-outline" size={17} color="#c7d2fe" />
+            <Ionicons name="wifi-outline" size={19} color="#c7d2fe" />
           </View>
         </View>
       </View>
@@ -196,28 +192,6 @@ const styles = StyleSheet.create({
   topRightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 7,
-  },
-  memberPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(99, 102, 241, 0.22)',
-    paddingHorizontal: 9,
-    paddingVertical: 4.5,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(129, 140, 248, 0.4)',
-    gap: 4,
-  },
-  memberPillStar: {
-    fontSize: 10,
-    color: '#c7d2fe',
-  },
-  memberPillText: {
-    fontSize: 9.5,
-    fontWeight: '800',
-    color: '#c7d2fe',
-    letterSpacing: 1,
   },
   contactlessWrap: {
     paddingLeft: 2,
