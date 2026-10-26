@@ -215,6 +215,11 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Web signup/login "silent failure" on the live https site
+- Cause is server-side: the https nginx host proxies `/api` to a non-Dundu/outdated backend (`/api/auth/signup` → 404, foreign login error text), while the Dundu stack on `:8082` is correct. The `'139.59.65.141 undefined undefined 139.59.65.141'` console line is **not** emitted by any Dundu web code (no `console.log` in `web/src`); it comes from that other bundle/app. Fix = nginx `proxy_pass` for `/api/` + `/uploads/` → Dundu backend (`deploy/DIGITALOCEAN.md`).
+- Web hardening: `api/client.js` rejects any response that is not the Dundu envelope `{ success, … }` with a visible "Unexpected response from the server… wrong API" error (+ `[api] unexpected response shape` console error); `Login.jsx`/`Signup.jsx` throw if no `token` is returned, so a wrong backend can never "succeed" silently again.
+- Verified (Playwright vs local backend): form signup → session + account; login → session; wrong password → error toast; simulated foreign-backend JSON → visible error, no session. Test account removed.
+
 ### 2026-10-26 — Live site not updating: DigitalOcean droplet deploys from the old repo; footer build marker
 - Production is a **DigitalOcean droplet** (`ssh droplet` → 139.59.65.141), not Render/Vercel. The live storefront bundle has none of the recent fixes (no `orders/quote`, no checkout quote UI) — the server is almost certainly still pulling the **old** GitHub repo `adarsh-techy/Dundu_Store` (dead since the 2026-10-20 move). Redeploy steps: `deploy/DIGITALOCEAN.md`.
 - `web/vite.config.js` defines `__BUILD_ID__` = `<short commit> · <build time UTC>`; `Footer.jsx` prints "Build …" under the copyright so the deployed build can be verified at a glance.

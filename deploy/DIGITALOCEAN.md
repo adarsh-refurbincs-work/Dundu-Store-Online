@@ -25,3 +25,23 @@ sudo systemctl reload nginx
 Confirm the new build is live: the storefront footer shows **`Build <commit> · <time> UTC`**
 (must equal `git rev-parse --short HEAD` on the server), and `POST /api/orders/quote`
 returns 401 (route present) instead of 404.
+
+## Signup / login "silent" on the https site (2026-10-26)
+
+`https://139-59-65-141.sslip.io/api/*` is proxied to a **different / outdated backend**:
+`POST /api/auth/signup` → `404 Route not found`, `GET /api/settings/payment` → 404, and the login
+error text is not Dundu's. The Dundu stack on `:8082` answers all of these correctly.
+
+Fix the https server block so `/api/` and `/uploads/` go to the Dundu backend (the same
+upstream the `:8082` site uses — `docker compose ps` / `ss -ltnp` shows its port), then reload:
+
+```nginx
+location /api/     { proxy_pass http://127.0.0.1:<dundu-backend-port>; proxy_set_header Host $host; proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; proxy_set_header X-Forwarded-Proto $scheme; client_max_body_size 50M; }
+location /uploads/ { proxy_pass http://127.0.0.1:<dundu-backend-port>; proxy_set_header Host $host; }
+```
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+curl -s -X POST https://139-59-65-141.sslip.io/api/auth/signup -H 'Content-Type: application/json' -d '{}'
+# expect a Dundu validation error ({"success":false,"message":"Name is required"}), not 404
+```

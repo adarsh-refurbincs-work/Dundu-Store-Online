@@ -611,48 +611,6 @@ export default function Profile() {
                 </div>
               )}
 
-              {/* Modern Dark Progress Container */}
-              <div
-                className="mt-3 rounded-2xl p-4.5 space-y-2.5"
-                style={{ backgroundColor: '#0D0F16', border: '1px solid #1E2333' }}
-              >
-                <div className="flex justify-between items-center text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <span style={{ color: '#F5D061' }}>★</span>
-                    <span className="font-semibold" style={{ color: '#E5E7EB' }}>Reward Milestone</span>
-                  </div>
-                  <span
-                    className="px-2 py-0.5 rounded text-[10px] font-bold"
-                    style={{
-                      background: 'rgba(245, 208, 97, 0.12)',
-                      border: '1px solid rgba(245, 208, 97, 0.25)',
-                      color: '#F5D061',
-                    }}
-                  >
-                    {200 - pointsAfterRedeem} pts to ₹200
-                  </span>
-                </div>
-
-                <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1C2130' }}>
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{
-                      width: `${progress}%`,
-                      background: 'linear-gradient(90deg, #9b6e1b, #F5D061, #FFF2B2)',
-                      boxShadow: '0 0 10px rgba(245,208,97,0.7)',
-                    }}
-                  />
-                </div>
-
-                <div className="flex justify-between text-xs pt-0.5">
-                  <span style={{ color: '#9CA3AF' }}>{pointsAfterRedeem} / 200 pts earned</span>
-                  <span className="font-bold" style={{ color: '#F5D061' }}>200 pts = ₹200 OFF</span>
-                </div>
-
-                <p className="text-xs text-center pt-1" style={{ color: '#6B7280', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  Earn 20 pts every ₹500 spent · Works in-store & online
-                </p>
-              </div>
             </>
           ) : (
             <div className="card p-8 text-center">

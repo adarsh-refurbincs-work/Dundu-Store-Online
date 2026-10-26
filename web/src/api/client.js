@@ -10,8 +10,19 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+// Every Dundu API success response is an envelope { success, message, data }. Anything else
+// (HTML from a mis-proxied route, another app's JSON) must fail visibly instead of letting
+// screens read `undefined.token` and "succeed" silently.
+const isEnvelope = (body) => body && typeof body === 'object' && 'success' in body;
+
 client.interceptors.response.use(
-  (res) => res.data,
+  (res) => {
+    if (!isEnvelope(res.data)) {
+      console.error('[api] unexpected response shape from', res.config?.baseURL, res.config?.url, '— is the storefront pointed at the right backend?', res.data);
+      return Promise.reject({ message: 'Unexpected response from the server. The storefront may be pointed at the wrong API.' });
+    }
+    return res.data;
+  },
   (err) => {
     if (err.response?.status === 401) {
       const isAuthEndpoint = err.config?.url?.includes('/auth/');

@@ -28,6 +28,7 @@ export default function Signup() {
     setLoading(true);
     try {
       const res = await authApi.signup({ ...form, phone: form.phone ? '+91' + form.phone : '' });
+      if (!res?.data?.token) throw { message: res?.message || 'Signup did not return a session. Please try again.' };
       setToken(res.data.token);
       setUser(res.data.user);
       await fetchCart();

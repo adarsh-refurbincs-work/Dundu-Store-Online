@@ -25,6 +25,7 @@ export default function Login() {
   const [otp, setOtp] = useState('');
 
   const finish = async (res) => {
+    if (!res?.data?.token) throw { message: res?.message || 'Login did not return a session. Please try again.' };
     setToken(res.data.token);
     setUser(res.data.user);
     await fetchCart();
