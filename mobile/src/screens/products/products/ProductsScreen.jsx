@@ -162,19 +162,32 @@ export const comboEffectivePrice = (c) => {
 /* ── Full-screen filter panel that slides in from the right ───────────────── */
 function SlidePanel({ visible, onClose, title, onReset, children }) {
   const [shown, setShown] = useState(visible);
-  const x = useRef(new Animated.Value(SCREEN_WIDTH)).current;
+  // Right-side drawer: full height, half the screen width (min 260 so chips stay usable)
+  const panelWidth = Math.max(260, Math.round(SCREEN_WIDTH * 0.5));
+  const x = useRef(new Animated.Value(panelWidth)).current;
+  const dim = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     if (visible) {
       setShown(true);
-      Animated.timing(x, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+      Animated.parallel([
+        Animated.timing(x, { toValue: 0, duration: 260, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(dim, { toValue: 1, duration: 260, useNativeDriver: true }),
+      ]).start();
     } else if (shown) {
-      Animated.timing(x, { toValue: SCREEN_WIDTH, duration: 220, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(() => setShown(false));
+      Animated.parallel([
+        Animated.timing(x, { toValue: panelWidth, duration: 220, easing: Easing.in(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(dim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      ]).start(() => setShown(false));
     }
   }, [visible]);
   if (!shown) return null;
   return (
     <Modal visible transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-      <Animated.View style={[styles.panel, { transform: [{ translateX: x }] }]}>
+      {/* dimmed backdrop — tap to close */}
+      <Animated.View style={[styles.panelBackdrop, { opacity: dim }]}>
+        <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
+      </Animated.View>
+      <Animated.View style={[styles.panel, { width: panelWidth, transform: [{ translateX: x }] }]}>
         <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
           <View style={styles.panelHeader}>
             <TouchableOpacity onPress={onClose} style={styles.panelClose} accessibilityLabel="Close filters" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
@@ -956,17 +969,24 @@ const styles = StyleSheet.create({
 
   /* ── Filter sheet ── */
   /* Full-screen slide-in panel */
-  panel: { ...StyleSheet.absoluteFillObject, backgroundColor: '#FFF8FB' },
+  panelBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.45)' },
+  panel: {
+    position: 'absolute', top: 0, bottom: 0, right: 0,
+    backgroundColor: '#FFF8FB',
+    borderTopLeftRadius: 18, borderBottomLeftRadius: 18,
+    shadowColor: '#000', shadowOffset: { width: -4, height: 0 }, shadowOpacity: 0.25, shadowRadius: 12, elevation: 16,
+  },
   panelHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 12,
+    paddingHorizontal: 12, paddingVertical: 12,
     borderBottomWidth: 1, borderBottomColor: '#f0c8dc', backgroundColor: '#fff',
+    borderTopLeftRadius: 18,
   },
   panelClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#f3e3ec', alignItems: 'center', justifyContent: 'center' },
   panelCloseText: { fontSize: 15, fontWeight: '800', color: '#7a2a52', lineHeight: 17 },
-  panelTitle: { flex: 1, textAlign: 'center', fontSize: 16, fontWeight: '800', color: '#111' },
-  panelReset: { fontSize: 12.5, fontWeight: '700', color: COLORS.primary },
-  panelBody: { flex: 1, paddingHorizontal: 18, paddingTop: 6 },
+  panelTitle: { flex: 1, textAlign: 'center', fontSize: 15, fontWeight: '800', color: '#111' },
+  panelReset: { fontSize: 11.5, fontWeight: '700', color: COLORS.primary },
+  panelBody: { flex: 1, paddingHorizontal: 12, paddingTop: 6 },
   sheetBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.65)',
