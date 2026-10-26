@@ -678,3 +678,4 @@ Verified with a 22-check smoke test on an isolated database (all pass, no server
 | Editing an item returns 404 "is in Trash" | Restore it from System → Trash first; the six admin routers block reads/edits of trashed rows |
 | Deleted item still missing / "not found" after delete | It is in Trash (`deleted_at`). Restore from System → Trash or `POST /admin/trash/:type/:id/restore` |
 | CORS error in browser | Origin not in `WEB_CLIENT_URL`/`ADMIN_CLIENT_URL`; in dev leave both unset to allow all |
+- 2026-10-26: Mobile loyalty card (LuxuryLoyaltyCard) base changed from black to light pink (#ffe4ef); white text/contactless icon switched to near-black, points box to translucent white, glow softened.

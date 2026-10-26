@@ -23,22 +23,22 @@ function EmvChip() {
 function ContactlessWaves() {
   return (
     <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-      <Circle cx="5" cy="12" r="1.6" fill="#ffffff" />
+      <Circle cx="5" cy="12" r="1.6" fill="#1a0a12" />
       <Path
         d="M9.5 7.5 C12.2 9.8 12.2 14.2 9.5 16.5"
-        stroke="#ffffff"
+        stroke="#1a0a12"
         strokeWidth="2.2"
         strokeLinecap="round"
       />
       <Path
         d="M14 4.5 C18 8.5 18 15.5 14 19.5"
-        stroke="#ffffff"
+        stroke="#1a0a12"
         strokeWidth="2.2"
         strokeLinecap="round"
       />
       <Path
         d="M18.5 2 C23.5 7 23.5 17 18.5 22"
-        stroke="#ffffff"
+        stroke="#1a0a12"
         strokeWidth="2.2"
         strokeLinecap="round"
         strokeOpacity={0.85}
@@ -164,7 +164,7 @@ export default function LuxuryLoyaltyCard({
 const styles = StyleSheet.create({
   cardContainer: {
     borderRadius: 26,
-    backgroundColor: '#070208',
+    backgroundColor: '#ffe4ef',
     borderWidth: 2,
     borderColor: '#ff1493',
     paddingHorizontal: 20,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     shadowColor: '#ff1493',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.7,
+    shadowOpacity: 0.35,
     shadowRadius: 18,
     elevation: 10,
   },
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#1a0a12',
     letterSpacing: 1.4,
   },
   topRightGroup: {
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
 
   /* Clean Borderless Points Box */
   pointsBox: {
-    backgroundColor: 'rgba(12, 4, 11, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
     borderRadius: 16,
     paddingVertical: 6,
     paddingHorizontal: 14,
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
   pointsNumber: {
     fontSize: 21,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#1a0a12',
     letterSpacing: 0.5,
   },
   ptsLabel: {
@@ -370,9 +370,9 @@ const styles = StyleSheet.create({
   cardNumberText: {
     fontSize: 19,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#1a0a12',
     letterSpacing: 2,
-    textShadowColor: 'rgba(255, 20, 147, 0.55)',
+    textShadowColor: 'rgba(255, 20, 147, 0.25)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 8,
   },
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   cardholderName: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#1a0a12',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   sinceYear: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: '#1a0a12',
     letterSpacing: 0.8,
     textAlign: 'right',
   },
