@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Combo detail: zoom product images in "Customize Your Combo"
+- `SlotSection` gets `onZoom` (= `setLightbox`): single-product preview image opens the `LightboxViewer` on tap; multi-choice tiles select on tap, zoom via the ⤢ badge or long-press.
+
 ### 2026-10-26 — Filter: Type / Material / Age Group as swipeable chip rows
 - `ChipScroller` (horizontal ScrollView of `Chip`s with an "All" first chip; tap again to clear) replaces `SelectDropdown` for those three sections in `FilterSheet`. `SelectDropdown` kept in the file (unused by the sheet).
 

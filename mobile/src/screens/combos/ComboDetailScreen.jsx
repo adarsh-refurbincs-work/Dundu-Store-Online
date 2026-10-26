@@ -38,7 +38,7 @@ function getImageUri(src) {
 }
 
 // ── Slot Section ──────────────────────────────────────────────────────────────
-function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
+function SlotSection({ slot, slotIndex, selection, onSelectionChange, onZoom }) {
   const hasMultipleProducts = slot.products && slot.products.length > 1;
   const chosenProductId = selection?.product_id || slot.products?.[0]?.id;
   const chosenProduct = slot.products?.find((p) => p.id === chosenProductId) || slot.products?.[0];
@@ -111,10 +111,18 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
                 <TouchableOpacity
                   style={[styles.productChoice, isChosen && styles.productChoiceActive]}
                   onPress={() => selectProduct(prod)}
+                  onLongPress={() => uri && onZoom?.(uri)}
                   activeOpacity={0.8}
                 >
                   {uri
-                    ? <Image source={{ uri }} style={styles.productChoiceImage} resizeMode="cover" />
+                    ? (
+                      <View style={{ position: 'relative' }}>
+                        <Image source={{ uri }} style={styles.productChoiceImage} resizeMode="cover" />
+                        <TouchableOpacity style={styles.zoomBadge} onPress={() => onZoom?.(uri)} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }} accessibilityLabel="Zoom image">
+                          <Text style={styles.zoomBadgeText}>⤢</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )
                     : <View style={styles.productChoiceImageFallback}><Text style={{ fontSize: 22 }}>👗</Text></View>
                   }
                   <Text style={[styles.productChoiceName, isChosen && styles.productChoiceNameActive]} numberOfLines={2}>
@@ -135,7 +143,12 @@ function SlotSection({ slot, slotIndex, selection, onSelectionChange }) {
       {!hasMultipleProducts && chosenProduct && (
         <View style={styles.singleProductRow}>
           {productUri
-            ? <Image source={{ uri: productUri }} style={styles.singleProductImage} resizeMode="cover" />
+            ? (
+              <TouchableOpacity onPress={() => onZoom?.(productUri)} activeOpacity={0.85} accessibilityLabel="Zoom image">
+                <Image source={{ uri: productUri }} style={styles.singleProductImage} resizeMode="cover" />
+                <View style={[styles.zoomBadge, { right: 4, bottom: 4, top: undefined, left: undefined }]}><Text style={styles.zoomBadgeText}>⤢</Text></View>
+              </TouchableOpacity>
+            )
             : <View style={[styles.singleProductImage, { backgroundColor: '#fce4f4', alignItems: 'center', justifyContent: 'center' }]}><Text style={{ fontSize: 22 }}>👗</Text></View>
           }
           <View style={{ flex: 1 }}>
@@ -525,6 +538,7 @@ export default function ComboDetailScreen() {
               slotIndex={i}
               selection={selections[i]}
               onSelectionChange={(sel) => handleSelectionChange(i, sel)}
+              onZoom={setLightbox}
             />
           ))}
         </View>
@@ -623,6 +637,9 @@ const styles = StyleSheet.create({
   savingsText: { fontSize: 12, fontWeight: '600', color: '#15803d', marginTop: 6 },
   savingsAmount: { color: '#15803d', fontWeight: '800' },
   savingsRegular: { color: '#dc2626', fontWeight: '700' },
+
+  zoomBadge: { position: 'absolute', top: 4, left: 4, width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center' },
+  zoomBadgeText: { color: '#fff', fontSize: 11, fontWeight: '800', lineHeight: 13 },
 
   /* Ratings */
   ratingText: { color: '#F6A800', fontWeight: '800' },
