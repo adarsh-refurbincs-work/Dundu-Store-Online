@@ -104,6 +104,18 @@ function ColorChip({ label, active, onPress }) {
   );
 }
 
+// Horizontal, swipeable chip row for single-select lists (Type / Material / Age Group)
+function ChipScroller({ options = [], value, onChange, allLabel = 'All' }) {
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipScroller} style={styles.chipScrollerWrap}>
+      <Chip label={allLabel} active={!value} onPress={() => onChange('')} />
+      {options.map((opt) => (
+        <Chip key={opt} label={opt} active={value === opt} onPress={() => onChange(value === opt ? '' : opt)} />
+      ))}
+    </ScrollView>
+  );
+}
+
 function Chip({ label, active, onPress, compact = false }) {
   return (
     <TouchableOpacity
@@ -316,8 +328,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {types.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Type</Text>
-                <SelectDropdown
-                  label="Type"
+                <ChipScroller
                   options={types}
                   value={local.type}
                   onChange={(v) => setLocal((p) => ({ ...p, type: v }))}
@@ -328,8 +339,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {materials.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Material</Text>
-                <SelectDropdown
-                  label="Material"
+                <ChipScroller
                   options={materials}
                   value={local.material}
                   onChange={(v) => setLocal((p) => ({ ...p, material: v }))}
@@ -351,8 +361,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {ageGroups.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Age Group</Text>
-                <SelectDropdown
-                  label="Age Group"
+                <ChipScroller
                   options={ageGroups}
                   value={local.age_group}
                   onChange={(v) => setLocal((p) => ({ ...p, age_group: v }))}
@@ -1083,6 +1092,8 @@ const styles = StyleSheet.create({
   },
   fchipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   fchipText: { fontSize: 12, color: '#222', fontWeight: '500' },
+  chipScrollerWrap: { marginHorizontal: -12, marginBottom: 6 },
+  chipScroller: { paddingHorizontal: 12, gap: 8, alignItems: 'center' },
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8, marginBottom: 6 },
   colorChip: { width: '31.5%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8, paddingVertical: 7 },
   colorChipText: { fontSize: 10.5, flexShrink: 1 },

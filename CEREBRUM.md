@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Filter: Type / Material / Age Group as swipeable chip rows
+- `ChipScroller` (horizontal ScrollView of `Chip`s with an "All" first chip; tap again to clear) replaces `SelectDropdown` for those three sections in `FilterSheet`. `SelectDropdown` kept in the file (unused by the sheet).
+
 ### 2026-10-26 — Colour filter: 3-per-row grid, smaller labels
 - `colorGrid` (wrap, space-between, rowGap 8) with `colorChip` width 31.5%, 14px swatch, 10.5px single-line label.
 
