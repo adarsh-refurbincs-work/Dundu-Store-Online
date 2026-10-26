@@ -118,68 +118,97 @@ export default function LoyaltyCard() {
             </span>
           </div>
 
-          {/* ── The Dundu Online Rewards Card matching mobile screenshot ── */}
+          {/* ── The Dundu Online Rewards Card matching reference design ── */}
           <div
             className="relative rounded-[28px] overflow-hidden select-none transition-all duration-300 hover:scale-[1.01]"
             style={{
-              background: 'linear-gradient(145deg, #161c3b 0%, #11152e 45%, #0d1024 100%)',
+              background: '#070208',
               padding: '26px 28px 24px',
               minHeight: '228px',
-              border: '1.5px solid rgba(129, 140, 248, 0.35)',
-              boxShadow: '0 20px 42px -10px rgba(0,0,0,0.7), 0 0 22px rgba(99, 102, 241, 0.12)',
+              border: '2px solid #ff1493',
+              boxShadow: '0 0 35px rgba(255, 20, 147, 0.5), 0 0 65px rgba(255, 20, 147, 0.2), 0 20px 42px rgba(0,0,0,0.9)',
             }}
           >
-            {/* Soft ambient lighting glow */}
+            {/* Neon Curved Swooshes & Ambient Glow */}
             <div
               style={{
                 position: 'absolute', top: '-40px', left: '-30px',
                 width: '260px', height: '260px', borderRadius: '50%', pointerEvents: 'none',
-                background: 'radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%)',
+                background: 'radial-gradient(circle, rgba(255, 20, 147, 0.25) 0%, transparent 70%)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute', left: '-100px', top: '-40px',
+                width: '340px', height: '340px', borderRadius: '50%', pointerEvents: 'none',
+                border: '2px solid rgba(255, 20, 147, 0.75)',
+                background: 'rgba(255, 20, 147, 0.07)',
+                boxShadow: '0 0 22px rgba(255, 20, 147, 0.35)',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute', right: '-90px', bottom: '-100px',
+                width: '290px', height: '290px', borderRadius: '50%', pointerEvents: 'none',
+                border: '2px solid rgba(255, 20, 147, 0.75)',
+                background: 'rgba(255, 20, 147, 0.08)',
+                boxShadow: '0 0 22px rgba(255, 20, 147, 0.35)',
               }}
             />
 
-            {/* Row 1: Brand with Sparkle Badge + App Member Pill & Waves */}
-            <div className="relative flex items-center justify-between mb-4">
+            {/* Row 1: Brand with Sparkle Badge + Shop Member Pill & Waves */}
+            <div className="relative flex items-center justify-between mb-4 z-10">
               <div className="flex items-center gap-3">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                   style={{
-                    backgroundColor: '#1b2247',
-                    border: '1.2px solid rgba(129, 140, 248, 0.45)',
+                    backgroundColor: '#1b0212',
+                    border: '1.5px solid #ff1493',
+                    boxShadow: '0 0 10px rgba(255, 20, 147, 0.75)',
                   }}
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M12 2 C12 7.5 7.5 12 2 12 C7.5 12 12 16.5 12 22 C12 16.5 16.5 12 22 12 C17 12 12 7.5 12 2 Z"
-                      stroke="#c7d2fe"
-                      strokeWidth="1.9"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="18.5" cy="5.5" r="1.4" fill="#c7d2fe" />
-                    <circle cx="5.5" cy="18.5" r="1.1" fill="#c7d2fe" />
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 4 C12 8.5 8.5 12 4 12 C8.5 12 12 15.5 12 20 C12 15.5 15.5 12 20 12 C15.5 12 12 8.5 12 4 Z" />
+                    <path d="M5.5 4 C5.5 5.5 4.5 6.5 3 6.5 C4.5 6.5 5.5 7.5 5.5 9 C5.5 7.5 6.5 6.5 8 6.5 C6.5 6.5 5.5 5.5 5.5 4 Z" />
+                    <path d="M19 15 C19 16.2 18.2 17 17 17 C18.2 17 19 17.8 19 19 C19 17.8 19.8 17 21 17 C19.8 17 19 16.2 19 15 Z" />
                   </svg>
                 </div>
                 <div>
                   <p className="text-white font-black text-lg tracking-wider leading-none">
                     DUNDU ONLINE
                   </p>
-                  <p className="text-[10px] font-bold text-indigo-300 tracking-[2px] uppercase mt-1">
+                  <p className="text-[10px] font-extrabold text-[#ff2a8d] tracking-[2px] uppercase mt-1">
                     STORE REWARDS CLUB
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center">
-                <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-                  <circle cx="5" cy="11" r="1.6" fill="#c7d2fe" />
-                  <path d="M9 6.5 C11.8 8.8 11.8 13.2 9 15.5" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
-                  <path d="M13 3.8 C17 7.5 17 14.5 13 18.2" stroke="#c7d2fe" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black tracking-wide"
+                  style={{
+                    background: '#e6006e',
+                    border: '1px solid #ff66b2',
+                    color: '#ffffff',
+                    boxShadow: '0 0 12px rgba(255, 0, 128, 0.75)',
+                  }}
+                >
+                  <span className="text-white text-[11px]">★</span>
+                  <span className="text-white text-[10px] tracking-wider">SHOP MEMBER</span>
+                </div>
+                <div className="flex items-center" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 20, 147, 0.6))' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="5" cy="12" r="1.6" fill="#ffffff" />
+                    <path d="M9.5 7.5 C12.2 9.8 12.2 14.2 9.5 16.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+                    <path d="M14 4.5 C18 8.5 18 15.5 14 19.5" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" />
+                    <path d="M18.5 2 C23.5 7 23.5 17 18.5 22" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" opacity="0.85" />
+                  </svg>
+                </div>
               </div>
             </div>
 
             {/* Row 2: Chip + Points Only Box */}
-            <div className="relative flex items-center justify-between my-3">
+            <div className="relative flex items-center justify-between my-3 z-10">
               {/* Realistic Gold EMV Chip */}
               <div
                 style={{
@@ -188,7 +217,7 @@ export default function LoyaltyCard() {
                   background: 'linear-gradient(135deg, #ffd84d 0%, #f59e0b 45%, #d97706 100%)',
                   borderRadius: '7px',
                   border: '1.2px solid #b45309',
-                  boxShadow: '0 4px 10px rgba(0,0,0,0.5)',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.6)',
                   padding: '3px',
                   display: 'flex',
                   alignItems: 'center',
@@ -228,53 +257,66 @@ export default function LoyaltyCard() {
                 </div>
               </div>
 
-              {/* Clean Points Box (No ≈ or cash value) */}
+              {/* Clean Points Box with Neon Pink Border */}
               <div
-                className="px-4 py-2 rounded-xl flex items-center gap-1.5"
+                className="px-4 py-2 rounded-2xl flex items-center gap-1.5"
                 style={{
-                  background: 'rgba(11, 15, 33, 0.9)',
-                  border: '1.2px solid rgba(99, 102, 241, 0.35)',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                  background: 'rgba(12, 4, 11, 0.95)',
+                  border: '2px solid #ff1493',
+                  boxShadow: '0 0 16px rgba(255, 20, 147, 0.8), 0 4px 12px rgba(0,0,0,0.5)',
                 }}
               >
                 <span className="text-amber-400 text-sm">★</span>
                 <span className="text-white font-black text-xl leading-none">
                   {card.points}
                 </span>
-                <span className="text-slate-400 font-bold text-xs tracking-wider ml-1">
+                <span className="text-[#ff2a8d] font-black text-xs tracking-wider ml-1">
                   PTS
                 </span>
               </div>
             </div>
 
-            {/* Row 3: Complete 16-Digit Card Number */}
-            <div className="relative my-3">
-              <p className="text-white font-mono font-bold text-lg tracking-[3.5px] leading-none">
-                {(() => {
-                  const full16 = ('4892' + (rawPhone || '882049183210')).padEnd(16, '9').slice(0, 16);
-                  return `${full16.slice(0, 4)}   ${full16.slice(4, 8)}   ${full16.slice(8, 12)}   ${full16.slice(12, 16)}`;
-                })()}
-              </p>
+            {/* Row 3: Complete 16-Digit Card Number (4 Groups Evenly Spaced) */}
+            <div className="relative my-3 flex items-center justify-between z-10 px-1">
+              {(() => {
+                const full16 = ('4892' + (rawPhone || '919846333075')).padEnd(16, '9').slice(0, 16);
+                const groups = [full16.slice(0, 4), full16.slice(4, 8), full16.slice(8, 12), full16.slice(12, 16)];
+                return groups.map((g, i) => (
+                  <span
+                    key={i}
+                    className="text-white font-black text-lg sm:text-xl tracking-wider leading-none"
+                    style={{ textShadow: '0 0 10px rgba(255, 20, 147, 0.6)' }}
+                  >
+                    {g}
+                  </span>
+                ));
+              })()}
             </div>
 
-            {/* Thin Divider Line */}
-            <div className="my-2.5 h-[1px] bg-white/10" />
+            {/* Thin Glowing Neon Pink Divider Line */}
+            <div
+              className="my-2.5 h-[1.2px] z-10"
+              style={{
+                backgroundColor: 'rgba(255, 20, 147, 0.65)',
+                boxShadow: '0 0 6px rgba(255, 20, 147, 0.6)',
+              }}
+            />
 
             {/* Row 4: Cardholder + Member Since */}
-            <div className="relative flex items-end justify-between pt-1">
+            <div className="relative flex items-end justify-between pt-1 z-10">
               <div>
-                <p className="text-[8.5px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
+                <p className="text-[8.5px] font-black text-[#ff2a8d] tracking-[1.8px] uppercase mb-1">
                   CARDHOLDER
                 </p>
                 <p className="text-white font-black text-sm tracking-wider uppercase">
-                  {(card.name || user?.name || 'ADARSH SHARMA').slice(0, 24)}
+                  {(card.name || user?.name || 'DEVU').slice(0, 24)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[8.5px] font-bold text-indigo-400 tracking-[1.8px] uppercase mb-1">
+                <p className="text-[8.5px] font-black text-[#ff2a8d] tracking-[1.8px] uppercase mb-1 text-right">
                   MEMBER SINCE
                 </p>
-                <p className="text-white font-black text-sm tracking-wider">
+                <p className="text-white font-black text-sm tracking-wider text-right">
                   {memberYear}
                 </p>
               </div>
