@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Filter: Type & Material as vertical scroll lists
+- `OptionList` (bordered box, maxHeight 190, nested vertical ScrollView, rows with ✓, "All" first, tap again clears) replaces the horizontal `ChipScroller` for Type and Material; Age Group keeps the horizontal chips.
+
 ### 2026-10-26 — Combo detail: colour circles + product-page size chips
 - `ComboDetailScreen` slot pickers: colour names → 34px colour dots (`COLOR_HEX` map, light colours get a grey ring, ✓ on the selected one), size chips restyled to the `ProductDetailScreen` look (16/9 padding, radius 8). Label still shows the chosen colour name.
 

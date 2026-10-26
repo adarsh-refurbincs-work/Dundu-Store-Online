@@ -116,6 +116,32 @@ function ChipScroller({ options = [], value, onChange, allLabel = 'All' }) {
   );
 }
 
+// Vertical, scrollable option list (Type / Material): bounded height, scrolls inside the drawer
+function OptionList({ options = [], value, onChange, allLabel = 'All' }) {
+  const rows = [allLabel, ...options];
+  return (
+    <View style={styles.optionListBox}>
+      <ScrollView nestedScrollEnabled showsVerticalScrollIndicator persistentScrollbar style={{ maxHeight: 190 }}>
+        {rows.map((opt, i) => {
+          const isAll = i === 0;
+          const active = isAll ? !value : value === opt;
+          return (
+            <TouchableOpacity
+              key={opt}
+              style={[styles.optionRow, i < rows.length - 1 && styles.optionRowDivider, active && styles.optionRowActive]}
+              onPress={() => onChange(isAll || value === opt ? '' : opt)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.optionRowText, active && styles.optionRowTextActive]} numberOfLines={1}>{opt}</Text>
+              {active && <Text style={styles.optionRowCheck}>✓</Text>}
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
 function Chip({ label, active, onPress, compact = false }) {
   return (
     <TouchableOpacity
@@ -328,7 +354,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {types.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Type</Text>
-                <ChipScroller
+                <OptionList
                   options={types}
                   value={local.type}
                   onChange={(v) => setLocal((p) => ({ ...p, type: v }))}
@@ -339,7 +365,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {materials.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Material</Text>
-                <ChipScroller
+                <OptionList
                   options={materials}
                   value={local.material}
                   onChange={(v) => setLocal((p) => ({ ...p, material: v }))}
@@ -1092,6 +1118,13 @@ const styles = StyleSheet.create({
   },
   fchipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   fchipText: { fontSize: 12, color: '#222', fontWeight: '500' },
+  optionListBox: { borderWidth: 1, borderColor: '#f0c8dc', borderRadius: 12, backgroundColor: '#fff', overflow: 'hidden', marginBottom: 6 },
+  optionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 12, paddingVertical: 10 },
+  optionRowDivider: { borderBottomWidth: 1, borderBottomColor: '#f6e6ee' },
+  optionRowActive: { backgroundColor: '#fff0f6' },
+  optionRowText: { fontSize: 12.5, color: '#222', fontWeight: '500', flex: 1 },
+  optionRowTextActive: { color: COLORS.primary, fontWeight: '700' },
+  optionRowCheck: { color: COLORS.primary, fontSize: 13, fontWeight: '800', marginLeft: 8 },
   chipScrollerWrap: { marginHorizontal: -12, marginBottom: 6 },
   chipScroller: { paddingHorizontal: 12, gap: 8, alignItems: 'center' },
   colorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8, marginBottom: 6 },
