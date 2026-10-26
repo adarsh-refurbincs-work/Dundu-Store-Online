@@ -57,8 +57,8 @@ export default function StockCheck() {
     const t = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 350);
     return () => clearTimeout(t);
   }, [search]);
-  const changeFilter = (v) => { changeFilter(v); setPage(1); };
-  const changeSort = (v) => { changeSort(v); setPage(1); };
+  const changeFilter = (v) => { setFilter(v); setPage(1); };
+  const changeSort = (v) => { setSort(v); setPage(1); };
 
   const params = { page, limit: PAGE_SIZE, filter, sort, search: debouncedSearch || undefined };
   const { data, isLoading, isFetching, refetch } = useQuery({
