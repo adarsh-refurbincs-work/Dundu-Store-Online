@@ -159,9 +159,6 @@ export default function LuxuryLoyaltyCard({
         <Text style={styles.cardNumberText}>{g4}</Text>
       </View>
 
-      {/* ── Thin Glowing Neon Pink Divider Line ── */}
-      <View style={styles.cardDivider} />
-
       {/* ── Row 4: Cardholder + Member Since ── */}
       <View style={styles.rowBottom}>
         <View style={styles.cardholderCol}>
@@ -379,22 +376,15 @@ const styles = StyleSheet.create({
     borderColor: '#92400e',
   },
 
-  /* Glowing Neon Pink Points Box */
+  /* Clean Borderless Points Box */
   pointsBox: {
-    backgroundColor: 'rgba(12, 4, 11, 0.95)',
+    backgroundColor: 'rgba(12, 4, 11, 0.65)',
     borderRadius: 16,
-    borderWidth: 2,
-    borderColor: '#ff1493',
     paddingVertical: 6,
-    paddingHorizontal: 15,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#ff1493',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
-    shadowRadius: 10,
-    elevation: 5,
   },
   starIcon: {
     fontSize: 16,
@@ -421,7 +411,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 4,
-    marginVertical: 3,
+    marginVertical: 4,
     zIndex: 2,
   },
   cardNumberText: {
@@ -432,19 +422,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(255, 20, 147, 0.55)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 8,
-  },
-
-  /* Thin Glowing Neon Pink Divider Line */
-  cardDivider: {
-    height: 1.2,
-    backgroundColor: 'rgba(255, 20, 147, 0.65)',
-    marginTop: 4,
-    marginBottom: 6,
-    shadowColor: '#ff1493',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 4,
-    zIndex: 2,
   },
 
   /* Row 4: Cardholder + Member Since */

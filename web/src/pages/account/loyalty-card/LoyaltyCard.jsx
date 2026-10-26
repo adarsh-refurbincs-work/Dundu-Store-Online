@@ -243,13 +243,11 @@ export default function LoyaltyCard() {
                 </div>
               </div>
 
-              {/* Clean Points Box with Neon Pink Border */}
+              {/* Clean Borderless Points Box */}
               <div
-                className="px-4 py-2 rounded-2xl flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-2xl flex items-center gap-1.5"
                 style={{
-                  background: 'rgba(12, 4, 11, 0.95)',
-                  border: '2px solid #ff1493',
-                  boxShadow: '0 0 16px rgba(255, 20, 147, 0.8), 0 4px 12px rgba(0,0,0,0.5)',
+                  background: 'rgba(12, 4, 11, 0.65)',
                 }}
               >
                 <span className="text-amber-400 text-sm">★</span>
@@ -278,15 +276,6 @@ export default function LoyaltyCard() {
                 ));
               })()}
             </div>
-
-            {/* Thin Glowing Neon Pink Divider Line */}
-            <div
-              className="my-2.5 h-[1.2px] z-10"
-              style={{
-                backgroundColor: 'rgba(255, 20, 147, 0.65)',
-                boxShadow: '0 0 6px rgba(255, 20, 147, 0.6)',
-              }}
-            />
 
             {/* Row 4: Cardholder + Member Since */}
             <div className="relative flex items-end justify-between pt-1 z-10">
