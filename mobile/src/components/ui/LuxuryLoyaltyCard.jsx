@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 
 /**
@@ -13,33 +13,6 @@ function EmvChip() {
         <View style={styles.chipVLine} />
         <View style={styles.chipCenter} />
       </View>
-    </View>
-  );
-}
-
-/**
- * Sparkle Logo Badge (3 white 4-pointed stars inside glowing pink circle)
- */
-function SparkleLogo() {
-  return (
-    <View style={styles.sparkleBadge}>
-      <Svg width={20} height={20} viewBox="0 0 24 24">
-        {/* Center sparkle */}
-        <Path
-          d="M12 4 C12 8.5 8.5 12 4 12 C8.5 12 12 15.5 12 20 C12 15.5 15.5 12 20 12 C15.5 12 12 8.5 12 4 Z"
-          fill="#ffffff"
-        />
-        {/* Top-left small sparkle */}
-        <Path
-          d="M5.5 4 C5.5 5.5 4.5 6.5 3 6.5 C4.5 6.5 5.5 7.5 5.5 9 C5.5 7.5 6.5 6.5 8 6.5 C6.5 6.5 5.5 5.5 5.5 4 Z"
-          fill="#ffffff"
-        />
-        {/* Bottom-right small sparkle */}
-        <Path
-          d="M19 15 C19 16.2 18.2 17 17 17 C18.2 17 19 17.8 19 19 C19 17.8 19.8 17 21 17 C19.8 17 19 16.2 19 15 Z"
-          fill="#ffffff"
-        />
-      </Svg>
     </View>
   );
 }
@@ -122,14 +95,15 @@ export default function LuxuryLoyaltyCard({
         <View style={styles.rightCrescent} />
       </View>
 
-      {/* ── Row 1: Brand Logo & Title + Shop Member Pill & Waves ── */}
+      {/* ── Row 1: Brand Logo & Title + Waves ── */}
       <View style={styles.rowTop}>
         <View style={styles.brandGroup}>
-          <SparkleLogo />
-          <View style={styles.brandTextGroup}>
-            <Text style={styles.brandTitle}>DUNDU ONLINE</Text>
-            <Text style={styles.brandSubtitle}>STORE REWARDS CLUB</Text>
-          </View>
+          <Image
+            source={require('../../../assets/dundulogo.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.brandTitle}>D LINK CARD</Text>
         </View>
 
         <View style={styles.topRightGroup}>
@@ -269,38 +243,17 @@ const styles = StyleSheet.create({
   brandGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
-  sparkleBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#1b0212',
-    borderWidth: 1.5,
-    borderColor: '#ff1493',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#ff1493',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.85,
-    shadowRadius: 7,
-    elevation: 4,
-  },
-  brandTextGroup: {
-    justifyContent: 'center',
+  brandLogo: {
+    width: 26,
+    height: 26,
   },
   brandTitle: {
-    fontSize: 15.5,
+    fontSize: 16,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 1.4,
-  },
-  brandSubtitle: {
-    fontSize: 8.5,
-    fontWeight: '800',
-    color: '#ff2a8d',
-    letterSpacing: 2,
-    marginTop: 2,
   },
   topRightGroup: {
     flexDirection: 'row',

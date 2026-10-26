@@ -9,6 +9,7 @@ import Spinner from '../../../components/ui/Spinner';
 import toast from 'react-hot-toast';
 import { Star, Gift, LogOut, MapPin, Plus, Trash2, Edit2, Wifi, Package, ChevronRight, Copy, Check, Share2 } from 'lucide-react';
 import { formatPrice, formatDate } from '../../../utils/format';
+import dunduLogo from '../../../assets/logo.png';
 
 function AddrField({ label, value, onChange, placeholder, type = 'text' }) {
   return (
@@ -440,31 +441,17 @@ export default function Profile() {
                   }}
                 />
 
-                {/* Row 1: Brand with Sparkle Badge + Shop Member Pill & Waves */}
+                {/* Row 1: Brand Logo & D LINK CARD + Waves */}
                 <div className="relative flex items-center justify-between mb-4 z-10">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                      style={{
-                        backgroundColor: '#1b0212',
-                        border: '1.5px solid #ff1493',
-                        boxShadow: '0 0 10px rgba(255, 20, 147, 0.75)',
-                      }}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 4 C12 8.5 8.5 12 4 12 C8.5 12 12 15.5 12 20 C12 15.5 15.5 12 20 12 C15.5 12 12 8.5 12 4 Z" />
-                        <path d="M5.5 4 C5.5 5.5 4.5 6.5 3 6.5 C4.5 6.5 5.5 7.5 5.5 9 C5.5 7.5 6.5 6.5 8 6.5 C6.5 6.5 5.5 5.5 5.5 4 Z" />
-                        <path d="M19 15 C19 16.2 18.2 17 17 17 C18.2 17 19 17.8 19 19 C19 17.8 19.8 17 21 17 C19.8 17 19 16.2 19 15 Z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-white font-black text-base tracking-wider leading-none">
-                        DUNDU ONLINE
-                      </p>
-                      <p className="text-[9.5px] font-extrabold text-[#ff2a8d] tracking-[2px] uppercase mt-1">
-                        STORE REWARDS CLUB
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-2.5">
+                    <img
+                      src={dunduLogo}
+                      alt="D Link"
+                      className="h-7 w-7 object-contain drop-shadow-[0_0_8px_rgba(255,20,147,0.6)]"
+                    />
+                    <p className="text-white font-black text-base tracking-wider leading-none">
+                      D LINK CARD
+                    </p>
                   </div>
 
                   <div className="flex items-center" style={{ filter: 'drop-shadow(0 0 6px rgba(255, 20, 147, 0.6))' }}>
