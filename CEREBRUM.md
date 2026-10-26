@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Colour filter: 3-per-row grid, smaller labels
+- `colorGrid` (wrap, space-between, rowGap 8) with `colorChip` width 31.5%, 14px swatch, 10.5px single-line label.
+
 ### 2026-10-26 — Colour filter swatches
 - `ProductsScreen`: `COLOR_HEX` name→hex map + `ColorChip` (16px swatch dot + name; light swatches get a ring; unknown names grey; Multicolor pink/green ring). Used for the Color section in the filter drawer.
 

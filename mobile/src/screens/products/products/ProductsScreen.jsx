@@ -99,7 +99,7 @@ function ColorChip({ label, active, onPress }) {
   return (
     <TouchableOpacity style={[styles.fchip, styles.colorChip, active && styles.fchipActive]} onPress={onPress} activeOpacity={0.75}>
       <View style={[styles.swatch, multi ? styles.swatchMulti : { backgroundColor: hex }, (isLight(hex) || active) && styles.swatchRing]} />
-      <Text style={[styles.fchipText, active && styles.fchipTextActive]}>{label}</Text>
+      <Text style={[styles.fchipText, styles.colorChipText, active && styles.fchipTextActive]} numberOfLines={1}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -340,7 +340,7 @@ function FilterSheet({ visible, onClose, filters, onApply, opts = {} }) {
             {colors.length > 0 && (
               <>
                 <Text style={styles.sheetSection}>Color</Text>
-                <View style={styles.chipRow}>
+                <View style={styles.colorGrid}>
                   {colors.map((c) => (
                     <ColorChip key={c} label={c} active={local.color === c} onPress={() => toggle('color', c)} />
                   ))}
@@ -1083,8 +1083,10 @@ const styles = StyleSheet.create({
   },
   fchipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   fchipText: { fontSize: 12, color: '#222', fontWeight: '500' },
-  colorChip: { flexDirection: 'row', alignItems: 'center', gap: 7, paddingLeft: 8 },
-  swatch: { width: 16, height: 16, borderRadius: 8 },
+  colorGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8, marginBottom: 6 },
+  colorChip: { width: '31.5%', flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 8, paddingVertical: 7 },
+  colorChipText: { fontSize: 10.5, flexShrink: 1 },
+  swatch: { width: 14, height: 14, borderRadius: 7 },
   swatchRing: { borderWidth: 1, borderColor: 'rgba(0,0,0,0.25)' },
   swatchMulti: { backgroundColor: '#E91E8C', borderWidth: 2, borderColor: '#43A047' },
   fchipTextActive: { color: '#fff', fontWeight: '700' },
