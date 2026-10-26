@@ -295,6 +295,7 @@ export default function Returns() {
             <table className="w-full text-xs text-left">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="px-3 py-3.5 text-right w-12">#</th>
                   <th className="px-5 py-3.5">Order Reference</th>
                   <th className="px-5 py-3.5">Customer</th>
                   <th className="px-5 py-3.5">Items in Order</th>
@@ -307,19 +308,20 @@ export default function Returns() {
               <tbody className="divide-y divide-slate-100">
                 {returns.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-20 text-slate-400 text-xs">
+                    <td colSpan={8} className="text-center py-20 text-slate-400 text-xs">
                       <RotateCcw className="h-10 w-10 text-slate-300 mx-auto mb-2" />
                       No return requests found matching the active criteria
                     </td>
                   </tr>
                 ) : (
-                  returns.map((r) => {
+                  returns.map((r, i) => {
                     const items = r.items || [];
                     const preview = items.slice(0, 2);
                     const extra = items.length - preview.length;
 
                     return (
                       <tr key={r.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-3 py-3.5 text-right text-slate-400 tabular-nums text-xs">{i + 1}</td>
                         <td className="px-5 py-3.5">
                           <button
                             onClick={() => navigate(`/orders/${r.order_id}`)}

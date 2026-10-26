@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Admin tables: `#` serial column
+- Added a right-aligned `#` column (continuous index over the loaded rows) to Product Catalog (`ProductList`), New Arrivals, Return & Refund Requests (`Returns`) and Delivery Staff & Fleet (`DeliveryStaff`); empty-state `colSpan`s widened.
+
 ### 2026-10-26 — Admin Stock Check: API pagination (15/page), inner scroll, # column
 - `GET /admin/stock-check` now takes `page`, `limit` (default 15, max 100, `0` = all), `search`, `filter` (all|profit|loss|no_sales|cost_missing), `sort` (profit|loss|sold|balance|name); returns `pagination { page, limit, total, pages, start, end }` + the page's `products`; `summary` still covers all products.
 - `StockCheck.jsx`: query keyed by params (`keepPreviousData`), 350 ms search debounce, page resets on filter/sort/search; table scrolls inside the card (`max-h-[62vh]`, sticky header) with a `#` serial column; pager footer (Prev / numbers / Next, "Showing a–b of N"); CSV export fetches `limit=0` (all matching rows) and includes `#`.

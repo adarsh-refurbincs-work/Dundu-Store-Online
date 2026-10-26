@@ -304,6 +304,7 @@ export default function NewArrivals() {
             <table className="w-full text-left text-sm">
               <thead className="bg-slate-50/75 border-b border-slate-200 text-xs font-semibold uppercase tracking-wider text-slate-500">
                 <tr>
+                  <th className="py-3.5 px-4 text-right w-12">#</th>
                   <th className="py-3.5 px-6">Product</th>
                   <th className="py-3.5 px-6">Category & Brand</th>
                   <th className="py-3.5 px-6">Price</th>
@@ -313,7 +314,7 @@ export default function NewArrivals() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {products.map((p) => {
+                {products.map((p, i) => {
                   const isMarked = p.is_new_arrival;
                   const inStock = p.stock > 0;
                   return (
@@ -324,6 +325,7 @@ export default function NewArrivals() {
                       }`}
                     >
                       {/* Product Thumbnail & Name */}
+                      <td className="py-4 px-4 text-right text-slate-400 tabular-nums text-xs">{i + 1}</td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-14 rounded-xl bg-slate-100 border border-slate-200/60 shrink-0 overflow-hidden relative">

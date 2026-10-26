@@ -254,6 +254,7 @@ export default function DeliveryStaff() {
             <table className="w-full text-xs text-left">
               <thead>
                 <tr className="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  <th className="px-3 py-3.5 text-right w-12">#</th>
                   <th className="px-5 py-3.5">Delivery Agent</th>
                   <th className="px-5 py-3.5">Contact Number</th>
                   <th className="px-5 py-3.5">Email Address</th>
@@ -267,18 +268,19 @@ export default function DeliveryStaff() {
               <tbody className="divide-y divide-slate-100">
                 {filteredStaff.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-20 text-slate-400 text-xs">
+                    <td colSpan={9} className="text-center py-20 text-slate-400 text-xs">
                       <Bike className="h-10 w-10 text-slate-300 mx-auto mb-2" />
                       No delivery staff found matching the filter criteria
                     </td>
                   </tr>
                 ) : (
-                  filteredStaff.map((s) => {
+                  filteredStaff.map((s, i) => {
                     const busy = actioningId === s.id;
                     const initials = s.name ? s.name.charAt(0).toUpperCase() : 'D';
 
                     return (
                       <tr key={s.id} className="hover:bg-slate-50/80 transition-colors">
+                        <td className="px-3 py-3.5 text-right text-slate-400 tabular-nums text-xs">{i + 1}</td>
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-bold shrink-0 shadow-sm">

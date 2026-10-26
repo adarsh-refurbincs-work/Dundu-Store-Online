@@ -465,6 +465,7 @@ export default function ProductList() {
             <table className="w-full text-sm text-left border-collapse">
               <thead className="sticky top-0 z-20 border-b border-slate-200/90 text-[11px] font-bold text-slate-600 uppercase tracking-wider shadow-2xs">
                 <tr>
+                  <th className="sticky top-0 z-20 px-3 py-3.5 bg-slate-50/95 backdrop-blur-xs text-right w-12">#</th>
                   <th className="sticky top-0 z-20 px-5 py-3.5 bg-slate-50/95 backdrop-blur-xs">Product</th>
                   <th className="sticky top-0 z-20 px-5 py-3.5 bg-slate-50/95 backdrop-blur-xs">Department</th>
                   <th className="sticky top-0 z-20 px-5 py-3.5 bg-slate-50/95 backdrop-blur-xs text-right">Price</th>
@@ -476,14 +477,15 @@ export default function ProductList() {
               <tbody className="divide-y divide-slate-100">
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-20 text-slate-400 text-xs">
+                    <td colSpan={7} className="text-center py-20 text-slate-400 text-xs">
                       <Package className="h-10 w-10 text-slate-300 mx-auto mb-2" />
                       No products matching the selected criteria
                     </td>
                   </tr>
                 ) : (
-                  products.map((p) => (
+                  products.map((p, i) => (
                     <tr key={p.id} className="hover:bg-slate-50/80 transition-colors group">
+                      <td className="px-3 py-3.5 text-right text-slate-400 tabular-nums text-xs">{i + 1}</td>
                       <td className="px-5 py-3.5">
                         <button
                           onClick={() => navigate(`/products/${p.id}`)}
@@ -684,7 +686,7 @@ export default function ProductList() {
                 {/* ── Inside Table Lazy-Load Trigger Sentinel ── */}
                 {hasNextPage && (
                   <tr ref={loadMoreRef}>
-                    <td colSpan={6} className="py-6 text-center bg-slate-50/40">
+                    <td colSpan={7} className="py-6 text-center bg-slate-50/40">
                       <div className="inline-flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
                         <RefreshCw className="h-4 w-4 animate-spin text-emerald-600" />
                         <span>Loading next batch of products...</span>
