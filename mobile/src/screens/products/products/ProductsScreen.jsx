@@ -964,8 +964,11 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.65)',
   },
+  // Flex-centred (not absoluteFill) so the sheet sits in the exact middle on every device,
+  // including Android with a translucent status bar.
   sheetCenter: {
-    ...StyleSheet.absoluteFillObject,
+    flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,

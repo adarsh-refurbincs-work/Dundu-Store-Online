@@ -215,6 +215,9 @@ Responsive audit: Playwright script that loads every route at widths 320→1920,
 
 ## 9. Changelog (newest first)
 
+### 2026-10-26 — Filter sheets truly centred
+- `ProductsScreen` `sheetCenter`: absoluteFill → `flex:1` centred container (backdrop stays absolute), so product and combo filter modals open in the middle of the screen on all devices.
+
 ### 2026-10-26 — One typeface everywhere: Manrope
 - **Mobile**: `expo-font` + `@expo-google-fonts/manrope` (400–800). `App.js` loads them (`useFonts`) and calls `applyGlobalFont()` from `src/theme/typography.js`, which patches `Text.render`/`TextInput.render` to set `fontFamily` = Manrope face chosen from the style's `fontWeight` (and strips `fontWeight`, since Android won't pick bold files for custom fonts). Styles with an explicit non-Manrope `fontFamily` (e.g. monospace member ID) are left alone. No per-screen changes needed.
 - **Web**: `--font-sans` → Manrope (Google Fonts link updated); Playfair Display kept for `.font-display` headings. **Admin**: Manrope link added, body `font-family` → Manrope.
