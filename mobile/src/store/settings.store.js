@@ -18,8 +18,8 @@ const useSettingsStore = create((set) => ({
   festivalName: '',
   festivalEmoji: '🎉',
   festivalBgColor: '#FFFFFF',
-  festivalNavbarColor: '#040d04',
-  festivalNavbarTextColor: '#FFFFFF',
+  festivalNavbarColor: '#FFF0F7',
+  festivalNavbarTextColor: '#1A1A1A',
   festivalLogoUrl: null,
   festivalBannerText: '',
 
@@ -75,8 +75,8 @@ const useSettingsStore = create((set) => ({
 
         // Apply festival colors only when ON, otherwise restore defaults
         festivalBgColor:         festEnabled ? (festRaw.festival_bg_color          || '#FFF7ED') : '#FFFFFF',
-        festivalNavbarColor:     festEnabled ? (festRaw.festival_navbar_color      || '#7C3AED') : '#040d04',
-        festivalNavbarTextColor: festEnabled ? (festRaw.festival_navbar_text_color || '#FFFFFF') : '#FFFFFF',
+        festivalNavbarColor:     festEnabled ? (festRaw.festival_navbar_color      || '#7C3AED') : '#FFF0F7',
+        festivalNavbarTextColor: festEnabled ? (festRaw.festival_navbar_text_color || '#FFFFFF') : '#1A1A1A',
         festivalLogoUrl:         festEnabled ? (festRaw.festival_logo_url          || null)    : null,
         festivalBannerText:      festEnabled ? (festRaw.festival_banner_text       || '')      : '',
 

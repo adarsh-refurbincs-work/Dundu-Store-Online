@@ -34,7 +34,7 @@ export default function CategoryStrip({
   const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
 
   const activeColor = themeColor || (festEnabled ? festNavText : COLORS.primary);
-  const bgColor     = festEnabled ? festNavBg : '#0d0d0d';
+  const bgColor     = festEnabled ? festNavBg : '#FFF0F7';
 
   return (
     <View style={[styles.wrapper, { backgroundColor: bgColor }, themeColor && { borderBottomColor: themeColor }, festEnabled && { borderBottomColor: festNavBg }]}>
@@ -59,7 +59,7 @@ export default function CategoryStrip({
                     ? <Image source={{ uri: iconUri }} style={styles.circleImage} resizeMode="cover" />
                     : <Text style={styles.comboCircleIcon}>🎀</Text>}
                 </View>
-                <Text style={[styles.label, { color: '#fff' }, isComboActive && { color: comboAccent, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
+                <Text style={[styles.label, { color: '#374151' }, isComboActive && { color: comboAccent, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
               </>
             ); })()}
           </TouchableOpacity>
@@ -84,7 +84,7 @@ export default function CategoryStrip({
                     </View>
                 }
               </View>
-              <Text style={[styles.label, { color: '#d1cacaff' }, isActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>
+              <Text style={[styles.label, { color: '#374151' }, isActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>
                 {cat.name}
               </Text>
             </TouchableOpacity>
@@ -96,7 +96,7 @@ export default function CategoryStrip({
           <View style={[styles.offerCircle, { backgroundColor: activeColor }, isOfferActive && { borderColor: activeColor }]}>
             <Text style={styles.offerIcon}>🏷</Text>
           </View>
-          <Text style={[styles.label, { color: '#ffffff' }, isOfferActive && { color: activeColor, fontWeight: '800' }]}>Offers</Text>
+          <Text style={[styles.label, { color: '#374151' }, isOfferActive && { color: activeColor, fontWeight: '800' }]}>Offers</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -127,9 +127,9 @@ export default function CategoryStrip({
 const styles = StyleSheet.create({
   wrapper: {
     paddingVertical: 10,
-    backgroundColor: '#040d04',
+    backgroundColor: '#FFF0F7',
     borderBottomWidth: 1,
-    borderBottomColor: '#163016',
+    borderBottomColor: '#FCE7F3',
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3a0a2a',
+    backgroundColor: '#FFEBF5',
     borderWidth: 2,
     borderColor: COLORS.primary,
   },
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     overflow: 'hidden',
-    backgroundColor: '#1a1a1a',
-    borderWidth: 2,
-    borderColor: '#2e2e2e',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#FBCFE8',
   },
   circleImage: { width: '100%', height: '100%' },
   circleFallback: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 11,
-    color: '#ffffff',
+    color: '#374151',
     marginTop: 4,
     textAlign: 'center',
     fontWeight: '600',
@@ -219,9 +219,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1.5,
-    borderColor: '#2e2e2e',
+    borderColor: '#FBCFE8',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -232,11 +232,11 @@ const styles = StyleSheet.create({
   },
   filterBtnActive: {
     borderColor: COLORS.primary,
-    backgroundColor: '#2a0a1a',
+    backgroundColor: '#FFEBF5',
   },
   filterBtnIcon: {
     fontSize: 15,
-    color: '#aaa',
+    color: COLORS.primary,
     fontWeight: '700',
   },
   filterBtnIconActive: {
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   },
   filterBtnLabel: {
     fontSize: 9,
-    color: '#888',
+    color: '#6B7280',
     fontWeight: '600',
     marginTop: 1,
     letterSpacing: 0.3,

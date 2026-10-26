@@ -380,6 +380,10 @@ export default function CheckoutScreen() {
   const afterDiscounts = round2(Math.max(0, subtotal - discount - loyaltyDiscount));
   const shipping = (deliveryCharge === 0 || afterDiscounts >= freeDeliveryThreshold || hasFreeShippingReward) ? 0 : deliveryCharge;
   const finalTotal = round2(afterDiscounts + shipping);
+  const shippingHint = deliveryCharge === 0 ? 'Free delivery on all orders' : shipping === 0
+    ? (hasFreeShippingReward ? 'Free delivery reward applied'
+      : `Free delivery on orders of ${formatPrice(freeDeliveryThreshold)} or more`)
+    : `Add ${formatPrice(Math.max(0, freeDeliveryThreshold - afterDiscounts))} more for free delivery`;
 
   const walletBelowMin = finalTotal < walletSettings.min_order_amount;
   const walletAmount = (() => {
@@ -627,28 +631,15 @@ export default function CheckoutScreen() {
             </View>
           )}
           <View style={styles.summaryRow}>
-            <Text style={[styles.summaryLabel, shipping === 0 && { textDecorationLine: 'line-through' }]}>Shipping</Text>
-            <Text style={[styles.summaryValue, shipping === 0 && { textDecorationLine: 'line-through', color: '#197f09ff' }]}>
-              {shipping === 0 ? formatPrice(deliveryCharge) : formatPrice(shipping)}
+            <Text style={styles.summaryLabel}>Shipping</Text>
+            <Text style={[styles.summaryValue, shipping === 0 && { color: '#16a34a', fontWeight: '700' }]}>
+              {shipping === 0 ? 'FREE' : formatPrice(shipping)}
             </Text>
           </View>
+          <Text style={styles.shippingHint}>{shippingHint}</Text>
           <View style={[styles.summaryRow, styles.totalRow]}>
             <Text style={styles.totalLabel}>Total</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {shipping === 0 && (
-                <Text style={{
-                  color: '#888',
-                  textDecorationLine: 'line-through',
-                  textDecorationColor: 'red',
-                  marginRight: 8,
-                  fontSize: 15,
-                  fontWeight: 'normal'
-                }}>
-                  {formatPrice(finalTotal + deliveryCharge)}
-                </Text>
-              )}
-              <Text style={styles.totalValue}>{formatPrice(finalTotal)}</Text>
-            </View>
+            <Text style={styles.totalValue}>{formatPrice(finalTotal)}</Text>
           </View>
 
           {loyaltyAvailable && (
@@ -813,28 +804,14 @@ export default function CheckoutScreen() {
                   </View>
                 )}
                 <View style={styles.confirmSummaryRow}>
-                  <Text style={[styles.confirmSummaryLabel, shipping === 0 && { textDecorationLine: 'line-through' }]}>Shipping</Text>
-                  <Text style={[styles.confirmSummaryValue, shipping === 0 && { textDecorationLine: 'line-through', color: '#888' }]}>
-                    {shipping === 0 ? formatPrice(deliveryCharge) : formatPrice(shipping)}
+                  <Text style={styles.confirmSummaryLabel}>Shipping</Text>
+                  <Text style={[styles.confirmSummaryValue, shipping === 0 && { color: '#16a34a', fontWeight: '700' }]}>
+                    {shipping === 0 ? 'FREE' : formatPrice(shipping)}
                   </Text>
                 </View>
                 <View style={[styles.confirmSummaryRow, { borderTopWidth: 1, borderTopColor: '#fcd7eb', marginTop: 4, paddingTop: 10 }]}>
                   <Text style={styles.confirmTotalLabel}>Total</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    {shipping === 0 && (
-                      <Text style={{
-                        color: '#888',
-                        textDecorationLine: 'line-through',
-                        textDecorationColor: 'red',
-                        marginRight: 8,
-                        fontSize: 14,
-                        fontWeight: 'normal'
-                      }}>
-                        {formatPrice(finalTotal + deliveryCharge)}
-                      </Text>
-                    )}
-                    <Text style={styles.confirmTotalValue}>{formatPrice(finalTotal)}</Text>
-                  </View>
+                  <Text style={styles.confirmTotalValue}>{formatPrice(finalTotal)}</Text>
                 </View>
                 {walletAmount > 0 && (
                   <>
@@ -1332,6 +1309,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.border,
     marginVertical: 10,
+  },
+  shippingHint: {
+    fontSize: 11,
+    color: '#888',
+    marginTop: -4,
+    marginBottom: 6,
   },
   summaryRow: {
     flexDirection: 'row',

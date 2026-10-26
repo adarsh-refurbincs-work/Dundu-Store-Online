@@ -41,8 +41,8 @@ export default function AppHeader({
   const festName         = useSettingsStore((s) => s.festivalName);
   const festBannerText   = useSettingsStore((s) => s.festivalBannerText);
 
-  const headerBg    = festEnabled ? festNavBg    : '#040d04';
-  const textColor   = festEnabled ? festNavText  : COLORS.white;
+  const headerBg    = festEnabled ? festNavBg    : '#FFF0F7';
+  const textColor   = festEnabled ? festNavText  : '#1A1A1A';
 
   const paddingTop =
     insets.top > 0
@@ -53,6 +53,7 @@ export default function AppHeader({
 
   return (
     <View style={[styles.wrapper, { paddingTop, backgroundColor: headerBg }]}>
+      <StatusBar barStyle={festEnabled ? 'light-content' : 'dark-content'} backgroundColor={headerBg} />
       {/* Festival banner strip */}
       {festEnabled && festBannerText ? (
         <View style={[styles.festBanner, { backgroundColor: festNavBg }]}>
@@ -134,7 +135,7 @@ export default function AppHeader({
               style={styles.iconBtn}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="heart-outline" size={24} color={textColor} />
+              <Ionicons name="heart-outline" size={24} color={festEnabled ? textColor : '#E91E8C'} />
             </TouchableOpacity>
           )}
 
@@ -177,7 +178,7 @@ export default function AppHeader({
 
 const styles = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#040d04',
+    backgroundColor: '#FFF0F7',
     borderBottomWidth: 0,
   },
   festBanner: {
@@ -241,20 +242,20 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     fontSize: 30,
-    color: COLORS.white,
+    color: '#1A1A1A',
     lineHeight: 34,
     fontWeight: '200',
   },
   title: {
     fontSize: 17,
     fontWeight: '700',
-    color: COLORS.white,
+    color: '#1A1A1A',
     flexShrink: 1,
   },
   pageTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: COLORS.white,
+    color: '#1A1A1A',
     marginRight: 4,
   },
   // Right icons

@@ -212,6 +212,14 @@ export default function Checkout() {
   const grandTotalShown = q ? Number(q.total) : grandTotal;
   const walletAmountShown = q ? Number(q.wallet_amount) : walletAmount;
   const payableShown = q ? Number(q.payable) : payableTotal;
+  // One shipping rule, stated in words next to the numbers: ₹{deliveryCharge} delivery,
+  // free once the amount after discounts reaches the threshold (or a free-shipping reward is used).
+  const afterDiscountsShown = Math.max(0, subtotal - discountShown - loyaltyDiscountShown);
+  const shippingHint = deliveryCharge === 0 ? 'Free delivery on all orders' : shippingShown === 0
+    ? (q?.free_shipping_reward || spinReward?.prize_type === 'free_shipping'
+        ? 'Free delivery reward applied'
+        : `Free delivery on orders of ${formatPrice(freeDeliveryThreshold)} or more`)
+    : `Add ${formatPrice(Math.max(0, freeDeliveryThreshold - afterDiscountsShown))} more for free delivery`;
 
   // Auto-apply a won spin/scratch coupon against the real subtotal (once per code).
   const autoTriedRef = useRef('');
@@ -506,20 +514,16 @@ export default function Checkout() {
                   <span>Loyalty Points ({loyaltyRule.points} pts)</span><span>−{formatPrice(loyaltyDiscountShown)}</span>
                 </div>
               )}
-              <div className="flex justify-between" style={shippingShown === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
+              <div className="flex justify-between" style={{ color: '#888' }}>
                 <span>Shipping</span>
-                <span>{shippingShown === 0 ? formatPrice(deliveryCharge) : formatPrice(shippingShown)}</span>
+                {shippingShown === 0
+                  ? <span style={{ color: '#4ade80', fontWeight: 600 }}>FREE</span>
+                  : <span>{formatPrice(shippingShown)}</span>}
               </div>
+              <p className="text-[11px] -mt-1" style={{ color: '#888' }}>{shippingHint}</p>
               <div className="flex justify-between font-bold text-base pt-1" style={{ borderTop: '1px solid #2e2e2e', color: '#f5f5f5' }}>
                 <span>Total</span>
-                <span className="flex items-center gap-2">
-                  {shippingShown === 0 && (
-                    <span style={{ color: '#888', textDecoration: 'line-through red', fontWeight: 'normal', fontSize: '14px' }}>
-                      {formatPrice(grandTotalShown + deliveryCharge)}
-                    </span>
-                  )}
-                  <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
-                </span>
+                <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
               </div>
             </div>
 
@@ -564,7 +568,7 @@ export default function Checkout() {
             {!quoting && shippingShown > 0 && (
               <p className="text-[11px] text-center" style={{ color: '#888' }}>Includes {formatPrice(shippingShown)} shipping</p>
             )}
-            {!quoting && shippingShown === 0 && paymentMethod === 'online' && payableShown > 0 && (
+            {!quoting && shippingShown === 0 && (
               <p className="text-[11px] text-center" style={{ color: '#4ade80' }}>Free shipping applied</p>
             )}
           </div>
@@ -631,20 +635,15 @@ export default function Checkout() {
                     <span>Loyalty Points</span><span>−{formatPrice(loyaltyDiscountShown)}</span>
                   </div>
                 )}
-                <div className="flex justify-between" style={shippingShown === 0 ? { color: '#888', textDecoration: 'line-through' } : { color: '#888' }}>
+                <div className="flex justify-between" style={{ color: '#888' }}>
                   <span>Shipping</span>
-                  <span>{shippingShown === 0 ? formatPrice(deliveryCharge) : formatPrice(shippingShown)}</span>
+                  {shippingShown === 0
+                    ? <span style={{ color: '#4ade80', fontWeight: 600 }}>FREE</span>
+                    : <span>{formatPrice(shippingShown)}</span>}
                 </div>
                 <div className="flex justify-between font-bold text-base pt-1" style={{ borderTop: '1px solid #2a2a2a', color: '#f5f5f5' }}>
                   <span>Total</span>
-                  <span className="flex items-center gap-2">
-                    {shippingShown === 0 && (
-                      <span style={{ color: '#888', textDecoration: 'line-through red', fontWeight: 'normal', fontSize: '14px' }}>
-                        {formatPrice(grandTotalShown + deliveryCharge)}
-                      </span>
-                    )}
-                    <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
-                  </span>
+                  <span style={{ color: '#e91e8c' }}>{formatPrice(grandTotalShown)}</span>
                 </div>
                 {walletAmountShown > 0 && (
                   <>
