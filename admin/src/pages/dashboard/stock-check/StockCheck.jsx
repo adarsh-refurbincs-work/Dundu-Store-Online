@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import {
   ClipboardCheck, Search, RefreshCw, Download, Package, ShoppingCart, Boxes,
@@ -34,44 +34,51 @@ const FILTERS = [
   { key: 'cost_missing', label: 'Buy price missing' },
 ];
 
+// Sorting / filtering / paging happen on the API (15 rows per page); labels only here.
 const SORTS = {
-  profit:  { label: 'Most profit',   fn: (a, b) => (b.profit ?? -Infinity) - (a.profit ?? -Infinity) },
-  loss:    { label: 'Most loss',     fn: (a, b) => (a.profit ?? Infinity) - (b.profit ?? Infinity) },
-  sold:    { label: 'Most sold',     fn: (a, b) => b.units_sold - a.units_sold },
-  balance: { label: 'Most balance',  fn: (a, b) => b.balance_qty - a.balance_qty },
-  name:    { label: 'Name (A–Z)',    fn: (a, b) => a.name.localeCompare(b.name) },
+  profit:  { label: 'Most profit' },
+  loss:    { label: 'Most loss' },
+  sold:    { label: 'Most sold' },
+  balance: { label: 'Most balance' },
+  name:    { label: 'Name (A–Z)' },
 };
+const PAGE_SIZE = 15;
 
 export default function StockCheck() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('profit');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [page, setPage] = useState(1);
 
+  // Debounce typing, and go back to page 1 whenever the filter / sort / search changes
+  useEffect(() => {
+    const t = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 350);
+    return () => clearTimeout(t);
+  }, [search]);
+  const changeFilter = (v) => { changeFilter(v); setPage(1); };
+  const changeSort = (v) => { changeSort(v); setPage(1); };
+
+  const params = { page, limit: PAGE_SIZE, filter, sort, search: debouncedSearch || undefined };
   const { data, isLoading, isFetching, refetch } = useQuery({
-    queryKey: ['stock-check'],
-    queryFn: () => inventoryApi.stockCheck(),
+    queryKey: ['stock-check', params],
+    queryFn: () => inventoryApi.stockCheck(params),
+    placeholderData: keepPreviousData,
   });
 
   const d = data?.data || {};
   const s = d.summary || {};
+  const rows = d.products || [];
+  const pg = d.pagination || { page: 1, pages: 1, total: rows.length, start: rows.length ? 1 : 0, end: rows.length, limit: PAGE_SIZE };
 
-  const rows = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return (d.products || [])
-      .filter((p) => {
-        if (filter === 'cost_missing') { if (p.cost_price !== null) return false; }
-        else if (filter !== 'all' && p.result !== filter) return false;
-        if (!q) return true;
-        return [p.name, p.sku, p.category].some((v) => v && v.toLowerCase().includes(q));
-      })
-      .sort(SORTS[sort].fn);
-  }, [d.products, filter, sort, search]);
-
-  const exportCsv = () => {
-    const head = ['Product', 'SKU', 'Category', 'Buy price/pc', 'Sell price/pc', 'Purchased qty', 'Purchase total',
+  const exportCsv = async () => {
+    // Export every matching row, not just the visible page
+    const all = await inventoryApi.stockCheck({ ...params, page: 1, limit: 0 }).then((r) => r?.data?.products || []).catch(() => rows);
+    const head = ['#', 'Product', 'SKU', 'Category', 'Buy price/pc', 'Sell price/pc', 'Purchased qty', 'Purchase total',
       'Sold qty', 'Orders', 'Buyers', 'Balance qty', 'Revenue', 'Profit', 'Result', 'Sold last 30 days', 'Speed', 'First sale', 'Last sale'];
-    const lines = rows.map((p) => [
+    const lines = all.map((p, i) => [
+      i + 1,
       p.name, p.sku || '', p.category || '', p.cost_price ?? '', p.sell_price, p.purchased_qty, p.purchase_total ?? '',
       p.units_sold, p.orders_count, p.buyers_count, p.balance_qty, p.revenue, p.profit ?? '', RESULT_BADGE[p.result]?.label,
       p.units_sold_30d, SPEED_BADGE[p.speed]?.label, p.first_sale_at ? formatDate(p.first_sale_at) : '', p.last_sale_at ? formatDate(p.last_sale_at) : '',
@@ -142,7 +149,7 @@ export default function StockCheck() {
             {FILTERS.map((f) => (
               <button
                 key={f.key}
-                onClick={() => setFilter(f.key)}
+                onClick={() => changeFilter(f.key)}
                 className={`px-2.5 py-1 rounded-lg whitespace-nowrap cursor-pointer ${filter === f.key ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 {f.label}
@@ -161,7 +168,7 @@ export default function StockCheck() {
             </div>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => changeSort(e.target.value)}
               className="text-xs border border-slate-200 rounded-xl px-2.5 py-1.5 bg-slate-50 text-slate-700 font-medium cursor-pointer focus:outline-none"
             >
               {Object.entries(SORTS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
@@ -169,10 +176,12 @@ export default function StockCheck() {
           </div>
         </div>
 
-        <div className="overflow-x-auto bg-pink-100/20">
+        {/* Scrolls inside the card (header stays pinned); 15 rows per page from the API */}
+        <div className={`overflow-auto max-h-[62vh] bg-pink-100/20 ${isFetching ? 'opacity-70' : ''}`}>
           <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-pink-100/40 border-b border-pink-100 text-[11px] font-bold text-pink-800 uppercase tracking-wider whitespace-nowrap">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-pink-100 border-b border-pink-200 text-[11px] font-bold text-pink-800 uppercase tracking-wider whitespace-nowrap">
+                <th className="px-3 py-3 text-right w-12">#</th>
                 <th className="px-4 py-3">Product</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3 text-right">Buy / pc</th>
@@ -189,13 +198,14 @@ export default function StockCheck() {
             <tbody className="divide-y divide-pink-100 bg-white text-black">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-14 text-center text-black/60 text-xs">
+                  <td colSpan={12} className="py-14 text-center text-black/60 text-xs">
                     <Package className="h-9 w-9 text-pink-200 mx-auto mb-2" />
                     No products match
                   </td>
                 </tr>
-              ) : rows.map((p) => (
+              ) : rows.map((p, i) => (
                 <tr key={p.id} onClick={() => navigate(`/stock-check/${p.id}`)} className="hover:bg-pink-100/40 cursor-pointer whitespace-nowrap">
+                  <td className="px-3 py-3 text-right text-black/50 tabular-nums">{(pg.page - 1) * pg.limit + i + 1}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-white border border-pink-100 overflow-hidden shrink-0 flex items-center justify-center">
@@ -232,6 +242,26 @@ export default function StockCheck() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pager */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-pink-100 bg-white text-xs">
+          <p className="text-black/60">
+            Showing <span className="font-semibold text-black">{pg.start}–{pg.end}</span> of <span className="font-semibold text-black">{pg.total}</span> products · {PAGE_SIZE} per page
+          </p>
+          <div className="flex items-center gap-1">
+            <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={pg.page <= 1}
+              className="px-3 py-1.5 rounded-lg border border-pink-200 font-semibold text-pink-800 disabled:opacity-40 hover:bg-pink-50">‹ Prev</button>
+            {Array.from({ length: pg.pages }, (_, i) => i + 1)
+              .filter((n) => n === 1 || n === pg.pages || Math.abs(n - pg.page) <= 2)
+              .reduce((acc, n, idx, arr) => { if (idx && n - arr[idx - 1] > 1) acc.push('…'); acc.push(n); return acc; }, [])
+              .map((n, idx) => n === '…'
+                ? <span key={`gap-${idx}`} className="px-1 text-black/40">…</span>
+                : <button key={n} type="button" onClick={() => setPage(n)}
+                    className={`min-w-8 px-2 py-1.5 rounded-lg border font-semibold ${n === pg.page ? 'bg-pink-600 border-pink-600 text-white' : 'border-pink-200 text-pink-800 hover:bg-pink-50'}`}>{n}</button>)}
+            <button type="button" onClick={() => setPage((p) => Math.min(pg.pages, p + 1))} disabled={pg.page >= pg.pages}
+              className="px-3 py-1.5 rounded-lg border border-pink-200 font-semibold text-pink-800 disabled:opacity-40 hover:bg-pink-50">Next ›</button>
+          </div>
         </div>
       </div>
     </div>

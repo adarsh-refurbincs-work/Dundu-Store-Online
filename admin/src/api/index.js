@@ -14,7 +14,7 @@ export const dashboardApi = {
 
 export const inventoryApi = {
   get: (params) => client.get('/admin/inventory', { params }),
-  stockCheck: () => client.get('/admin/stock-check'),
+  stockCheck: (params) => client.get('/admin/stock-check', { params }),
   stockCheckProduct: (id) => client.get(`/admin/stock-check/${id}`),
 };
 

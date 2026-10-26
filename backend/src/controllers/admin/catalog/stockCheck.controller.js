@@ -103,13 +103,41 @@ const PRODUCT_SALES_SQL = (where) => `
   WHERE p.deleted_at IS NULL ${where}
 `;
 
-// GET /admin/stock-check
-const getStockCheck = async (_req, res) => {
+const SORTS = {
+  profit:  (a, b) => (b.profit ?? -Infinity) - (a.profit ?? -Infinity),
+  loss:    (a, b) => (a.profit ?? Infinity) - (b.profit ?? Infinity),
+  sold:    (a, b) => b.units_sold - a.units_sold,
+  balance: (a, b) => b.balance_qty - a.balance_qty,
+  name:    (a, b) => a.name.localeCompare(b.name),
+};
+
+// GET /admin/stock-check?page=1&limit=15&search=&filter=all|profit|loss|no_sales|cost_missing&sort=profit
+// `limit=0` returns every matching row (CSV export). Summary always covers ALL products.
+const getStockCheck = async (req, res) => {
   const { rows } = await db.query(`${PRODUCT_SALES_SQL('')} ORDER BY p.name`);
   const products = rows.map(shape);
 
+  const q = String(req.query.search || '').trim().toLowerCase();
+  const filter = String(req.query.filter || 'all');
+  const sortFn = SORTS[String(req.query.sort || 'profit')] || SORTS.profit;
+  const matching = products
+    .filter((p) => {
+      if (filter === 'cost_missing') { if (p.cost_price !== null) return false; }
+      else if (filter !== 'all' && p.result !== filter) return false;
+      if (!q) return true;
+      return [p.name, p.sku, p.category].some((v) => v && String(v).toLowerCase().includes(q));
+    })
+    .sort(sortFn);
+
+  const rawLimit = parseInt(req.query.limit, 10);
+  const limit = Number.isNaN(rawLimit) ? 15 : rawLimit === 0 ? matching.length || 1 : Math.min(100, Math.max(1, rawLimit));
+  const pages = Math.max(1, Math.ceil(matching.length / limit));
+  const page = Math.min(pages, Math.max(1, parseInt(req.query.page, 10) || 1));
+  const pageRows = matching.slice((page - 1) * limit, page * limit);
+
   const sum = (key) => products.reduce((t, p) => t + (p[key] || 0), 0);
   ok(res, {
+    pagination: { page, limit, total: matching.length, pages, start: matching.length ? (page - 1) * limit + 1 : 0, end: (page - 1) * limit + pageRows.length },
     summary: {
       products: products.length,
       purchased_qty: sum('purchased_qty'),
@@ -124,7 +152,7 @@ const getStockCheck = async (_req, res) => {
       no_sales_products: products.filter((p) => p.result === 'no_sales').length,
       cost_missing_products: products.filter((p) => p.cost_price === null).length,
     },
-    products,
+    products: pageRows,
   });
 };
 
