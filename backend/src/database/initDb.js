@@ -145,6 +145,8 @@ async function initDb() {
       "ALTER TABLE cart ADD CONSTRAINT cart_quantity_positive CHECK (quantity > 0)",
       "ALTER TABLE order_items DROP CONSTRAINT IF EXISTS order_items_quantity_positive",
       "ALTER TABLE order_items ADD CONSTRAINT order_items_quantity_positive CHECK (quantity > 0)",
+      "CREATE TABLE IF NOT EXISTS wishlist_groups (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE, name VARCHAR(100) NOT NULL, created_at TIMESTAMPTZ DEFAULT now(), CONSTRAINT wishlist_groups_user_name_unique UNIQUE(user_id, name))",
+      "ALTER TABLE wishlists ADD COLUMN IF NOT EXISTS group_name VARCHAR(100) DEFAULT 'General'",
     ];
 
     for (const stmt of alterStatements) {

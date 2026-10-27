@@ -90,9 +90,14 @@ export const userApi = {
   addAddress: (data) => client.post('/users/addresses', data),
   updateAddress: (id, data) => client.put(`/users/addresses/${id}`, data),
   deleteAddress: (id) => client.delete(`/users/addresses/${id}`),
-  getWishlist: () => client.get('/users/wishlist'),
-  toggleWishlist: (product_id) =>
-    client.post('/users/wishlist', { product_id }),
+  getWishlist: (group) => client.get('/users/wishlist', { params: group ? { group } : {} }),
+  getWishlistGroups: () => client.get('/users/wishlist/groups'),
+  createWishlistGroup: (name) => client.post('/users/wishlist/groups', { name }),
+  renameWishlistGroup: (old_name, new_name) => client.put('/users/wishlist/groups', { old_name, new_name }),
+  deleteWishlistGroup: (name) => client.delete(`/users/wishlist/groups/${encodeURIComponent(name)}`),
+  setWishlistItemGroup: (product_id, group_name) => client.put('/users/wishlist/item-group', { product_id, group_name }),
+  toggleWishlist: (product_id, group_name) =>
+    client.post('/users/wishlist', { product_id, group_name }),
   getNotifications: () => client.get('/users/notifications'),
   markNotificationsRead: () => client.post('/users/notifications/read'),
 };

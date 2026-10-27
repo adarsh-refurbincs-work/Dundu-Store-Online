@@ -17,6 +17,11 @@ router.delete('/addresses/:id', ah(ctrl.deleteAddress));
 
 // Wishlist Endpoints
 router.get('/wishlist', ah(wishlistCtrl.getWishlist));
+router.get('/wishlist/groups', ah(wishlistCtrl.getWishlistGroups));
+router.post('/wishlist/groups', ah(wishlistCtrl.createWishlistGroup));
+router.put('/wishlist/groups', ah(wishlistCtrl.renameWishlistGroup));
+router.delete('/wishlist/groups/:name', ah(wishlistCtrl.deleteWishlistGroup));
+router.put('/wishlist/item-group', ah(wishlistCtrl.setWishlistItemGroup));
 router.post('/wishlist', ah(wishlistCtrl.toggleWishlist));
 router.post('/wishlist/toggle', ah(wishlistCtrl.toggleWishlist));
 router.delete('/wishlist/:product_id', ah(wishlistCtrl.toggleWishlist));
