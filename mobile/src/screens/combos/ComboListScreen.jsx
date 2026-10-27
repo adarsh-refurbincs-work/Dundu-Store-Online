@@ -137,7 +137,7 @@ export default function ComboListScreen() {
   return (
     <SafeAreaView style={[styles.safe, festEnabled && { backgroundColor: festNavBg }]} edges={['left', 'right', 'bottom']}>
       {/* Same top bar as Home / Shop: logo + cart + wishlist */}
-      <AppHeader logo showCart showWishlist />
+      <AppHeader logo showCart showWishlist backgroundColor={festEnabled ? festNavBg : '#F5F0FF'} />
 
       {/* Search bar — searches the main catalogue */}
       <View style={[styles.searchBar, festEnabled && { backgroundColor: festNavBg, borderBottomColor: festNavBg }]}>
@@ -164,6 +164,8 @@ export default function ComboListScreen() {
         onPressCombo={() => {}}
         onPressOffers={() => goToShop({ offer: true })}
         onPressCategory={(cat) => goToShop({ category: cat.slug, category_name: cat.name })}
+        bgColor={festEnabled ? festNavBg : '#F5F0FF'}
+        themeColor="#8B5CF6"
       />
 
       {loading ? (
@@ -210,16 +212,16 @@ export default function ComboListScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFF0F7' },
+  safe: { flex: 1, backgroundColor: '#F5F0FF' },
 
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF0F7',
+    backgroundColor: '#F5F0FF',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#FCE7F3',
+    borderBottomColor: '#E9D5FF',
   },
   searchInput: {
     flex: 1,
@@ -230,11 +232,11 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     color: '#1F2937',
     borderWidth: 1,
-    borderColor: '#F9A8D4',
+    borderColor: '#D8B4FE',
   },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingBottom: 60 },
 
-  list: { padding: 14, paddingBottom: 100 },
+  list: { padding: 14, paddingBottom: 100, backgroundColor: '#F5F0FF' },
 
   headerInfo: { marginBottom: 10 },
   headerInfoText: { fontSize: 12, color: '#999', fontWeight: '600' },
@@ -246,8 +248,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: '#f0d6e8',
-    shadowColor: COLORS.primary,
+    borderColor: '#E9D5FF',
+    shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
   cardImage: { width: '100%', height: '100%' },
   cardImageFallback: {
     width: '100%', height: '100%',
-    backgroundColor: '#fce4f4',
+    backgroundColor: '#EDE9FE',
     alignItems: 'center', justifyContent: 'center',
   },
   cardImageFallbackText: { fontSize: 60 },
@@ -283,14 +285,14 @@ const styles = StyleSheet.create({
 
   slotRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginBottom: 10 },
   slotPill: {
-    backgroundColor: '#fce4f4', paddingHorizontal: 10, paddingVertical: 4,
-    borderRadius: 12, borderWidth: 1, borderColor: '#f0b8d8',
+    backgroundColor: '#EDE9FE', paddingHorizontal: 10, paddingVertical: 4,
+    borderRadius: 12, borderWidth: 1, borderColor: '#DDD6FE',
   },
   slotPillMore: { backgroundColor: '#f5f5f5', borderColor: '#ddd' },
-  slotPillText: { fontSize: 11, fontWeight: '700', color: '#C2167A', maxWidth: 90 },
+  slotPillText: { fontSize: 11, fontWeight: '700', color: '#7C3AED', maxWidth: 90 },
 
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2 },
-  offerPrice: { fontSize: 22, fontWeight: '900', color: COLORS.primary },
+  offerPrice: { fontSize: 22, fontWeight: '900', color: '#7C3AED' },
   ratingWrap: { marginLeft: 'auto', flexDirection: 'row', alignItems: 'baseline', gap: 4 },
   ratingText: { fontSize: 13, fontWeight: '800', color: '#F6A800' },
   ratingCount: { fontSize: 11, color: '#999', fontWeight: '600' },

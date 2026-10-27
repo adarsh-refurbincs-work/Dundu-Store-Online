@@ -158,7 +158,7 @@ export default function AppHeader({
                 style={styles.iconBtn}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={styles.icon}>🛍</Text>
+                <Ionicons name="bag-handle-outline" size={24} color={festEnabled ? textColor : (isDark ? '#FFFFFF' : '#1A1A1A')} />
                 {cartCount > 0 && (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>

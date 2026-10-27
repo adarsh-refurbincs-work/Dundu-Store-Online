@@ -335,7 +335,7 @@ export default function ProductDetailScreen() {
           />
         }
       />
-      <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
+      <ScrollView showsVerticalScrollIndicator={false} bounces={false} contentContainerStyle={styles.scrollContent}>
 
         {/* ── Image gallery ── */}
         <View style={styles.gallery}>
@@ -980,6 +980,10 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontSize: 14,
     fontWeight: '600',
+  },
+
+  scrollContent: {
+    paddingTop: 12,
   },
 
   /* Gallery */

@@ -264,7 +264,7 @@ export default function CartScreen() {
       <AppHeader logo rightComponent={
         count > 0 ? (
           <View style={styles.cartBadgeWrap}>
-            <Text style={styles.cartBadgeIcon}>🛍</Text>
+            <Ionicons name="bag-handle-outline" size={24} color="#1A1A1A" />
             <View style={styles.cartBadge}>
               <Text style={styles.cartBadgeText}>{count > 99 ? '99+' : count}</Text>
             </View>

@@ -484,17 +484,17 @@ export default function ProductsScreen() {
     : null;
   const useComboTheme = comboMode && comboThemeEnabled && !!comboThemeColor;
 
-  const T = useComboTheme ? {
-    // Combos themed with custom accent; search bar and search field match Women / Maternity / default categories
-    primary:     comboThemeColor,
-    bg:          comboThemeBgColor || '#1a0a12',
-    topBg:       '#FFF0F7',
-    surface:     '#fdf8f3',
-    border:      '#FCE7F3',
-    tagBg:       '#fdf8f3',
+  const T = comboMode ? {
+    // Combos: light purple theme across top bar, search, sort, and products page
+    primary:     comboThemeColor || '#8B5CF6',
+    bg:          '#F5F0FF',
+    topBg:       '#F5F0FF',
+    surface:     '#FFFFFF',
+    border:      '#E9D5FF',
+    tagBg:       '#EDE9FE',
     inputBg:     '#FFFFFF',
-    inputBorder: '#F9A8D4',
-    stripBorder: comboThemeColor,
+    inputBorder: '#D8B4FE',
+    stripBorder: comboThemeColor || '#8B5CF6',
   } : hasCustomTheme ? {
     primary:     activeCat.theme_color,
     bg:          activeCat.theme_bg_color || '#090d12',
@@ -665,9 +665,9 @@ export default function ProductsScreen() {
         logo
         showCart
         showWishlist
-        logoColor={(hasCustomTheme || isGenzy || useComboTheme) ? T.primary : undefined}
-        backgroundColor={festEnabled ? festNavBg : (isGenzy || hasCustomTheme ? T.topBg : undefined)}
-        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff'))}
+        logoColor={(hasCustomTheme || isGenzy || comboMode) ? T.primary : undefined}
+        backgroundColor={festEnabled ? festNavBg : (comboMode || isGenzy || hasCustomTheme ? T.topBg : undefined)}
+        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff' && T.topBg !== '#F5F0FF'))}
       />
 
       {/* Search bar */}
@@ -701,8 +701,8 @@ export default function ProductsScreen() {
         onPressOffers={handleOffersPress}
         onPressCombo={handleComboPress}
         themeColor={T.stripBorder}
-        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff'))}
-        bgColor={festEnabled ? festNavBg : (isGenzy || hasCustomTheme ? T.topBg : undefined)}
+        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff' && T.topBg !== '#F5F0FF'))}
+        bgColor={festEnabled ? festNavBg : (comboMode || isGenzy || hasCustomTheme ? T.topBg : undefined)}
       />
 
       {comboMode ? (
