@@ -485,15 +485,15 @@ export default function ProductsScreen() {
   const useComboTheme = comboMode && comboThemeEnabled && !!comboThemeColor;
 
   const T = useComboTheme ? {
-    // Combos themed like a custom category (admin → Combos → icon & theme)
+    // Combos themed with custom accent; search bar and search field match Women / Maternity / default categories
     primary:     comboThemeColor,
     bg:          comboThemeBgColor || '#1a0a12',
-    topBg:       '#000', // search bar stays black like other categories; only the content area is themed
-    surface:     '#fdf8f3', // off-white sort/filter chips, same as the default category look
-    border:      comboThemeColor + '55',
+    topBg:       '#FFF0F7',
+    surface:     '#fdf8f3',
+    border:      '#FCE7F3',
     tagBg:       '#fdf8f3',
-    inputBg:     '#1a1a1a',
-    inputBorder: '#2e2e2e',
+    inputBg:     '#FFFFFF',
+    inputBorder: '#F9A8D4',
     stripBorder: comboThemeColor,
   } : hasCustomTheme ? {
     primary:     activeCat.theme_color,
@@ -678,12 +678,12 @@ export default function ProductsScreen() {
             {
               backgroundColor: festEnabled ? 'rgba(255,255,255,0.18)' : T.inputBg,
               borderColor: festEnabled ? 'rgba(255,255,255,0.25)' : T.inputBorder,
-              color: (!festEnabled && (isGenzy || hasCustomTheme)) ? '#f5f5f5' : '#1F2937',
+              color: (!festEnabled && !comboMode && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7'))) ? '#f5f5f5' : '#1F2937',
             },
             festEnabled && { color: festNavText },
           ]}
           placeholder="Search products, brands..."
-          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : ((isGenzy || hasCustomTheme) ? '#888888' : '#9CA3AF')}
+          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : ((!comboMode && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7'))) ? '#888888' : '#9CA3AF')}
           value={searchInput}
           onChangeText={setSearchInput}
           onSubmitEditing={handleSearch}

@@ -210,7 +210,7 @@ export default function ComboListScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff0f6' },
+  safe: { flex: 1, backgroundColor: '#FFF0F7' },
 
   searchBar: {
     flexDirection: 'row',
