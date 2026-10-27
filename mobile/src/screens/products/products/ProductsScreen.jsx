@@ -661,7 +661,14 @@ export default function ProductsScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: festEnabled ? festNavBg : T.bg }]} edges={['left', 'right', 'bottom']}>
 
-      <AppHeader logo showCart showWishlist logoColor={(hasCustomTheme || isGenzy || useComboTheme) ? T.primary : undefined} />
+      <AppHeader
+        logo
+        showCart
+        showWishlist
+        logoColor={(hasCustomTheme || isGenzy || useComboTheme) ? T.primary : undefined}
+        backgroundColor={festEnabled ? festNavBg : (isGenzy || hasCustomTheme ? T.topBg : undefined)}
+        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff'))}
+      />
 
       {/* Search bar */}
       <View style={[styles.searchBar, { backgroundColor: festEnabled ? festNavBg : T.topBg, borderBottomColor: festEnabled ? festNavBg : T.border }]}>
@@ -671,11 +678,12 @@ export default function ProductsScreen() {
             {
               backgroundColor: festEnabled ? 'rgba(255,255,255,0.18)' : T.inputBg,
               borderColor: festEnabled ? 'rgba(255,255,255,0.25)' : T.inputBorder,
+              color: (!festEnabled && (isGenzy || hasCustomTheme)) ? '#f5f5f5' : '#1F2937',
             },
             festEnabled && { color: festNavText },
           ]}
           placeholder="Search products, brands..."
-          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : '#9CA3AF'}
+          placeholderTextColor={festEnabled ? 'rgba(255,255,255,0.65)' : ((isGenzy || hasCustomTheme) ? '#888888' : '#9CA3AF')}
           value={searchInput}
           onChangeText={setSearchInput}
           onSubmitEditing={handleSearch}
@@ -693,6 +701,8 @@ export default function ProductsScreen() {
         onPressOffers={handleOffersPress}
         onPressCombo={handleComboPress}
         themeColor={T.stripBorder}
+        isDark={!festEnabled && (isGenzy || (hasCustomTheme && T.topBg !== '#FFF0F7' && T.topBg !== '#ffffff'))}
+        bgColor={festEnabled ? festNavBg : (isGenzy || hasCustomTheme ? T.topBg : undefined)}
       />
 
       {comboMode ? (

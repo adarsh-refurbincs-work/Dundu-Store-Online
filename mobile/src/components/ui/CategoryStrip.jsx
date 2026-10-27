@@ -25,6 +25,8 @@ export default function CategoryStrip({
   onPressCombo,
   isComboActive = false,
   themeColor,
+  isDark = false,
+  bgColor: propBgColor,
 }) {
   const festEnabled = useSettingsStore((s) => s.festivalEnabled);
   const festNavBg   = useSettingsStore((s) => s.festivalNavbarColor);
@@ -33,11 +35,15 @@ export default function CategoryStrip({
   const comboThemeEnabled = useSettingsStore((s) => s.comboThemeEnabled);
   const comboThemeColor = useSettingsStore((s) => s.comboThemeColor);
 
-  const activeColor = themeColor || (festEnabled ? festNavText : COLORS.primary);
-  const bgColor     = festEnabled ? festNavBg : '#FFF0F7';
+  const defaultActiveColor = isDark ? '#22c55e' : COLORS.primary;
+  const activeColor = themeColor || (festEnabled ? festNavText : defaultActiveColor);
+  const defaultBg   = isDark ? '#040d04' : '#FFF0F7';
+  const bgColor     = festEnabled ? festNavBg : (propBgColor || defaultBg);
+  const defaultBorder = isDark ? '#163016' : '#FCE7F3';
+  const borderBottom  = festEnabled ? festNavBg : (themeColor || defaultBorder);
 
   return (
-    <View style={[styles.wrapper, { backgroundColor: bgColor }, themeColor && { borderBottomColor: themeColor }, festEnabled && { borderBottomColor: festNavBg }]}>
+    <View style={[styles.wrapper, { backgroundColor: bgColor, borderBottomColor: borderBottom }, isDark && styles.wrapperDark, themeColor && { borderBottomColor: themeColor }, festEnabled && { borderBottomColor: festNavBg }]}>
       {/* Scrollable category circles */}
       <ScrollView
         horizontal
@@ -54,12 +60,18 @@ export default function CategoryStrip({
           >
             {(() => { const comboAccent = comboThemeEnabled ? comboThemeColor : activeColor; const iconUri = getImageUri(comboIconUrl); return (
               <>
-                <View style={[styles.comboCircle, { borderColor: comboAccent }, isComboActive && { borderWidth: 2.5, backgroundColor: comboAccent + '33' }, iconUri && { overflow: 'hidden' }]}>
+                <View style={[
+                  styles.comboCircle,
+                  isDark && styles.comboCircleDark,
+                  { borderColor: comboAccent },
+                  isComboActive && { borderWidth: 2.5, backgroundColor: comboAccent + '33' },
+                  iconUri && { overflow: 'hidden' }
+                ]}>
                   {iconUri
                     ? <Image source={{ uri: iconUri }} style={styles.circleImage} resizeMode="cover" />
                     : <Text style={styles.comboCircleIcon}>🎀</Text>}
                 </View>
-                <Text style={[styles.label, { color: '#374151' }, isComboActive && { color: comboAccent, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
+                <Text style={[styles.label, isDark && styles.labelDark, isComboActive && { color: comboAccent, fontWeight: '800' }]} numberOfLines={1}>Combos</Text>
               </>
             ); })()}
           </TouchableOpacity>
@@ -76,7 +88,7 @@ export default function CategoryStrip({
               onPress={() => onPressCategory(cat)}
               activeOpacity={0.75}
             >
-              <View style={[styles.circle, isActive && { borderWidth: 2.5, borderColor: activeColor }]}>
+              <View style={[styles.circle, isDark && styles.circleDark, isActive && { borderWidth: 2.5, borderColor: activeColor }]}>
                 {uri
                   ? <Image source={{ uri }} style={styles.circleImage} resizeMode="cover" />
                   : <View style={styles.circleFallback}>
@@ -84,7 +96,7 @@ export default function CategoryStrip({
                     </View>
                 }
               </View>
-              <Text style={[styles.label, { color: '#374151' }, isActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>
+              <Text style={[styles.label, isDark && styles.labelDark, isActive && { color: activeColor, fontWeight: '800' }]} numberOfLines={1}>
                 {cat.name}
               </Text>
             </TouchableOpacity>
@@ -96,21 +108,33 @@ export default function CategoryStrip({
           <View style={[styles.offerCircle, { backgroundColor: activeColor }, isOfferActive && { borderColor: activeColor }]}>
             <Text style={styles.offerIcon}>🏷</Text>
           </View>
-          <Text style={[styles.label, { color: '#374151' }, isOfferActive && { color: activeColor, fontWeight: '800' }]}>Offers</Text>
+          <Text style={[styles.label, isDark && styles.labelDark, isOfferActive && { color: activeColor, fontWeight: '800' }]}>Offers</Text>
         </TouchableOpacity>
       </ScrollView>
 
       {/* Sticky filter button on the right */}
       {onPressFilter && (
         <TouchableOpacity
-          style={[styles.filterBtn, filterCount > 0 && styles.filterBtnActive]}
+          style={[
+            styles.filterBtn,
+            isDark && styles.filterBtnDark,
+            filterCount > 0 && (isDark ? styles.filterBtnActiveDark : styles.filterBtnActive)
+          ]}
           onPress={onPressFilter}
           activeOpacity={0.8}
         >
-          <Text style={[styles.filterBtnIcon, filterCount > 0 && styles.filterBtnIconActive]}>
+          <Text style={[
+            styles.filterBtnIcon,
+            isDark && styles.filterBtnIconDark,
+            filterCount > 0 && styles.filterBtnIconActive
+          ]}>
             {filterCount > 0 ? `⧩ ${filterCount}` : '⧩'}
           </Text>
-          <Text style={[styles.filterBtnLabel, filterCount > 0 && styles.filterBtnLabelActive]}>
+          <Text style={[
+            styles.filterBtnLabel,
+            isDark && styles.filterBtnLabelDark,
+            filterCount > 0 && styles.filterBtnLabelActive
+          ]}>
             Filter
           </Text>
           {filterCount > 0 && (
@@ -266,4 +290,35 @@ const styles = StyleSheet.create({
     borderColor: '#0d0d0d',
   },
   filterBadgeText: { fontSize: 9, fontWeight: '800', color: '#fff' },
+
+  /* Dark mode overrides (e.g. Genzy theme) */
+  wrapperDark: {
+    backgroundColor: '#040d04',
+    borderBottomColor: '#163016',
+  },
+  comboCircleDark: {
+    backgroundColor: '#3a0a2a',
+  },
+  circleDark: {
+    backgroundColor: '#1a1a1a',
+    borderWidth: 2,
+    borderColor: '#2e2e2e',
+  },
+  labelDark: {
+    color: '#ffffff',
+  },
+  filterBtnDark: {
+    backgroundColor: '#1a1a1a',
+    borderColor: '#2e2e2e',
+  },
+  filterBtnActiveDark: {
+    borderColor: COLORS.primary,
+    backgroundColor: '#2a0a1a',
+  },
+  filterBtnIconDark: {
+    color: '#aaa',
+  },
+  filterBtnLabelDark: {
+    color: '#888',
+  },
 });

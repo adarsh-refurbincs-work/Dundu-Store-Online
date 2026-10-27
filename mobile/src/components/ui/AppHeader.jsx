@@ -25,6 +25,9 @@ export default function AppHeader({
   showWishlist = false,
   rightComponent,
   logoColor,
+  backgroundColor: customBg,
+  textColor: customTextColor,
+  isDark: propIsDark,
 }) {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -41,8 +44,16 @@ export default function AppHeader({
   const festName         = useSettingsStore((s) => s.festivalName);
   const festBannerText   = useSettingsStore((s) => s.festivalBannerText);
 
-  const headerBg    = festEnabled ? festNavBg    : '#FFF0F7';
-  const textColor   = festEnabled ? festNavText  : '#1A1A1A';
+  const isDark = propIsDark !== undefined
+    ? propIsDark
+    : (customBg ? (customBg !== '#FFF0F7' && customBg !== '#ffffff') : false);
+
+  const defaultBg   = isDark ? '#040d04' : '#FFF0F7';
+  const defaultText = isDark ? '#FFFFFF' : '#1A1A1A';
+
+  const headerBg    = festEnabled ? festNavBg   : (customBg || defaultBg);
+  const textColor   = festEnabled ? festNavText : (customTextColor || defaultText);
+  const statusBarStyle = festEnabled ? 'light-content' : (isDark ? 'light-content' : 'dark-content');
 
   const paddingTop =
     insets.top > 0
@@ -53,7 +64,7 @@ export default function AppHeader({
 
   return (
     <View style={[styles.wrapper, { paddingTop, backgroundColor: headerBg }]}>
-      <StatusBar barStyle={festEnabled ? 'light-content' : 'dark-content'} backgroundColor={headerBg} />
+      <StatusBar barStyle={statusBarStyle} backgroundColor={headerBg} />
       {/* Festival banner strip */}
       {festEnabled && festBannerText ? (
         <View style={[styles.festBanner, { backgroundColor: festNavBg }]}>
@@ -135,7 +146,7 @@ export default function AppHeader({
               style={styles.iconBtn}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="heart-outline" size={24} color={festEnabled ? textColor : '#E91E8C'} />
+              <Ionicons name="heart-outline" size={24} color={festEnabled ? textColor : (isDark ? '#FFFFFF' : '#E91E8C')} />
             </TouchableOpacity>
           )}
 
