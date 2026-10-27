@@ -19,7 +19,7 @@ export default function ComboDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { addComboToCart, isLoading: adding } = useCartStore();
+  const { items, addComboToCart, isLoading: adding } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const { data, isLoading, isError } = useQuery({ queryKey: ['combo', id], queryFn: () => comboApi.getOne(id) });
   const combo = data?.data?.combo;
@@ -54,6 +54,12 @@ export default function ComboDetail() {
       const variant = (product?.variants || []).find((v) => v.id === sel.variant_id);
       return { slot_id: s.id, slot_label: s.slot_label, product_id: product?.id, variant_id: variant?.id || null, size: variant?.size || null, color: variant?.color || null };
     });
+    const alreadyInCart = items?.find((i) => i.combo_id && String(i.combo_id) === String(combo.id));
+    if (alreadyInCart) {
+      toast.info('This combo is already in your bag');
+      return;
+    }
+
     try {
       await addComboToCart(combo.id, combo_selections, qty);
       toast.success('Bundle added to your bag');

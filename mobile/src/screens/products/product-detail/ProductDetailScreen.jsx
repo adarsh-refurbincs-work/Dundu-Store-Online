@@ -15,6 +15,7 @@ import {
   TextInput,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -158,6 +159,59 @@ export default function ProductDetailScreen() {
         Alert.alert('Select Options', 'Please select size/colour.');
         return;
       }
+
+      // Check if product with the same size/variant is already in the cart
+      try {
+        await useCartStore.getState().fetchCart();
+      } catch (_) {}
+      const cartItems = useCartStore.getState().items || [];
+      const currentSize = selectedSize || selectedVariant?.size || null;
+
+      const alreadyInCart = cartItems.find((item) => {
+        if (item.combo_id) return false;
+        if (String(item.product_id) !== String(product.id)) return false;
+
+        // If both have variant_id, compare variant_id
+        if (selectedVariant?.id && item.variant_id) {
+          if (String(item.variant_id) === String(selectedVariant.id)) return true;
+        }
+
+        // Compare by size if size is present
+        if (currentSize && item.size) {
+          if (item.size.trim().toLowerCase() === currentSize.trim().toLowerCase()) {
+            if (selectedColor && item.color) {
+              return item.color.trim().toLowerCase() === selectedColor.trim().toLowerCase();
+            }
+            return true;
+          }
+          return false;
+        }
+
+        // If neither has variant_id and neither has size
+        if (!selectedVariant?.id && !item.variant_id && !currentSize && !item.size) {
+          return true;
+        }
+
+        return false;
+      });
+
+      if (alreadyInCart) {
+        Alert.alert(
+          'Item Already in Cart',
+          currentSize
+            ? `This item (Size: ${currentSize}) is already in your cart. You can update the quantity directly from your cart.`
+            : 'This item is already in your cart. You can update the quantity directly from your cart.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'View Cart',
+              onPress: () => navigation.navigate('MainTabs', { screen: 'Cart' }),
+            },
+          ]
+        );
+        return;
+      }
+
       setCartLoading(true);
       try {
         await addItem({
@@ -495,7 +549,7 @@ export default function ProductDetailScreen() {
             >
               {cartLoading
                 ? <ActivityIndicator color="#fff" size="small" />
-                : <Text style={styles.cartBtnText}>{inStock ? '🛒  Add to Cart' : 'Out of Stock'}</Text>
+                : <Text style={styles.cartBtnText}>{inStock ? 'Add to Cart' : 'Out of Stock'}</Text>
               }
             </TouchableOpacity>
 
@@ -506,7 +560,7 @@ export default function ProductDetailScreen() {
             >
               {buyLoading
                 ? <ActivityIndicator color="#fff" size="small" />
-                : <Text style={styles.buyBtnText}>{inStock ? '⚡  Buy Now' : 'Out of Stock'}</Text>
+                : <Text style={styles.buyBtnText}>{inStock ? 'Buy Now' : 'Out of Stock'}</Text>
               }
             </TouchableOpacity>
           </View>
@@ -619,7 +673,7 @@ export default function ProductDetailScreen() {
         </View>
       </ScrollView>
 
-      {/* ✅ Add-to-Cart Success Popup */}
+      {/* Add-to-Cart Success Popup */}
       <Modal
         visible={cartSuccess}
         transparent
@@ -634,7 +688,7 @@ export default function ProductDetailScreen() {
           <View style={styles.successSheet}>
             {/* Green check circle */}
             <View style={styles.successIconWrap}>
-              <Text style={styles.successIcon}>✅</Text>
+              <Ionicons name="checkmark" size={32} color="#15803D" />
             </View>
             <Text style={styles.successTitle}>Added to Cart!</Text>
             <Text style={styles.successProduct} numberOfLines={2}>
@@ -650,7 +704,7 @@ export default function ProductDetailScreen() {
                 style={styles.successViewCart}
                 onPress={() => { setCartSuccess(false); navigation.navigate('MainTabs', { screen: 'Cart' }); }}
               >
-                <Text style={styles.successViewCartText}>🛒  View Cart</Text>
+                <Text style={styles.successViewCartText}>View Cart</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.successContinue}

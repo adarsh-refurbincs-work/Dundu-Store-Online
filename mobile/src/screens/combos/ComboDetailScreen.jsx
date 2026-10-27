@@ -405,6 +405,30 @@ export default function ComboDetailScreen() {
         return;
       }
 
+      // Check if this combo is already in the cart
+      try {
+        await useCartStore.getState().fetchCart();
+      } catch (_) {}
+      const cartItems = useCartStore.getState().items || [];
+      const alreadyInCart = cartItems.find(
+        (item) => item.combo_id && String(item.combo_id) === String(combo.id)
+      );
+
+      if (alreadyInCart) {
+        Alert.alert(
+          'Combo Already in Cart',
+          'This combo is already in your cart. You can update the quantity directly from your cart.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'View Cart',
+              onPress: () => navigation.navigate('MainTabs', { screen: 'Cart' }),
+            },
+          ]
+        );
+        return;
+      }
+
       setCartLoading(true);
       try {
         // Build payload — one cart item per combo
@@ -585,7 +609,7 @@ export default function ComboDetailScreen() {
             >
               {cartLoading
                 ? <ActivityIndicator color="#fff" size="small" />
-                : <Text style={styles.cartBtnText}>{!inStock ? 'Out of Stock' : cartSuccess ? '✓ Added to Cart' : '🛒  Add to Cart'}</Text>}
+                : <Text style={styles.cartBtnText}>{!inStock ? 'Out of Stock' : cartSuccess ? 'Added to Cart' : 'Add to Cart'}</Text>}
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.buyBtn, !inStock && styles.actionBtnDisabled]}
@@ -593,7 +617,7 @@ export default function ComboDetailScreen() {
               disabled={!inStock}
               activeOpacity={0.85}
             >
-              <Text style={styles.buyBtnText}>{inStock ? '⚡  Buy Now' : 'Out of Stock'}</Text>
+              <Text style={styles.buyBtnText}>{inStock ? 'Buy Now' : 'Out of Stock'}</Text>
             </TouchableOpacity>
           </View>
         </View>

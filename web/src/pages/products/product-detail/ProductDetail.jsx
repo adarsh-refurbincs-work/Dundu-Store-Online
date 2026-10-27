@@ -45,7 +45,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const qc = useQueryClient();
-  const { addToCart, isLoading: cartLoading } = useCartStore();
+  const { items, addToCart, isLoading: cartLoading } = useCartStore();
   const { isAuthenticated, user } = useAuthStore();
 
   const [selectedSize, setSelectedSize] = useState(null);
@@ -132,6 +132,42 @@ export default function ProductDetail() {
   const handleAddToCart = async () => {
     if (!isAuthenticated()) return requireLogin();
     if (!validateSelection()) return;
+
+    const currentSize = selectedSize || selectedVariant?.size || null;
+    const alreadyInCart = items?.find((item) => {
+      if (item.combo_id) return false;
+      if (String(item.product_id) !== String(product.id)) return false;
+
+      if (selectedVariant?.id && item.variant_id) {
+        if (String(item.variant_id) === String(selectedVariant.id)) return true;
+      }
+
+      if (currentSize && item.size) {
+        if (item.size.trim().toLowerCase() === currentSize.trim().toLowerCase()) {
+          if (pickedColor && item.color) {
+            return item.color.trim().toLowerCase() === pickedColor.trim().toLowerCase();
+          }
+          return true;
+        }
+        return false;
+      }
+
+      if (!selectedVariant?.id && !item.variant_id && !currentSize && !item.size) {
+        return true;
+      }
+
+      return false;
+    });
+
+    if (alreadyInCart) {
+      toast.info(
+        currentSize
+          ? `This item (Size: ${currentSize}) is already in your cart.`
+          : 'This item is already in your cart.'
+      );
+      return;
+    }
+
     try {
       await addToCart(product.id, selectedVariant?.id, qty);
       toast.success('Added to your bag');
