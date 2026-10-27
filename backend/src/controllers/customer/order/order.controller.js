@@ -90,7 +90,8 @@ const computeShipping = async (client, userId, amountAfterDiscounts) => {
   const charge = Math.max(0, parseFloat(map.delivery_charge ?? '50') || 0);
   const threshold = Math.max(0, parseFloat(map.free_delivery_threshold ?? '500') || 0);
 
-  if (charge === 0 || amountAfterDiscounts >= threshold) return { shipping: 0, freeShipReward: null };
+  const rule = { deliveryCharge: charge, freeThreshold: threshold };
+  if (charge === 0 || amountAfterDiscounts >= threshold) return { shipping: 0, freeShipReward: null, ...rule };
 
   // An unredeemed "free shipping" spin/scratch reward waives the charge once.
   const { rows: spinRows } = await client.query(
@@ -98,16 +99,16 @@ const computeShipping = async (client, userId, amountAfterDiscounts) => {
      ORDER BY created_at ASC LIMIT 1 FOR UPDATE`,
     [userId]
   );
-  if (spinRows.length) return { shipping: 0, freeShipReward: { table: 'spin_wheel_logs', id: spinRows[0].id } };
+  if (spinRows.length) return { shipping: 0, freeShipReward: { table: 'spin_wheel_logs', id: spinRows[0].id }, ...rule };
 
   const { rows: scratchRows } = await client.query(
     `SELECT id FROM scratch_card_logs WHERE user_id=$1 AND prize_type='free_shipping' AND is_redeemed=false
      ORDER BY scratched_at ASC LIMIT 1 FOR UPDATE`,
     [userId]
   );
-  if (scratchRows.length) return { shipping: 0, freeShipReward: { table: 'scratch_card_logs', id: scratchRows[0].id } };
+  if (scratchRows.length) return { shipping: 0, freeShipReward: { table: 'scratch_card_logs', id: scratchRows[0].id }, ...rule };
 
-  return { shipping: charge, freeShipReward: null };
+  return { shipping: charge, freeShipReward: null, ...rule };
 };
 
 // Turns the customer's combo cart rows into ordinary line items. Validates that every
@@ -548,7 +549,7 @@ const placeOrder = async (req, res) => {
     if (appliedReward && best.type !== 'referral') appliedReward = null;
 
     const afterDiscounts = round2(Math.max(0, subtotal - discount - loyaltyDiscount));
-    const { shipping, freeShipReward } = await computeShipping(client, req.user.id, afterDiscounts);
+    const { shipping, freeShipReward, deliveryCharge, freeThreshold } = await computeShipping(client, req.user.id, afterDiscounts);
     const total = round2(afterDiscounts + shipping);
     const orderNumber = generateOrderNumber();
 
@@ -589,6 +590,8 @@ const placeOrder = async (req, res) => {
           subtotal: round2(subtotal), discount: round2(discount), discount_type: discountType,
           loyalty_discount: round2(loyaltyDiscount), loyalty_points_redeemed: loyaltyPointsRedeemed,
           shipping: round2(shipping), free_shipping_reward: !!freeShipReward,
+          // The rule itself, so the checkout can explain the shipping line without its own copy of the settings.
+          delivery_charge: round2(deliveryCharge), free_delivery_threshold: round2(freeThreshold),
           total, wallet_amount: walletAmount, payable: payableAmount, item_count: cartItems.length,
         },
       });

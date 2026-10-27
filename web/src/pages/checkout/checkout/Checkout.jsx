@@ -214,12 +214,15 @@ export default function Checkout() {
   const payableShown = q ? Number(q.payable) : payableTotal;
   // One shipping rule, stated in words next to the numbers: ₹{deliveryCharge} delivery,
   // free once the amount after discounts reaches the threshold (or a free-shipping reward is used).
+  // The quote carries the rule it applied; the settings values are only the pre-quote fallback.
+  const deliveryChargeRule = q?.delivery_charge != null ? Number(q.delivery_charge) : Number(deliveryCharge) || 0;
+  const freeThresholdRule = q?.free_delivery_threshold != null ? Number(q.free_delivery_threshold) : Number(freeDeliveryThreshold) || 0;
   const afterDiscountsShown = Math.max(0, subtotal - discountShown - loyaltyDiscountShown);
-  const shippingHint = deliveryCharge === 0 ? 'Free delivery on all orders' : shippingShown === 0
+  const shippingHint = deliveryChargeRule === 0 ? 'Free delivery on all orders' : shippingShown === 0
     ? (q?.free_shipping_reward || spinReward?.prize_type === 'free_shipping'
         ? 'Free delivery reward applied'
-        : `Free delivery on orders of ${formatPrice(freeDeliveryThreshold)} or more`)
-    : `Add ${formatPrice(Math.max(0, freeDeliveryThreshold - afterDiscountsShown))} more for free delivery`;
+        : `Free delivery on orders of ${formatPrice(freeThresholdRule)} or more`)
+    : `Add ${formatPrice(Math.max(0, freeThresholdRule - afterDiscountsShown))} more for free delivery`;
 
   // Auto-apply a won spin/scratch coupon against the real subtotal (once per code).
   const autoTriedRef = useRef('');

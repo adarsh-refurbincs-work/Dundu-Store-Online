@@ -63,7 +63,7 @@ export const orderApi = {
   cancel: (id) => client.post(`/orders/${id}/cancel`),
   retryPayment: (id) => client.post(`/orders/${id}/pay`),
   returnRequest: (id, reason) => client.post(`/orders/${id}/return`, { reason }),
-  getRestrictions: () => client.get('/orders/restrictions'),
+  getRestrictions: () => client.get('/orders/return-restrictions'),
 };
 
 // Coupons

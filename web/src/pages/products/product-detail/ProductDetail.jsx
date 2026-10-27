@@ -49,7 +49,7 @@ export default function ProductDetail() {
   const { isAuthenticated, user } = useAuthStore();
 
   const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [pickedColor, setSelectedColor] = useState(null);
   const [qty, setQty] = useState(1);
   const [thumbs, setThumbs] = useState(null);
   const [wishlisted, setWishlisted] = useState(null);
@@ -85,6 +85,8 @@ export default function ProductDetail() {
   const variants = product?.variants || [];
   const allImages = product?.images || [];
   const colors = useMemo(() => [...new Set(variants.map((v) => v.color).filter(Boolean))], [variants]);
+  // A single-colour product has nothing to choose: treat that colour as selected (sizes are never preselected).
+  const selectedColor = pickedColor ?? (colors.length === 1 ? colors[0] : null);
   const sizes = useMemo(() => {
     const pool = selectedColor ? variants.filter((v) => v.color === selectedColor) : variants;
     const list = [...new Set(pool.map((v) => v.size).filter(Boolean))];
@@ -279,7 +281,7 @@ export default function ProductDetail() {
                   const active = selectedColor === c;
                   const inStock = colorInStock(c);
                   return (
-                    <button key={c} onClick={() => { setThumbs(null); setSelectedColor(active ? null : c); }} disabled={!inStock}
+                    <button key={c} onClick={() => { setThumbs(null); setSelectedColor(active && colors.length > 1 ? null : c); }} disabled={!inStock}
                       className={`chip capitalize ${active ? 'is-active' : ''} ${!inStock ? 'opacity-40 line-through' : ''}`} aria-pressed={active}>
                       <span className="w-3.5 h-3.5 rounded-full border border-white/25" style={{ backgroundColor: COLOR_HEX[c.toLowerCase()] || '#888' }} />{c}
                     </button>
