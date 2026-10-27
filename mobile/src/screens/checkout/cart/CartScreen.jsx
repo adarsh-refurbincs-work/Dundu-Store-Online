@@ -8,17 +8,17 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import useCartStore, { MAX_CART_QTY } from '../../../store/cart.store';
 import useAuthStore from '../../../store/auth.store';
 import { COLORS, UPLOADS_URL } from '../../../config';
 import AppHeader from '../../../components/ui/AppHeader';
 import { formatPrice } from '../../../utils/format';
 import useRequireAuth from '../../../hooks/useRequireAuth';
-import FreeShippingNudgeBanner from '../../../components/ui/FreeShippingNudgeBanner';
-import useFreeShippingStore from '../../../store/freeShipping.store';
 import { useTranslation } from '../../../store/language.store';
 
 function getImageUri(imageStr) {
@@ -37,25 +37,20 @@ export default function CartScreen() {
   const FREE_SHIPPING_THRESHOLD = freeDeliveryThreshold;
   const { isAuthenticated } = useAuthStore();
   const { requireAuth } = useRequireAuth();
-  const openFreeShippingModal = useFreeShippingStore((s) => s.openModal);
   const [actionLoading, setActionLoading] = React.useState({});
+  const [itemToRemove, setItemToRemove] = React.useState(null);
+  const [isRemoving, setIsRemoving] = React.useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       if (isAuthenticated) fetchCart();
       fetchShippingSettings();
-      if (total > 0 && FREE_SHIPPING_THRESHOLD > 0 && total < FREE_SHIPPING_THRESHOLD) {
-        const timer = setTimeout(() => {
-          openFreeShippingModal(total);
-        }, 300);
-        return () => clearTimeout(timer);
-      }
-    }, [isAuthenticated, total, FREE_SHIPPING_THRESHOLD])
+    }, [isAuthenticated])
   );
 
   async function handleUpdateQty(item, newQty) {
     if (newQty < 1) {
-      handleRemove(item);
+      setItemToRemove(item);
       return;
     }
     if (newQty > MAX_CART_QTY) {
@@ -72,28 +67,19 @@ export default function CartScreen() {
     }
   }
 
-  async function handleRemove(item) {
-    Alert.alert(
-      'Remove Item',
-      `Remove "${item.product_name || item.name}" from cart?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Remove',
-          style: 'destructive',
-          onPress: async () => {
-            setActionLoading((prev) => ({ ...prev, [item.id]: true }));
-            try {
-              await removeItem(item.id);
-            } catch (err) {
-              Alert.alert('Error', err?.message || 'Failed to remove item.');
-            } finally {
-              setActionLoading((prev) => ({ ...prev, [item.id]: false }));
-            }
-          },
-        },
-      ]
-    );
+  async function confirmRemoveItem() {
+    if (!itemToRemove) return;
+    setIsRemoving(true);
+    setActionLoading((prev) => ({ ...prev, [itemToRemove.id]: true }));
+    try {
+      await removeItem(itemToRemove.id);
+      setItemToRemove(null);
+    } catch (err) {
+      Alert.alert('Error', err?.message || 'Failed to remove item.');
+    } finally {
+      setIsRemoving(false);
+      setActionLoading((prev) => ({ ...prev, [itemToRemove.id]: false }));
+    }
   }
 
   // Estimate only — final shipping is computed by the server after discounts.
@@ -163,8 +149,16 @@ export default function CartScreen() {
               <TouchableOpacity style={styles.buyNowBtn} onPress={() => navigation.navigate('Checkout')}>
                 <Text style={styles.buyNowText}>Buy Now</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.removeButton} onPress={() => handleRemove(item)} disabled={isLoading}>
-                <Text style={styles.removeIcon}>🗑</Text>
+              <TouchableOpacity
+                style={styles.removeButton}
+                onPress={() => setItemToRemove(item)}
+                disabled={isLoading}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.removeIconCircle}>
+                  <Ionicons name="trash-outline" size={17} color="#EF4444" />
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -238,16 +232,32 @@ export default function CartScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.removeButton}
-              onPress={() => handleRemove(item)}
+              onPress={() => setItemToRemove(item)}
               disabled={isLoading}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              activeOpacity={0.7}
             >
-              <Text style={styles.removeIcon}>🗑</Text>
+              <View style={styles.removeIconCircle}>
+                <Ionicons name="trash-outline" size={17} color="#EF4444" />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </View>
     );
   }
+
+  const removeImgUri = itemToRemove
+    ? getImageUri(itemToRemove.combo_image || itemToRemove.image || itemToRemove.product_image)
+    : null;
+  const removeName = itemToRemove
+    ? (itemToRemove.combo_name || itemToRemove.product_name || itemToRemove.name || 'Item')
+    : '';
+  const removePrice = itemToRemove
+    ? (Number(itemToRemove.combo_offer_price || itemToRemove.offer_price) > 0
+        ? Number(itemToRemove.combo_offer_price || itemToRemove.offer_price)
+        : Number(itemToRemove.combo_price || itemToRemove.price) || 0)
+    : 0;
 
   return (
     <SafeAreaView style={styles.safe} edges={['left', 'right', 'bottom']}>
@@ -290,15 +300,12 @@ export default function CartScreen() {
             data={items}
             keyExtractor={(item) => String(item.id)}
             renderItem={renderItem}
-            ListHeaderComponent={<FreeShippingNudgeBanner total={total} threshold={FREE_SHIPPING_THRESHOLD} autoPopup={true} />}
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
           />
 
           {/* Summary */}
           <View style={styles.summaryContainer}>
-            <FreeShippingNudgeBanner total={total} threshold={FREE_SHIPPING_THRESHOLD} style={{ marginBottom: 12 }} />
-
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>{t('subtotal', 'Subtotal')}</Text>
               <Text style={styles.summaryValue}>{formatPrice(total)}</Text>
@@ -323,6 +330,77 @@ export default function CartScreen() {
           </View>
         </View>
       )}
+
+      {/* ── Professional Remove Confirmation Modal ── */}
+      <Modal
+        visible={!!itemToRemove}
+        transparent
+        animationType="fade"
+        onRequestClose={() => { if (!isRemoving) setItemToRemove(null); }}
+      >
+        <View style={styles.modalBackdrop}>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => { if (!isRemoving) setItemToRemove(null); }}
+          />
+          <View style={styles.modalCard}>
+            <View style={styles.modalIconWrap}>
+              <Ionicons name="trash-outline" size={26} color="#EF4444" />
+            </View>
+
+            <Text style={styles.modalTitle}>{t('removeItem', 'Remove from Bag?')}</Text>
+            <Text style={styles.modalSubtitle}>
+              {t('removeConfirmSub', 'Are you sure you want to remove this item from your shopping bag?')}
+            </Text>
+
+            {itemToRemove && (
+              <View style={styles.modalItemPreview}>
+                <View style={styles.modalItemThumb}>
+                  {removeImgUri ? (
+                    <Image source={{ uri: removeImgUri }} style={styles.modalItemImg} resizeMode="cover" />
+                  ) : (
+                    <Text style={{ fontSize: 20 }}>{itemToRemove.combo_id ? '🎀' : '👗'}</Text>
+                  )}
+                </View>
+                <View style={styles.modalItemInfo}>
+                  <Text style={styles.modalItemName} numberOfLines={2}>{removeName}</Text>
+                  {(itemToRemove.size || itemToRemove.color) && (
+                    <Text style={styles.modalItemMeta} numberOfLines={1}>
+                      {[itemToRemove.size, itemToRemove.color].filter(Boolean).join(' · ')}
+                    </Text>
+                  )}
+                  <Text style={styles.modalItemPrice}>{formatPrice(removePrice)}</Text>
+                </View>
+              </View>
+            )}
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalCancelBtn}
+                onPress={() => setItemToRemove(null)}
+                disabled={isRemoving}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalCancelText}>{t('cancel', 'Cancel')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalRemoveBtn, isRemoving && { opacity: 0.7 }]}
+                onPress={confirmRemoveItem}
+                disabled={isRemoving}
+                activeOpacity={0.8}
+              >
+                {isRemoving ? (
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                ) : (
+                  <Text style={styles.modalRemoveText}>{t('remove', 'Remove')}</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -524,11 +602,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   removeButton: {
-    padding: 6,
-    alignSelf: 'flex-start',
+    padding: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  removeIcon: {
-    fontSize: 20,
+  removeIconCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   cartContent: {
     flex: 1,
@@ -597,5 +683,137 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 14,
     fontWeight: '700',
+  },
+
+  /* Professional Remove Modal */
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 22,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    elevation: 16,
+  },
+  modalIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FEE2E2',
+    borderWidth: 1.5,
+    borderColor: '#FECACA',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#111827',
+    textAlign: 'center',
+    letterSpacing: -0.3,
+  },
+  modalSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 18,
+  },
+  modalItemPreview: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 14,
+    padding: 10,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  modalItemThumb: {
+    width: 48,
+    height: 58,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalItemImg: {
+    width: '100%',
+    height: '100%',
+  },
+  modalItemInfo: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  modalItemName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#1F2937',
+    lineHeight: 17,
+  },
+  modalItemMeta: {
+    fontSize: 11,
+    color: '#9CA3AF',
+    marginTop: 2,
+  },
+  modalItemPrice: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: COLORS.primary,
+    marginTop: 3,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+    marginTop: 20,
+  },
+  modalCancelBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  modalCancelText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  modalRemoveBtn: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: '#EF4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#EF4444',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalRemoveText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.2,
   },
 });
